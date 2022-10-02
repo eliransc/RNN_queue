@@ -1206,10 +1206,10 @@ def generate_mgc(capacity, util_lower = 0.7, util_upper = 1.1, arrival_dist =  4
 def generate_ph(is_arrival):
 
     if np.random.rand() < 0.8:
-        s1, A1 = create_gen_erlang_many_ph(np.random.randint(35, 101))
+        s1, A1 = create_gen_erlang_many_ph(np.random.randint(35, 201))
     else:
         try:
-            s1, A1 = create_mix_erlang_ph(np.random.randint(35, 101))
+            s1, A1 = create_mix_erlang_ph(np.random.randint(35, 201))
         except:
             s1, A1 = create_gen_erlang_many_ph(np.random.randint(35, 101))
 
