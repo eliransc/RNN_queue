@@ -78,6 +78,9 @@ class RNN(nn.Module):
 model = RNN(input_size, hidden_size, num_layers, num_classes).to(device)
 
 # Loss and optimizer
+def log_cross(outputs, labels):
+    return criterion(outputs, labels)
+
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)  
 
@@ -92,7 +95,7 @@ for epoch in range(num_epochs):
         
         # Forward pass
         outputs = model(images)
-        loss = criterion(outputs, labels)
+        loss = log_cross(outputs, labels) # criterion(outputs, labels)
         
         # Backward and optimize
         optimizer.zero_grad()
