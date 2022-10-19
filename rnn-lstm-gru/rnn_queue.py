@@ -12,13 +12,13 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # Hyper-parameters
 # input_size = 784 # 28x28
 num_classes = 15
-num_epochs = 2
+num_epochs = 10
 batch_size = 100
 learning_rate = 0.01
 
 input_size = 2
 sequence_length = 2000
-hidden_size = 128
+hidden_size = 64
 num_layers = 2
 
 
@@ -103,6 +103,9 @@ def log_cross(outputs, labels):
     capacity_labels = labels[:, 5:10]
     service_labels = labels[:, 10:]
 
+    priority_labels = torch.argmax(priority_labels, dim=1, keepdim=True)
+    capacity_labels = torch.argmax(capacity_labels, dim=1, keepdim=True)
+
     priority_outputs = outputs[:, :5]
     capacity_outputs = outputs[:, 5:10]
     service_outputs = outputs[:, 10:]
@@ -111,14 +114,14 @@ def log_cross(outputs, labels):
     # priority_outputs = m(priority_outputs)
     # capacity_outputs = m(capacity_outputs)
 
-    priority_loss = criterion(priority_outputs, priority_labels)
-    capacity_loss = criterion(capacity_outputs, capacity_labels)
+    priority_loss = criterion(priority_outputs, priority_labels.flatten())
+    capacity_loss = criterion(capacity_outputs, capacity_labels.flatten())
 
     mae_loss = nn.L1Loss()
     L1_Loss = mae_loss(service_outputs, service_labels)
 
 
-    return L1_Loss + capacity_loss + priority_loss
+    return L1_Loss + 10*capacity_loss + 10*priority_loss
 
 
 criterion = nn.CrossEntropyLoss()
@@ -136,6 +139,7 @@ for epoch in range(num_epochs):
         # Forward pass
         outputs = model(images)
         loss = log_cross(outputs, labels)  # criterion(outputs, labels)
+
 
         # Backward and optimize
         optimizer.zero_grad()

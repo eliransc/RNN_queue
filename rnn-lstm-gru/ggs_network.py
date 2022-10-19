@@ -1154,6 +1154,81 @@ def generate_normal(is_arrival):
         return (mu, sig, moms_ser)
 
 
+def generate_mmc(capacity, num_servers, transion_matrix ,util_lower = 0.7, util_upper = 0.9, arrival_dist =  4, ser_dist = 4):
+    '''
+    Generate M/G/c queue where is G is PH
+    util_lower: lower bound of queue utilization
+    util_upper: upper bound of queue utilization
+    arrival_dist: give code of the distirubtion type - 4 means ph
+    ser_dist: give code of the distirubtion type - 4 means ph
+    '''
+
+    ## Currently all servers serve with expected value 1
+
+    from datetime import datetime
+
+    arrival_dist_list = []
+    ser_dist_list = []
+    s_arrival_list = []
+    A_arrival_list = []
+    moms_arrive_list = []
+    s_service_list = []
+    A_service_list = []
+    moms_service_list = []
+
+
+    I = np.identity(num_servers)
+    a1 = I - np.transpose(transion_matrix)
+    b1 = np.array([0.8, 0.9])  # np.random.rand(num_servers)
+    x1 = np.linalg.solve(a1, b1)
+
+    now = datetime.now()
+
+    for server in range(num_servers):
+
+
+        np.random.seed(now.microsecond)
+        # arrival_rate = np.random.uniform(0, 1)
+        A_arrival = np.array([[-1.]])
+        s_arrival = np.array([1.])
+        A_arrival = A_arrival * x1[server] # arrival_rate
+
+        A_service = np.array([[-1.]])
+        s_service = np.array([1.])
+
+
+        moms_arrive = np.array(compute_first_n_moments(s_arrival, A_arrival, 10)).flatten()
+
+        ex_lower = util_lower*capacity/x1[server]
+        ex_upper = util_upper*capacity/x1[server]
+
+        ex = np.random.uniform(ex_lower, ex_upper)
+
+        A_service = A_service/ex
+
+        moms_service = np.array(compute_first_n_moments(s_service, A_service, 10)).flatten()
+
+        rho = x1[server]*moms_service[0]/capacity
+
+        arrival_dist_list.append(arrival_dist)
+        ser_dist_list.append(ser_dist)
+        s_arrival_list.append(s_arrival)
+        A_arrival_list.append(A_arrival)
+        moms_arrive_list.append(moms_arrive)
+        s_service_list.append(s_service)
+        A_service_list.append(A_service)
+        moms_service_list.append(moms_service)
+
+
+
+
+
+
+
+    return (arrival_dist_list, ser_dist_list, (s_arrival_list, A_arrival_list, moms_arrive_list), (s_service_list, A_service_list, moms_service_list))
+
+
+
 def generate_mgc(capacity, util_lower = 0.7, util_upper = 1.1, arrival_dist =  4, ser_dist = 4):
     '''
     Generate M/G/c queue where is G is PH
@@ -1200,44 +1275,9 @@ def generate_mgc(capacity, util_lower = 0.7, util_upper = 1.1, arrival_dist =  4
 
     return (arrival_dist, ser_dist, (s_arrival, A_arrival, moms_arrive), (s_service, A_service, moms_service))
 
-def generate_mmc(capacity, util_lower=0.7, util_upper=1.1, arrival_dist=4, ser_dist=4):
-    '''
-    Generate M/M/c queue where is G is PH
-    util_lower: lower bound of queue utilization
-    util_upper: upper bound of queue utilization
-    arrival_dist: give code of the distirubtion type - 4 means ph
-    ser_dist: give code of the distirubtion type - 4 means ph
-    '''
-
-    from datetime import datetime
-
-    now = datetime.now()
 
 
-    np.random.seed(now.microsecond)
-    rho = np.random.uniform(util_lower, util_upper)
-    arrival_rate = rho * capacity
-    A_arrival = np.array([[-1.]])
-    s_arrival = np.array([1.])
-    A_arrival = A_arrival * arrival_rate
-
-    moms_arrive = np.array(compute_first_n_moments(s_arrival, A_arrival, 10)).flatten()
-
-    A_service = np.array([[-1.]])
-    s_service = np.array([1.])
-
-    moms_service = np.array(compute_first_n_moments(s_service, A_service, 10)).flatten()
-
-    rho = arrival_rate * moms_service[0] / capacity
-
-    return (arrival_dist, ser_dist, (s_arrival, A_arrival, moms_arrive), (s_service, A_service, moms_service))
-
-
-
-def generate_ph(is_arrival, is_exponential):
-
-    if is_exponential:
-        s1, A1 = create_gen_erlang_many_ph(1)
+def generate_ph(is_arrival):
 
     if np.random.rand() < 0.8:
         s1, A1 = create_gen_erlang_many_ph(np.random.randint(35, 201))
@@ -1265,7 +1305,7 @@ class g:
     service_times = []
     queueing_time = {}
     inter_departure_time = []
-    num_arrivals = 2500
+    num_arrivals = 25000
     warm_up_arrivals = 100
 
 
@@ -1277,19 +1317,19 @@ class Customer:
 
 class GG1:
 
-    def __init__(self, capacity, num_classes, model_input):
+    def __init__(self, capacities, num_classes, model_input):
         self.num_classes = num_classes
         self.customer_counter = 0
-        self.capacity = capacity
+        self.capacities = capacities
         self.env = simpy.Environment()
         self.patient_counter = 0
-        self.server = simpy.PriorityResource(self.env, capacity=self.capacity)
+        self.server = [simpy.PriorityResource(self.env, capacity=capacity) for capacity in capacities]
         arrival_dist, ser_dist, arrival_dist_params, ser_dist_params = model_input # self.get_gg1_input()
         self.arrival_dist = arrival_dist
         self.ser_dist = ser_dist
         self.arrival_dist_params = arrival_dist_params
         self.ser_dist_params = ser_dist_params
-        self.arrival_rate = 1/arrival_dist_params[2][0]
+        self.arrival_rate = [1/arrival_dist_params[2][ind][0] for ind in range(capacities.shape[0])]
         self.num_cust_sys = 0
         self.num_cust_durations = np.zeros(500)
         self.last_event_time = 0
@@ -1300,13 +1340,14 @@ class GG1:
 
 
     def run(self):
+
         self.env.process(self.customer_arrivals())
 
-        self.env.run(until=float(g.num_arrivals)/self.arrival_rate )
+        self.env.run(until=float(g.num_arrivals)/self.arrival_rate[0] )
 
     def get_gg1_input(self):
 
-        arrival_dist =  4 # np.random.choice([1, 2, 3], size=1, replace=True, p=[0.3, 0.4, 0.3])[0]
+        arrival_dist =   4 # np.random.choice([1, 2, 3], size=1, replace=True, p=[0.3, 0.4, 0.3])[0]
         ser_dist = 4  #  np.random.choice([1, 2, 3], size=1, replace=True, p=[0.3, 0.4, 0.3])[0]
 
         if arrival_dist == 1:
@@ -1316,7 +1357,7 @@ class GG1:
         elif arrival_dist == 3:
             arrival_dist_params = generate_normal(True)
         else:
-            arrival_dist_params = generate_ph(True, True)
+            arrival_dist_params = generate_ph(True)
 
         if ser_dist == 1:
             ser_dist_params = generate_unif(False)
@@ -1325,7 +1366,7 @@ class GG1:
         elif arrival_dist == 3:
             ser_dist_params = generate_normal(False)
         else:
-            ser_dist_params = generate_ph(False, True)
+            ser_dist_params = generate_ph(False)
 
 
         return arrival_dist, ser_dist, arrival_dist_params, ser_dist_params
@@ -1333,10 +1374,13 @@ class GG1:
 
     def service(self, customer):
 
-       arrival_time = self.env.now
+        if customer.id % 10000 == 0:
+            print(customer.id)
+
+        arrival_time = self.env.now
 
 
-       with self.server.request(priority=customer.priority) as req: #priority=priority
+        with self.server.request(priority=customer.priority) as req: #priority=priority
             yield req
 
             q_time = self.env.now - arrival_time
@@ -1401,6 +1445,9 @@ class GG1:
 
 
     def customer_arrivals(self):
+
+
+
 
         while True:
 
@@ -1478,47 +1525,53 @@ def main(args):
 
     for ind in tqdm(range(args.num_iterations)):
 
-        for capacity in tqdm(range(1, args.max_capacity + 1)):
+        # for capacity in tqdm(range(1, args.max_capacity + 1)):
+        capacity = np.array([1,1])
+        num_servers = 2
+        num_classes = 1
 
-            model_inputs = generate_mmc(capacity)
+        transion_matrix = np.array([[0, 1.0],[0.0,0]])  # SHOULD Be generated or input form data
 
-            for num_classes in tqdm(range(1, args.max_num_classes + 1)):
 
-                start_time = time.time()
-                gg1 = GG1(capacity, num_classes, model_inputs)
-                gg1.run()
-                args.end_time = float(args.num_arrival / gg1.arrival_rate)
-                steady_state = gg1.num_cust_durations / args.end_time
-                dist_dict = {1: 'uniform', 2: 'gamma', 3: 'normal', 4:'PH'}
-                arrival_rate = 1 / gg1.arrival_dist_params[2][0]
+        model_inputs = generate_mmc(capacity, num_servers, transion_matrix)
 
-                print('The capacity is: ', gg1.capacity)
-                print('rho is: ', arrival_rate * gg1.ser_dist_params[2][0] / gg1.capacity)
-                print("--- %s seconds the %d th iteration ---" % (time.time() - start_time, ind))
+            # for num_classes in tqdm(range(1, args.max_num_classes + 1)):
 
-                model_num = np.random.randint(1, 1000000)
+        start_time = time.time()
+        gg1 = GG1(capacity, num_classes, model_inputs)
+        gg1.run()
+        args.end_time = float(args.num_arrival / gg1.arrival_rate)
+        steady_state = gg1.num_cust_durations / args.end_time
+        dist_dict = {1: 'uniform', 2: 'gamma', 3: 'normal', 4:'PH'}
+        arrival_rate = 1 / gg1.arrival_dist_params[2][0]
 
-                curr_path = args.log_event_path + '_' + 'capacity_' + str(capacity) + '_' +'priority' + '_' + str(num_classes) + '_' + str(model_num) + '.pkl'
+        print('The capacity is: ', gg1.capacity)
+        print('rho is: ', arrival_rate * gg1.ser_dist_params[2][0] / gg1.capacity)
+        print("--- %s seconds the %d th iteration ---" % (time.time() - start_time, ind))
 
-                pkl.dump((gg1.event_log, model_inputs, capacity, num_classes), open(curr_path, 'wb'))
+        model_num = np.random.randint(1, 1000000)
+
+        curr_path = args.log_event_path + '_' + 'capacity_' + str(capacity) + '_' +'priority' + '_' + str(num_classes) + '_' + str(model_num) + '.pkl'
+
+        pkl.dump((gg1.event_log, model_inputs, capacity, num_classes), open(curr_path, 'wb'))
 
 
 def parse_arguments(argv):
 
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
+    parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=5)
+    parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=5)
     parser.add_argument('--r', type=np.array, help='external arrivals', default=np.array([]))
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=2)
     parser.add_argument('--mu', type=np.array, help='service rates', default=np.array([]))
-    parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
-    parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=500)
+    parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000000)
+    parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=500000)
     parser.add_argument('--size', type=int, help='the number of stations in the system', default=1)
     parser.add_argument('--p_correct', type=float, help='the prob of external matched customer', default=0.5)
     parser.add_argument('--ser_matched_rate', type=float, help='service rate of matched customers', default=1.2)
     parser.add_argument('--ser_mis_matched_rate', type=float, help='service rate of mismatched customers', default=10.)
-    parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=1000000)
+    parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=1)
     parser.add_argument('--case_num', type=int, help='case number in my settings', default=random.randint(0, 100000))
     parser.add_argument('--log_event_path', type=str, help='case number in my settings', default='/scratch/eliransc/RNN_data/log_event')
     parser.add_argument('--is_corr', type=bool, help='should we keep track on inter departure', default=True)
