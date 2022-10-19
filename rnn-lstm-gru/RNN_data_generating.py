@@ -1219,11 +1219,11 @@ def generate_mmc(capacity, util_lower=0.7, util_upper=1.1, arrival_dist=4, ser_d
     arrival_rate = rho * capacity
     A_arrival = np.array([[-1.]])
     s_arrival = np.array([1.])
-    A_arrival = A_arrival * arrival_rate
+    # A_arrival = A_arrival * arrival_rate
 
     moms_arrive = np.array(compute_first_n_moments(s_arrival, A_arrival, 10)).flatten()
 
-    A_service = np.array([[-1.]])
+    A_service = np.array([[-1.]])/rho
     s_service = np.array([1.])
 
     moms_service = np.array(compute_first_n_moments(s_service, A_service, 10)).flatten()
@@ -1498,7 +1498,8 @@ def main(args):
 
                 model_num = np.random.randint(1, 1000000)
 
-                curr_path = args.log_event_path  + 'capacity_' + str(capacity) + '_' +'priority' + '_' + str(num_classes) + '_' + str(model_num) + '.pkl'
+                curr_path = args.log_event_path + 'service_rate'+ '_'+ str(-gg1.ser_dist_params[1][0][0])+ '_' + 'capacity_'\
+                            + str(capacity) + '_' +'priority' + '_' + str(num_classes) + '_' + str(model_num) + '.pkl'
 
                 pkl.dump((gg1.event_log, model_inputs, capacity, num_classes), open(curr_path, 'wb'))
 
