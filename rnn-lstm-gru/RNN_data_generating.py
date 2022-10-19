@@ -1498,7 +1498,7 @@ def main(args):
 
                 model_num = np.random.randint(1, 1000000)
 
-                curr_path = args.log_event_path + '_' + 'capacity_' + str(capacity) + '_' +'priority' + '_' + str(num_classes) + '_' + str(model_num) + '.pkl'
+                curr_path = args.log_event_path  + 'capacity_' + str(capacity) + '_' +'priority' + '_' + str(num_classes) + '_' + str(model_num) + '.pkl'
 
                 pkl.dump((gg1.event_log, model_inputs, capacity, num_classes), open(curr_path, 'wb'))
 
@@ -1520,7 +1520,7 @@ def parse_arguments(argv):
     parser.add_argument('--ser_mis_matched_rate', type=float, help='service rate of mismatched customers', default=10.)
     parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=1000000)
     parser.add_argument('--case_num', type=int, help='case number in my settings', default=random.randint(0, 100000))
-    parser.add_argument('--log_event_path', type=str, help='case number in my settings', default='/scratch/eliransc/RNN_service_rate')
+    parser.add_argument('--log_event_path', type=str, help='case number in my settings', default='/scratch/eliransc/RNN_service_rate/')
     parser.add_argument('--is_corr', type=bool, help='should we keep track on inter departure', default=True)
     parser.add_argument('--waiting_pkl_path', type=bool, help='the path of the average waiting time', default='./pkl/waiting_time')
 
