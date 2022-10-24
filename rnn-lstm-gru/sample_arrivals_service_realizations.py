@@ -1153,6 +1153,69 @@ def generate_normal(is_arrival):
             moms_ser = np.append(moms_ser, np.array(N(nthmomnormal(mu, sig, mom))).astype(np.float64))
         return (mu, sig, moms_ser)
 
+def gg1_generator_arrivals( util_lower = 0.5, util_upper = 0.99, arrival_dist =  4, ser_dist = 4):
+    '''
+    Generate G/G/1 queue where is G is PH
+    util_lower: lower bound of queue utilization
+    util_upper: upper bound of queue utilization
+    arrival_dist: give code of the distirubtion type - 4 means ph
+    ser_dist: give code of the distirubtion type - 4 means ph
+    '''
+
+    from datetime import datetime
+
+    now = datetime.now()
+    np.random.seed(now.microsecond)
+    rho = np.random.uniform(util_lower, util_upper)
+
+
+    if np.random.rand() < 0.8:
+        s_arrival, A_arrival = create_gen_erlang_many_ph(np.random.randint(5, 50))
+    else:
+        try:
+            s_arrival, A_arrival = create_mix_erlang_ph(np.random.randint(5, 50))
+        except:
+            s_arrival, A_arrival = create_gen_erlang_many_ph(np.random.randint(5, 50))
+
+    moms_arrive = np.array(compute_first_n_moments(s_arrival, A_arrival, 10)).flatten()
+
+
+
+    return  (s_arrival, A_arrival, moms_arrive)
+
+
+
+def gg1_generator_service( util_lower = 0.5, util_upper = 0.99, arrival_dist =  4, ser_dist = 4):
+    '''
+    Generate G/G/1 queue where is G is PH
+    util_lower: lower bound of queue utilization
+    util_upper: upper bound of queue utilization
+    arrival_dist: give code of the distirubtion type - 4 means ph
+    ser_dist: give code of the distirubtion type - 4 means ph
+    '''
+
+    from datetime import datetime
+
+    now = datetime.now()
+    np.random.seed(now.microsecond)
+    rho = np.random.uniform(util_lower, util_upper)
+
+
+    if np.random.rand() < 0.8:
+        s_service, A_service = create_gen_erlang_many_ph(np.random.randint(35, 101))
+    else:
+        try:
+            s_service, A_service = create_mix_erlang_ph(np.random.randint(35, 101))
+        except:
+            s_service, A_service = create_gen_erlang_many_ph(np.random.randint(35, 101))
+
+
+    A_service = A_service/rho
+
+    moms_service = np.array(compute_first_n_moments(s_service, A_service, 10)).flatten()
+
+
+    return (s_service, A_service, moms_service)
 
 def gg1_generator( util_lower = 0.5, util_upper = 0.99, arrival_dist =  4, ser_dist = 4):
     '''
@@ -1197,7 +1260,6 @@ def gg1_generator( util_lower = 0.5, util_upper = 0.99, arrival_dist =  4, ser_d
     moms_service = np.array(compute_first_n_moments(s_service, A_service, 10)).flatten()
 
     rho = arrival_rate*moms_service[0]
-
 
 
     return (arrival_dist, ser_dist, (s_arrival, A_arrival, moms_arrive), (s_service, A_service, moms_service))
@@ -1305,8 +1367,8 @@ class g:
     service_times = []
     queueing_time = {}
     inter_departure_time = []
-    num_arrivals = 250000
-    warm_up_arrivals = 200
+    num_arrivals = 450000
+    warm_up_arrivals = 400
     num_moms  =  10
     counter_for_moms_arrivals = 0
     counter_for_moms_depart_sojourn = 0
@@ -1561,150 +1623,40 @@ def get_gg1_input():
 
     return arrival_dist, ser_dist, arrival_dist_params, ser_dist_params
 
+def sample_single_arrive_ser(dist_type, num_arrivals):
+
+    if dist_type == 'arrivals':
+        s_arrival, A_arrival, moms_arrive = gg1_generator_arrivals()
+        arrivals = SamplesFromPH(ml.matrix(s_arrival), A_arrival, int(num_arrivals * 1.25))
+        return (s_arrival, A_arrival, moms_arrive, arrivals)
+
+    else:
+        s_service, A_service, moms_service = gg1_generator_service()
+        services  = SamplesFromPH(ml.matrix(s_service), A_service, int(g.num_arrivals * 1.25))
+        return (s_service, A_service, moms_service, services)
+
+
 
 def main(args):
 
 
 
-
-
-
-    now = datetime.now()
-    current_time = now.strftime("%H_%M_%S")
-
-    for ind in tqdm(range(args.num_iterations)):
-
-        for capacity in range(1, args.max_capacity + 1):
-
-            model_inputs = gg1_generator()
-
-            arrival_dist, ser_dist, (s_arrival, A_arrival, moms_arrive), (s_service, A_service, moms_service) = model_inputs
-
-            now = time.time()
-            arrivals = SamplesFromPH(ml.matrix(s_arrival), A_arrival, 10000)
-            print('For 10k it took: ', time.time() - now)
-
-            now = time.time()
-            arrivals = SamplesFromPH(ml.matrix(s_arrival), A_arrival, 20000)
-            print('For 20k it took: ', time.time() - now)
-
-            now = time.time()
-            arrivals = SamplesFromPH(ml.matrix(s_arrival), A_arrival, 50000)
-            print('For 50k it took: ', time.time() - now)
-
-            now = time.time()
-            arrivals = SamplesFromPH(ml.matrix(s_arrival), A_arrival, 100000)
-            print('For 100k it took: ', time.time() - now)
-
-            now = time.time()
-            arrivals = SamplesFromPH(ml.matrix(s_arrival), A_arrival, 250000)
-            print('For 250k it took: ', time.time() - now)
-
-
-
-
-            arrivals = SamplesFromPH(ml.matrix(s_arrival), A_arrival, int(g.num_arrivals * 1.25))
-            services = SamplesFromPH(ml.matrix(s_service), A_service, int(g.num_arrivals * 1.25))
-
-
-            for num_classes in range(1, args.max_num_classes + 1):
-                model_num = np.random.randint(1, 1000000)
-                for iteration in tqdm(range(1, args.num_iter_same_params + 1)):
-                    now = datetime.now()
-                    np.random.seed(now.microsecond)
-
-                    np.random.shuffle(arrivals)
-                    np.random.shuffle(services)
-                    print('First arrival is: ', arrivals[0] )
-
-                    start_time = time.time()
-
-
-
-
-                    gg1 = GG1(capacity, num_classes, model_inputs, arrivals, services)
-                    gg1.run()
-                    steady_state = gg1.num_cust_durations / args.end_time
-                    dist_dict = {1: 'uniform', 2: 'gamma', 3: 'normal', 4:'PH'}
-                    arrival_rate = 1 / gg1.arrival_dist_params[2][0]
-
-                    print('The capacity is: ', gg1.capacity)
-                    print('rho is: ', arrival_rate * gg1.ser_dist_params[2][0] / gg1.capacity)
-                    print("--- %s seconds the %d th iteration ---" % (time.time() - start_time, ind))
-
-                    gg1.event_log = pd.DataFrame({'Customer_id': gg1.event_log_customer_id_list,
-                                                  'Priority': gg1.event_log_customer_Priority_list,
-                                                  'Arrival_time': gg1.event_log_Arrival_time_list,
-                                                  'Departure_time': gg1.event_log_Departure_time_list})
-
-
-                    # new_folder_name = os.path.join(args.log_event_path,str(model_num))
-                    # if not os.path.exists(new_folder_name):
-                    #     os.mkdir(new_folder_name)
-
-                    curr_path = 'service_rate' + '_' + str(
-                        -gg1.ser_dist_params[1][0][0]) + '_' + 'capacity_' \
-                                + str(capacity) + '_' + 'priority' + '_' + str(num_classes) + '_' + str(
-                        model_num) + 'iteration_' + str(iteration) + '.pkl'
-
-                    full_path = os.path.join(args.read_path, curr_path)
-                    pkl.dump((gg1.event_log, model_inputs, capacity, num_classes, iteration), open(full_path, 'wb'))
-
-                files = os.listdir(args.read_path)
-
-                curr_files = [file for file in files if str(model_num) in file]
-
-
-
-                inter_arrive_list = []
-                inter_departure_list = []
-                sojourn_list = []
-
-                for file in curr_files:
-                    full_path = os.path.join(args.read_path, file)
-                    event_log, model_inputs, capacity, num_classes, iteration = pkl.load(open(full_path, 'rb'))
-                    event_log['last_departure'] = np.append(0, np.array(event_log['Departure_time'])[:-1])
-                    event_log['last_arrival'] = np.append(0, np.array(event_log['Arrival_time'])[:-1])
-                    event_log['inter_arrival'] = event_log['Arrival_time'] - event_log['last_arrival']
-                    event_log['inter_departure'] = event_log['Departure_time'] - event_log['last_departure']
-                    event_log['sojourn_time'] = event_log['Departure_time'] - event_log['Arrival_time']
-
-                    event_log = event_log.loc[1:, :]
-
-                    sojourn_arr = np.array(event_log['sojourn_time'])
-                    inter_arrival_arr = np.array(event_log['inter_arrival'])[1:]
-                    inter_departure_arr = np.array(event_log['inter_departure'])[1:]
-
-                    sojourn_list.append(sojourn_arr)
-                    inter_arrive_list.append(inter_arrival_arr)
-                    inter_departure_list.append(inter_departure_arr)
-
-                    inter_arrive_large_arr = np.concatenate(inter_arrive_list, axis=0)
-                    inter_departure_large_arr = np.concatenate(inter_departure_list, axis=0)
-                    sojourn_large_arr = np.concatenate(sojourn_list, axis=0)
-
-                moms_inter_arrival = []
-                moms_inter_departure = []
-                moms_sojourn = []
-
-                for power in range(1, 11):
-                    moms_inter_arrival.append((inter_arrive_large_arr ** power).mean())
-                    moms_inter_departure.append((inter_departure_large_arr ** power).mean())
-                    moms_sojourn.append((sojourn_large_arr ** power).mean())
-
-                dump_path = args.dump_path
-                model_path = os.path.join(dump_path, str(model_num) + '.pkl')
-                pkl.dump((moms_inter_arrival, moms_inter_departure, moms_sojourn, model_inputs), open(model_path, 'wb'))
-
-                # _ = [os.remove(os.path.join(args.read_path, file)) for file in curr_files]
-
-
+        for ind in tqdm(range(args.num_iterations)):
+            arrivals_all_data_list = [sample_single_arrive_ser('arrivals', g.num_arrivals) for ind in range(args.list_size)]
+            now = datetime.now()
+            np.random.seed(now.microsecond)
+            pkl.dump(arrivals_all_data_list, open(os.path.join(args.arrivals_path, str(random.randint(0, 100000)) + '.pkl'), 'wb'))
+            print('finish arrivals')
+            services_all_data_list = [sample_single_arrive_ser('service', g.num_arrivals) for ind in range(args.list_size)]
+            pkl.dump(services_all_data_list, open(os.path.join(args.services_path, str(random.randint(0, 100000)) + '.pkl'), 'wb'))
+            print('finish services')
 
 
 def parse_arguments(argv):
 
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('--list_size', type=int, help='maximum server capacity', default=10)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
     parser.add_argument('--num_iter_same_params', type=int, help='max num priority classes', default=20)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
@@ -1712,9 +1664,12 @@ def parse_arguments(argv):
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
     parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=100500)
     parser.add_argument('--size', type=int, help='the number of stations in the system', default=1)
-    parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=2)
+    parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=10000)
     parser.add_argument('--case_num', type=int, help='case number in my settings', default=random.randint(0, 100000))
-    parser.add_argument('--read_path', type=str, help='the path of the files to read from', default=r'C:\Users\user\workspace\data\gg1_inverse_service'  )
+    parser.add_argument('--read_path', type=str, help='the path of the files to read from', default=r'C:\Users\user\workspace\data\ph_random'  )
+    parser.add_argument('--arrivals_path', type=str, help='the path of the files to read from', default='/scratch/eliransc/ph_random/arrivals') #r'C:\Users\user\workspace\data\ph_random\arrivals'
+    parser.add_argument('--services_path', type=str, help='the path of the files to read from', default='/scratch/eliransc/ph_random/services' ) #  r'C:\Users\user\workspace\data\ph_random\services'
+
     parser.add_argument('--dump_path', type=str, help='path to pkl folder', default=r'C:\Users\user\workspace\data\gg1_inverse_pkls'  )#r'C:\Users\user\workspace\data\gg1_service_inverse'
     parser.add_argument('--is_corr', type=bool, help='should we keep track on inter departure', default=True)
     parser.add_argument('--waiting_pkl_path', type=bool, help='the path of the average waiting time', default='./pkl/waiting_time')
