@@ -1713,7 +1713,7 @@ def main(args):
                 model_path = os.path.join(dump_path, str(model_num) + '_num_arrivals_' + str(g.num_arrivals)+ '_capacity_' + str(capacity) + '.pkl')
                 pkl.dump((moms_inter_arrival, moms_inter_departure, moms_sojourn, corr_departure_list, model_inputs), open(model_path, 'wb'))
 
-                # _ = [os.remove(os.path.join(args.read_path, file)) for file in curr_files]
+                _ = [os.remove(os.path.join(args.read_path, file)) for file in curr_files]
 
 
 def parse_arguments(argv):
