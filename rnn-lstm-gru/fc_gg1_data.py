@@ -1305,12 +1305,11 @@ class g:
     service_times = []
     queueing_time = {}
     inter_departure_time = []
-    num_arrivals = 250000
-    warm_up_arrivals = 200
+    num_arrivals = 450000
+    warm_up_arrivals = 0
     num_moms  =  10
     counter_for_moms_arrivals = 0
     counter_for_moms_depart_sojourn = 0
-
 
 
 class Customer:
@@ -1340,7 +1339,7 @@ class GG1:
         self.ser_dist_params = ser_dist_params
         self.arrival_rate = 1/arrival_dist_params[2][0]
         self.num_cust_sys = 0
-        self.num_cust_durations = np.zeros(500)
+        self.num_cust_durations = np.zeros(2500)
         self.last_event_time = 0
         self.last_time = 0
         self.last_departure = 0
@@ -1507,7 +1506,7 @@ class GG1:
             customer = Customer(self.customer_counter, self.num_classes, arrival_time)
 
 
-            if customer.id % 10000 == 0:
+            if customer.id % 100000 == 0:
                 print(customer.id)
                 print('It took: ', time.time()-self.last1000)
                 self.last1000 = time.time()
@@ -1576,35 +1575,48 @@ def main(args):
 
         for capacity in range(1, args.max_capacity + 1):
 
-            model_inputs = gg1_generator()
+            # model_inputs = gg1_generator()
 
-            arrival_dist, ser_dist, (s_arrival, A_arrival, moms_arrive), (s_service, A_service, moms_service) = model_inputs
+            arrival_dist = 4
+            ser_dist = 4
 
-            now = time.time()
-            arrivals = SamplesFromPH(ml.matrix(s_arrival), A_arrival, 10000)
-            print('For 10k it took: ', time.time() - now)
+            arrivals_path = r'C:\Users\user\workspace\data\ph_random\arrivals' #'/scratch/eliransc/ph_random/arrivals'
+            files = os.listdir(arrivals_path)
+            num_files = len(files)
+            file_num = np.random.randint(0, num_files)
+            arrivals_ = pkl.load(open(os.path.join(arrivals_path, files[file_num]), 'rb'))
+            list_size = len(arrivals_)
+            sample_num = np.random.randint(0, list_size)
+            s_arrival, A_arrival, moms_arrive, arrivals = arrivals_[sample_num]
 
-            now = time.time()
-            arrivals = SamplesFromPH(ml.matrix(s_arrival), A_arrival, 20000)
-            print('For 20k it took: ', time.time() - now)
-
-            now = time.time()
-            arrivals = SamplesFromPH(ml.matrix(s_arrival), A_arrival, 50000)
-            print('For 50k it took: ', time.time() - now)
-
-            now = time.time()
-            arrivals = SamplesFromPH(ml.matrix(s_arrival), A_arrival, 100000)
-            print('For 100k it took: ', time.time() - now)
-
-            now = time.time()
-            arrivals = SamplesFromPH(ml.matrix(s_arrival), A_arrival, 250000)
-            print('For 250k it took: ', time.time() - now)
-
+            services_path = r'C:\Users\user\workspace\data\ph_random\services' # '/scratch/eliransc/ph_random/services'
+            files = os.listdir(services_path)
+            num_files = len(files)
+            file_num = np.random.randint(0, num_files)
+            services_ = pkl.load(open(os.path.join(services_path, files[file_num]), 'rb'))
+            list_size = len(services_)
+            sample_num = np.random.randint(0, list_size)
+            s_service, A_service, moms_service, services = services_[sample_num]
 
 
 
-            arrivals = SamplesFromPH(ml.matrix(s_arrival), A_arrival, int(g.num_arrivals * 1.25))
-            services = SamplesFromPH(ml.matrix(s_service), A_service, int(g.num_arrivals * 1.25))
+            np.random.seed(now.microsecond)
+
+            rho = np.random.uniform(0.7, 0.95)
+            print(rho)
+            new_expected_ser = moms_arrive[0] * capacity * rho
+            services = services * new_expected_ser
+            orig_mean = ser_moment_n(s_service, A_service, 1)[0]
+            A_service = A_service * orig_mean / new_expected_ser
+
+            moms_service = np.array(compute_first_n_moments(s_service, A_service, 10)).flatten()
+
+
+
+            model_inputs = (arrival_dist, ser_dist, (s_arrival, A_arrival, moms_arrive), (s_service, A_service, moms_service))
+            #
+            # arrivals = SamplesFromPH(ml.matrix(s_arrival), A_arrival, int(g.num_arrivals * 1.25))
+            # services = SamplesFromPH(ml.matrix(s_service), A_service, int(g.num_arrivals * 1.25))
 
 
             for num_classes in range(1, args.max_num_classes + 1):
@@ -1618,9 +1630,6 @@ def main(args):
                     print('First arrival is: ', arrivals[0] )
 
                     start_time = time.time()
-
-
-
 
                     gg1 = GG1(capacity, num_classes, model_inputs, arrivals, services)
                     gg1.run()
@@ -1655,10 +1664,11 @@ def main(args):
                 curr_files = [file for file in files if str(model_num) in file]
 
 
-
                 inter_arrive_list = []
                 inter_departure_list = []
                 sojourn_list = []
+                corr_arrival_list = []
+                corr_departure_list = []
 
                 for file in curr_files:
                     full_path = os.path.join(args.read_path, file)
@@ -1675,6 +1685,11 @@ def main(args):
                     inter_arrival_arr = np.array(event_log['inter_arrival'])[1:]
                     inter_departure_arr = np.array(event_log['inter_departure'])[1:]
 
+                    R2 = np.corrcoef(np.array(event_log['inter_arrival']).astype(float)[:-1],
+                                     np.array(event_log['inter_arrival']).astype(float)[1:])
+                    R2_departure = np.corrcoef(np.array(event_log['inter_departure']).astype(float)[:-1],
+                                               np.array(event_log['inter_departure']).astype(float)[1:])
+
                     sojourn_list.append(sojourn_arr)
                     inter_arrive_list.append(inter_arrival_arr)
                     inter_departure_list.append(inter_departure_arr)
@@ -1682,6 +1697,8 @@ def main(args):
                     inter_arrive_large_arr = np.concatenate(inter_arrive_list, axis=0)
                     inter_departure_large_arr = np.concatenate(inter_departure_list, axis=0)
                     sojourn_large_arr = np.concatenate(sojourn_list, axis=0)
+                    corr_arrival_list.append(R2[0, 1])
+                    corr_departure_list.append(R2_departure[0, 1])
 
                 moms_inter_arrival = []
                 moms_inter_departure = []
@@ -1693,12 +1710,10 @@ def main(args):
                     moms_sojourn.append((sojourn_large_arr ** power).mean())
 
                 dump_path = args.dump_path
-                model_path = os.path.join(dump_path, str(model_num) + '.pkl')
-                pkl.dump((moms_inter_arrival, moms_inter_departure, moms_sojourn, model_inputs), open(model_path, 'wb'))
+                model_path = os.path.join(dump_path, str(model_num) + '_num_arrivals_' + str(g.num_arrivals)+ '_capacity_' + str(capacity) + '.pkl')
+                pkl.dump((moms_inter_arrival, moms_inter_departure, moms_sojourn, corr_departure_list, model_inputs), open(model_path, 'wb'))
 
                 # _ = [os.remove(os.path.join(args.read_path, file)) for file in curr_files]
-
-
 
 
 def parse_arguments(argv):
@@ -1711,13 +1726,9 @@ def parse_arguments(argv):
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
     parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=100500)
-    parser.add_argument('--size', type=int, help='the number of stations in the system', default=1)
     parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=2)
-    parser.add_argument('--case_num', type=int, help='case number in my settings', default=random.randint(0, 100000))
-    parser.add_argument('--read_path', type=str, help='the path of the files to read from', default=r'C:\Users\user\workspace\data\gg1_inverse_service'  )
-    parser.add_argument('--dump_path', type=str, help='path to pkl folder', default=r'C:\Users\user\workspace\data\gg1_inverse_pkls'  )#r'C:\Users\user\workspace\data\gg1_service_inverse'
-    parser.add_argument('--is_corr', type=bool, help='should we keep track on inter departure', default=True)
-    parser.add_argument('--waiting_pkl_path', type=bool, help='the path of the average waiting time', default='./pkl/waiting_time')
+    parser.add_argument('--read_path', type=str, help='the path of the files to read from', default=r'C:\Users\user\workspace\data\gg1_inverse_service'  ) # /scratch/eliransc/gg1_inverse_service
+    parser.add_argument('--dump_path', type=str, help='path to pkl folder', default=r'C:\Users\user\workspace\data\gg1_inverse_pkls'  ) #/scratch/eliransc/gg1_inverse_pkls'
 
     args = parser.parse_args(argv)
 

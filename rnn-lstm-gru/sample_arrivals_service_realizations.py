@@ -1185,7 +1185,7 @@ def gg1_generator_arrivals( util_lower = 0.5, util_upper = 0.99, arrival_dist = 
 
 
 
-def gg1_generator_service( util_lower = 0.5, util_upper = 0.99, arrival_dist =  4, ser_dist = 4):
+def gg1_generator_service(capacity, util_lower = 0.5, util_upper = 0.99, arrival_dist =  4, ser_dist = 4):
     '''
     Generate G/G/1 queue where is G is PH
     util_lower: lower bound of queue utilization
@@ -1202,12 +1202,12 @@ def gg1_generator_service( util_lower = 0.5, util_upper = 0.99, arrival_dist =  
 
 
     if np.random.rand() < 0.8:
-        s_service, A_service = create_gen_erlang_many_ph(np.random.randint(35, 101))
+        s_service, A_service = create_gen_erlang_many_ph(np.random.randint(5, 70))
     else:
         try:
-            s_service, A_service = create_mix_erlang_ph(np.random.randint(35, 101))
+            s_service, A_service = create_mix_erlang_ph(np.random.randint(5, 70))
         except:
-            s_service, A_service = create_gen_erlang_many_ph(np.random.randint(35, 101))
+            s_service, A_service = create_gen_erlang_many_ph(np.random.randint(5, 70))
 
 
     A_service = A_service/rho
@@ -1631,24 +1631,22 @@ def sample_single_arrive_ser(dist_type, num_arrivals):
         return (s_arrival, A_arrival, moms_arrive, arrivals)
 
     else:
-        s_service, A_service, moms_service = gg1_generator_service()
-        services  = SamplesFromPH(ml.matrix(s_service), A_service, int(g.num_arrivals * 1.25))
+        s_service, A_service, moms_service = gg1_generator_arrivals()
+        services = SamplesFromPH(ml.matrix(s_service), A_service, int(g.num_arrivals * 1.25))
         return (s_service, A_service, moms_service, services)
 
 
-
 def main(args):
-
 
 
         for ind in tqdm(range(args.num_iterations)):
             arrivals_all_data_list = [sample_single_arrive_ser('arrivals', g.num_arrivals) for ind in range(args.list_size)]
             now = datetime.now()
             np.random.seed(now.microsecond)
-            pkl.dump(arrivals_all_data_list, open(os.path.join(args.arrivals_path, str(random.randint(0, 100000)) + '.pkl'), 'wb'))
+            pkl.dump(arrivals_all_data_list, open(os.path.join(args.arrivals_path, str(random.randint(0, 100000))+ '_num_arrivals_' + str(g.num_arrivals) + '.pkl'), 'wb'))
             print('finish arrivals')
             services_all_data_list = [sample_single_arrive_ser('service', g.num_arrivals) for ind in range(args.list_size)]
-            pkl.dump(services_all_data_list, open(os.path.join(args.services_path, str(random.randint(0, 100000)) + '.pkl'), 'wb'))
+            pkl.dump(services_all_data_list, open(os.path.join(args.services_path, str(random.randint(0, 100000)) + '_num_arrivals_' + str(g.num_arrivals) + '.pkl'), 'wb'))
             print('finish services')
 
 
@@ -1656,23 +1654,16 @@ def parse_arguments(argv):
 
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--list_size', type=int, help='maximum server capacity', default=10)
+    parser.add_argument('--list_size', type=int, help='maximum server capacity', default=20)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
     parser.add_argument('--num_iter_same_params', type=int, help='max num priority classes', default=20)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
     parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=100500)
-    parser.add_argument('--size', type=int, help='the number of stations in the system', default=1)
     parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=10000)
-    parser.add_argument('--case_num', type=int, help='case number in my settings', default=random.randint(0, 100000))
-    parser.add_argument('--read_path', type=str, help='the path of the files to read from', default=r'C:\Users\user\workspace\data\ph_random'  )
-    parser.add_argument('--arrivals_path', type=str, help='the path of the files to read from', default='/scratch/eliransc/ph_random/arrivals') #r'C:\Users\user\workspace\data\ph_random\arrivals'
-    parser.add_argument('--services_path', type=str, help='the path of the files to read from', default='/scratch/eliransc/ph_random/services' ) #  r'C:\Users\user\workspace\data\ph_random\services'
-
-    parser.add_argument('--dump_path', type=str, help='path to pkl folder', default=r'C:\Users\user\workspace\data\gg1_inverse_pkls'  )#r'C:\Users\user\workspace\data\gg1_service_inverse'
-    parser.add_argument('--is_corr', type=bool, help='should we keep track on inter departure', default=True)
-    parser.add_argument('--waiting_pkl_path', type=bool, help='the path of the average waiting time', default='./pkl/waiting_time')
+    parser.add_argument('--arrivals_path', type=str, help='the path of the files to read from', default='/scratch/eliransc/ph_random/arrivals') #   r'C:\Users\user\workspace\data\ph_random\arrivals'
+    parser.add_argument('--services_path', type=str, help='the path of the files to read from', default='/scratch/eliransc/ph_random/services' ) #    r'C:\Users\user\workspace\data\ph_random\services'
 
     args = parser.parse_args(argv)
 
