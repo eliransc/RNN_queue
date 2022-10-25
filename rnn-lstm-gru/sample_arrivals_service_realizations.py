@@ -1626,14 +1626,20 @@ def get_gg1_input():
 def sample_single_arrive_ser(dist_type, num_arrivals):
 
     if dist_type == 'arrivals':
-        s_arrival, A_arrival, moms_arrive = gg1_generator_arrivals()
-        arrivals = SamplesFromPH(ml.matrix(s_arrival), A_arrival, int(num_arrivals * 1.25))
-        return (s_arrival, A_arrival, moms_arrive, arrivals)
+        try:
+            s_arrival, A_arrival, moms_arrive = gg1_generator_arrivals()
+            arrivals = SamplesFromPH(ml.matrix(s_arrival), A_arrival, int(num_arrivals * 1.25))
+            return (s_arrival, A_arrival, moms_arrive, arrivals)
+        except:
+            return sample_single_arrive_ser(dist_type, num_arrivals)
 
     else:
-        s_service, A_service, moms_service = gg1_generator_arrivals()
-        services = SamplesFromPH(ml.matrix(s_service), A_service, int(g.num_arrivals * 1.25))
-        return (s_service, A_service, moms_service, services)
+        try:
+            s_service, A_service, moms_service = gg1_generator_arrivals()
+            services = SamplesFromPH(ml.matrix(s_service), A_service, int(g.num_arrivals * 1.25))
+            return (s_service, A_service, moms_service, services)
+        except:
+            return sample_single_arrive_ser(dist_type, num_arrivals)
 
 
 def main(args):
