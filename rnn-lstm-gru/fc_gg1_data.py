@@ -1597,7 +1597,7 @@ def main(args):
 
             np.random.seed(now.microsecond)
 
-            rho = np.random.uniform(0.7, 0.95)
+            rho = np.random.uniform(0.5, 0.95)
             print(rho)
             new_expected_ser = moms_arrive[0] * capacity * rho
             services = services * new_expected_ser
