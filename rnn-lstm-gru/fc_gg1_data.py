@@ -43,7 +43,7 @@ from scipy.stats import rv_discrete
 # import seaborn as sns
 import random
 from scipy.stats import loguniform
-from butools.fitting import *
+# from butools.fitting import *
 from datetime import datetime
 from fastbook import *
 import itertools
