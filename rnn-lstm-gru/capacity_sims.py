@@ -1306,8 +1306,8 @@ class g:
     queueing_time = {}
     inter_departure_time = []
     num_arrivals = 450000
-    warm_up_arrivals = 1000
-    num_moms  =  10
+    warm_up_arrivals = 0
+    num_moms = 10
     counter_for_moms_arrivals = 0
     counter_for_moms_depart_sojourn = 0
 
@@ -1349,8 +1349,10 @@ class GG1:
         self.event_log_customer_Priority_list = []
         self.event_log_Arrival_time_list = []
         self.event_log_Departure_time_list = []
-
-        self.event_log = pd.DataFrame([], columns = ['Customer_id', 'Priority', 'Arrival_time', 'Departure_time'])
+        self.event_log_num_sys_list = []
+        self.event_log_num_queue_list = []
+        self.queue_status_arrival_epochs = {}
+        self.event_log = pd.DataFrame([], columns = ['Customer_id', 'Priority', 'Arrival_time', 'Departure_time', 'Num_sys', 'Num_queue'])
         self.queueing_time = {}
         self.last1000 = time.time()
 
@@ -1388,10 +1390,10 @@ class GG1:
 
     def service(self, customer):
 
-       arrival_time = self.env.now
+        arrival_time = self.env.now
 
 
-       with self.server.request(priority=customer.priority) as req: #priority=priority
+        with self.server.request(priority=customer.priority) as req: #priority=priority
             yield req
 
             q_time = self.env.now - arrival_time
@@ -1433,42 +1435,42 @@ class GG1:
             self.prev_departure = self.last_departure
             self.last_departure = self.env.now
 
-            if customer.id > g.warm_up_arrivals:
+        if customer.id > g.warm_up_arrivals:
 
-                # inter_departure = self.last_departure - self.prev_departure
-                # if self.inter_depart_moms[0] == 0:
-                #     for mom in range(g.num_moms):
-                #         self.inter_depart_moms[mom] = inter_departure**(mom+1)
-                #         self.sojourn_moms = (customer.arrival_time - self.last_departure)**(mom+1)
-                # else:
-                #     for mom in range(g.num_moms):
-                #         self.inter_depart_moms[mom] = (g.counter_for_moms_depart_sojourn*self.inter_depart_moms[mom]+inter_departure**(mom+1))/(g.counter_for_moms_depart_sojourn+1)
-                #         self.sojourn_moms[mom] = (g.counter_for_moms_depart_sojourn * self.sojourn_moms[
-                #             mom] + (customer.arrival_time - self.last_departure)**(mom+1)) / (g.counter_for_moms_depart_sojourn + 1)
-                #
-                # g.counter_for_moms_depart_sojourn += 1
-
-
-                # curr_ind = self.event_log.shape[0]
-                # self.event_log.loc[curr_ind, 'Customer_id'] = customer.id
-                # self.event_log.loc[curr_ind, 'Priority'] = customer.priority
-                # self.event_log.loc[curr_ind, 'Arrival_time'] = customer.arrival_time
-                # self.event_log.loc[curr_ind, 'Departure_time'] = self.env.now
-
-                self.event_log_customer_id_list.append(customer.id)
-                self.event_log_customer_Priority_list.append(customer.priority)
-                self.event_log_Arrival_time_list.append(customer.arrival_time)
-                self.event_log_Departure_time_list.append(self.env.now)
-
-            g.service_times.append(inter_ser)
+            # inter_departure = self.last_departure - self.prev_departure
+            # if self.inter_depart_moms[0] == 0:
+            #     for mom in range(g.num_moms):
+            #         self.inter_depart_moms[mom] = inter_departure**(mom+1)
+            #         self.sojourn_moms = (customer.arrival_time - self.last_departure)**(mom+1)
+            # else:
+            #     for mom in range(g.num_moms):
+            #         self.inter_depart_moms[mom] = (g.counter_for_moms_depart_sojourn*self.inter_depart_moms[mom]+inter_departure**(mom+1))/(g.counter_for_moms_depart_sojourn+1)
+            #         self.sojourn_moms[mom] = (g.counter_for_moms_depart_sojourn * self.sojourn_moms[
+            #             mom] + (customer.arrival_time - self.last_departure)**(mom+1)) / (g.counter_for_moms_depart_sojourn + 1)
+            #
+            # g.counter_for_moms_depart_sojourn += 1
 
 
+            # curr_ind = self.event_log.shape[0]
+            # self.event_log.loc[curr_ind, 'Customer_id'] = customer.id
+            # self.event_log.loc[curr_ind, 'Priority'] = customer.priority
+            # self.event_log.loc[curr_ind, 'Arrival_time'] = customer.arrival_time
+            # self.event_log.loc[curr_ind, 'Departure_time'] = self.env.now
 
-            tot_time = self.env.now - self.last_event_time
-            self.num_cust_durations[self.num_cust_sys] += tot_time
-            self.num_cust_sys -= 1
-            self.last_event_time = self.env.now
-            self.last_time = self.env.now
+            self.event_log_customer_id_list.append(customer.id)
+            self.event_log_customer_Priority_list.append(customer.priority)
+            self.event_log_Arrival_time_list.append(customer.arrival_time)
+            self.event_log_Departure_time_list.append(self.env.now)
+            self.event_log_num_sys_list.append(self.num_cust_sys)
+            self.event_log_num_queue_list.append(self.server.put_queue.__len__())
+
+
+        tot_time = self.env.now - self.last_event_time
+        self.num_cust_durations[self.num_cust_sys] += tot_time
+        self.num_cust_sys -= 1
+        self.last_event_time = self.env.now
+        self.last_time = self.env.now
+
 
 
     def customer_arrivals(self):
@@ -1529,6 +1531,7 @@ class GG1:
             tot_time = self.env.now - self.last_event_time
             self.num_cust_durations[self.num_cust_sys] += tot_time
             self.last_event_time = self.env.now
+            self.queue_status_arrival_epochs[customer.id] = self.num_cust_sys
             self.num_cust_sys += 1
             self.last_time = self.env.now
             self.env.process(self.service(customer))
@@ -1563,152 +1566,160 @@ def get_gg1_input():
 
 def main(args):
 
+
     now = datetime.now()
     current_time = now.strftime("%H_%M_%S")
 
     for ind in tqdm(range(args.num_iterations)):
 
-        for capacity in range(1, args.max_capacity + 1):
-
-            # model_inputs = gg1_generator()
-
-            arrival_dist = 4
-            ser_dist = 4
-
-            arrivals_path = r'C:\Users\user\workspace\data\ph_random\arrivals' #'/scratch/eliransc/ph_random/arrivals'
-            files = os.listdir(arrivals_path)
-            num_files = len(files)
-            file_num = np.random.randint(0, num_files)
-            arrivals_ = pkl.load(open(os.path.join(arrivals_path, files[file_num]), 'rb'))
-            list_size = len(arrivals_)
-            sample_num = np.random.randint(0, list_size)
-            s_arrival, A_arrival, moms_arrive, arrivals = arrivals_[sample_num]
-
-            services_path = r'C:\Users\user\workspace\data\ph_random\services' # '/scratch/eliransc/ph_random/services'
-            files = os.listdir(services_path)
-            num_files = len(files)
-            file_num = np.random.randint(0, num_files)
-            services_ = pkl.load(open(os.path.join(services_path, files[file_num]), 'rb'))
-            list_size = len(services_)
-            sample_num = np.random.randint(0, list_size)
-            s_service, A_service, moms_service, services = services_[sample_num]
+        capacity = 3
 
 
 
+        # model_inputs = gg1_generator()
+
+        arrival_dist = 4
+        ser_dist = 4
+
+        arrivals_path = r'C:\Users\user\workspace\data\ph_random\arrivals' #'/scratch/eliransc/ph_random/arrivals'
+        files = os.listdir(arrivals_path)
+        num_files = len(files)
+        file_num = np.random.randint(0, num_files)
+        arrivals_ = pkl.load(open(os.path.join(arrivals_path, files[file_num]), 'rb'))
+        list_size = len(arrivals_)
+        sample_num = np.random.randint(0, list_size)
+        s_arrival, A_arrival, moms_arrive, arrivals = arrivals_[sample_num]
+
+        services_path = r'C:\Users\user\workspace\data\ph_random\services' # '/scratch/eliransc/ph_random/services'
+        files = os.listdir(services_path)
+        num_files = len(files)
+        file_num = np.random.randint(0, num_files)
+        services_ = pkl.load(open(os.path.join(services_path, files[file_num]), 'rb'))
+        list_size = len(services_)
+        sample_num = np.random.randint(0, list_size)
+        s_service, A_service, moms_service, services = services_[sample_num]
+
+        np.random.seed(now.microsecond)
+
+        rho = np.random.uniform(0.9, 0.95)
+        print(rho)
+        new_expected_ser = moms_arrive[0] * capacity * rho
+        services = services * new_expected_ser
+        orig_mean = ser_moment_n(s_service, A_service, 1)[0]
+        A_service = A_service * orig_mean / new_expected_ser
+
+        moms_service = np.array(compute_first_n_moments(s_service, A_service, 10)).flatten()
+
+
+
+        model_inputs = (arrival_dist, ser_dist, (s_arrival, A_arrival, moms_arrive), (s_service, A_service, moms_service))
+        #
+        # arrivals = SamplesFromPH(ml.matrix(s_arrival), A_arrival, int(g.num_arrivals * 1.25))
+        # services = SamplesFromPH(ml.matrix(s_service), A_service, int(g.num_arrivals * 1.25))
+
+
+        num_classes  = 2
+        model_num = np.random.randint(1, 1000000)
+        for iteration in tqdm(range(1, args.num_iter_same_params + 1)):
+            now = datetime.now()
             np.random.seed(now.microsecond)
 
-            rho = np.random.uniform(0.7, 0.95)
-            print(rho)
-            new_expected_ser = moms_arrive[0] * capacity * rho
-            services = services * new_expected_ser
-            orig_mean = ser_moment_n(s_service, A_service, 1)[0]
-            A_service = A_service * orig_mean / new_expected_ser
-
-            moms_service = np.array(compute_first_n_moments(s_service, A_service, 10)).flatten()
 
 
+            np.random.shuffle(arrivals)
+            np.random.shuffle(services)
+            print('First arrival is: ', arrivals[0] )
 
-            model_inputs = (arrival_dist, ser_dist, (s_arrival, A_arrival, moms_arrive), (s_service, A_service, moms_service))
-            #
-            # arrivals = SamplesFromPH(ml.matrix(s_arrival), A_arrival, int(g.num_arrivals * 1.25))
-            # services = SamplesFromPH(ml.matrix(s_service), A_service, int(g.num_arrivals * 1.25))
+            start_time = time.time()
 
+            gg1 = GG1(capacity, num_classes, model_inputs, arrivals, services)
+            gg1.run()
+            steady_state = gg1.num_cust_durations / args.end_time
+            dist_dict = {1: 'uniform', 2: 'gamma', 3: 'normal', 4:'PH'}
+            arrival_rate = 1 / gg1.arrival_dist_params[2][0]
 
-            for num_classes in range(1, args.max_num_classes + 1):
-                model_num = np.random.randint(1, 1000000)
-                for iteration in tqdm(range(1, args.num_iter_same_params + 1)):
-                    now = datetime.now()
-                    np.random.seed(now.microsecond)
+            print('The capacity is: ', gg1.capacity)
+            print('rho is: ', arrival_rate * gg1.ser_dist_params[2][0] / gg1.capacity)
+            print("--- %s seconds the %d th iteration ---" % (time.time() - start_time, ind))
 
-                    np.random.shuffle(arrivals)
-                    np.random.shuffle(services)
-                    print('First arrival is: ', arrivals[0] )
-
-                    start_time = time.time()
-
-                    gg1 = GG1(capacity, num_classes, model_inputs, arrivals, services)
-                    gg1.run()
-                    steady_state = gg1.num_cust_durations / args.end_time
-                    dist_dict = {1: 'uniform', 2: 'gamma', 3: 'normal', 4:'PH'}
-                    arrival_rate = 1 / gg1.arrival_dist_params[2][0]
-
-                    print('The capacity is: ', gg1.capacity)
-                    print('rho is: ', arrival_rate * gg1.ser_dist_params[2][0] / gg1.capacity)
-                    print("--- %s seconds the %d th iteration ---" % (time.time() - start_time, ind))
-
-                    gg1.event_log = pd.DataFrame({'Customer_id': gg1.event_log_customer_id_list,
-                                                  'Priority': gg1.event_log_customer_Priority_list,
-                                                  'Arrival_time': gg1.event_log_Arrival_time_list,
-                                                  'Departure_time': gg1.event_log_Departure_time_list})
+            gg1.event_log = pd.DataFrame({'Customer_id': gg1.event_log_customer_id_list,
+                                          'Priority': gg1.event_log_customer_Priority_list,
+                                          'Arrival_time': gg1.event_log_Arrival_time_list,
+                                          'Departure_time': gg1.event_log_Departure_time_list,
+                                          'Num_sys': gg1.event_log_num_sys_list,
+                                          'Num_queue': gg1.event_log_num_queue_list})
 
 
-                    # new_folder_name = os.path.join(args.log_event_path,str(model_num))
-                    # if not os.path.exists(new_folder_name):
-                    #     os.mkdir(new_folder_name)
-
-                    curr_path = 'service_rate' + '_' + str(
-                        -gg1.ser_dist_params[1][0][0]) + '_' + 'capacity_' \
-                                + str(capacity) + '_' + 'priority' + '_' + str(num_classes) + '_' + str(
-                        model_num) + 'iteration_' + str(iteration) + '.pkl'
-
-                    full_path = os.path.join(args.read_path, curr_path)
-                    pkl.dump((gg1.event_log, model_inputs, capacity, num_classes, iteration), open(full_path, 'wb'))
-
-                files = os.listdir(args.read_path)
-
-                curr_files = [file for file in files if str(model_num) in file]
 
 
-                inter_arrive_list = []
-                inter_departure_list = []
-                sojourn_list = []
-                corr_arrival_list = []
-                corr_departure_list = []
+            # new_folder_name = os.path.join(args.log_event_path,str(model_num))
+            # if not os.path.exists(new_folder_name):
+            #     os.mkdir(new_folder_name)
 
-                for file in curr_files:
-                    full_path = os.path.join(args.read_path, file)
-                    event_log, model_inputs, capacity, num_classes, iteration = pkl.load(open(full_path, 'rb'))
-                    event_log['last_departure'] = np.append(0, np.array(event_log['Departure_time'])[:-1])
-                    event_log['last_arrival'] = np.append(0, np.array(event_log['Arrival_time'])[:-1])
-                    event_log['inter_arrival'] = event_log['Arrival_time'] - event_log['last_arrival']
-                    event_log['inter_departure'] = event_log['Departure_time'] - event_log['last_departure']
-                    event_log['sojourn_time'] = event_log['Departure_time'] - event_log['Arrival_time']
+            curr_path = 'service_rate' + '_' + str(
+                -gg1.ser_dist_params[1][0][0]) + '_' + 'capacity_' \
+                        + str(capacity) + '_' + 'priority' + '_' + str(num_classes) + '_' + str(
+                model_num) + 'iteration_' + str(iteration) + '.pkl'
 
-                    event_log = event_log.loc[1:, :]
+            full_path = os.path.join(args.read_path, curr_path)
+            pkl.dump((gg1.event_log, model_inputs, capacity, num_classes, iteration, gg1.queue_status_arrival_epochs), open(full_path, 'wb'))
 
-                    sojourn_arr = np.array(event_log['sojourn_time'])
-                    inter_arrival_arr = np.array(event_log['inter_arrival'])[1:]
-                    inter_departure_arr = np.array(event_log['inter_departure'])[1:]
+        files = os.listdir(args.read_path)
 
-                    R2 = np.corrcoef(np.array(event_log['inter_arrival']).astype(float)[:-1],
-                                     np.array(event_log['inter_arrival']).astype(float)[1:])
-                    R2_departure = np.corrcoef(np.array(event_log['inter_departure']).astype(float)[:-1],
-                                               np.array(event_log['inter_departure']).astype(float)[1:])
+        curr_files = [file for file in files if str(model_num) in file]
 
-                    sojourn_list.append(sojourn_arr)
-                    inter_arrive_list.append(inter_arrival_arr)
-                    inter_departure_list.append(inter_departure_arr)
 
-                    inter_arrive_large_arr = np.concatenate(inter_arrive_list, axis=0)
-                    inter_departure_large_arr = np.concatenate(inter_departure_list, axis=0)
-                    sojourn_large_arr = np.concatenate(sojourn_list, axis=0)
-                    corr_arrival_list.append(R2[0, 1])
-                    corr_departure_list.append(R2_departure[0, 1])
+        inter_arrive_list = []
+        inter_departure_list = []
+        sojourn_list = []
+        corr_arrival_list = []
+        corr_departure_list = []
 
-                moms_inter_arrival = []
-                moms_inter_departure = []
-                moms_sojourn = []
+        for file in curr_files:
+            full_path = os.path.join(args.read_path, file)
+            event_log, model_inputs, capacity, num_classes, iteration, _ = pkl.load(open(full_path, 'rb'))
+            event_log['last_departure'] = np.append(0, np.array(event_log['Departure_time'])[:-1])
+            event_log['last_arrival'] = np.append(0, np.array(event_log['Arrival_time'])[:-1])
+            event_log['inter_arrival'] = event_log['Arrival_time'] - event_log['last_arrival']
+            event_log['inter_departure'] = event_log['Departure_time'] - event_log['last_departure']
+            event_log['sojourn_time'] = event_log['Departure_time'] - event_log['Arrival_time']
 
-                for power in range(1, 11):
-                    moms_inter_arrival.append((inter_arrive_large_arr ** power).mean())
-                    moms_inter_departure.append((inter_departure_large_arr ** power).mean())
-                    moms_sojourn.append((sojourn_large_arr ** power).mean())
 
-                dump_path = args.dump_path
-                model_path = os.path.join(dump_path, str(model_num) + '_num_arrivals_' + str(g.num_arrivals)+ '_capacity_' + str(capacity) + '.pkl')
-                pkl.dump((moms_inter_arrival, moms_inter_departure, moms_sojourn, corr_departure_list, model_inputs), open(model_path, 'wb'))
+            event_log = event_log.loc[1:, :]
 
-                _ = [os.remove(os.path.join(args.read_path, file)) for file in curr_files]
+            sojourn_arr = np.array(event_log['sojourn_time'])
+            inter_arrival_arr = np.array(event_log['inter_arrival'])[1:]
+            inter_departure_arr = np.array(event_log['inter_departure'])[1:]
+
+            R2 = np.corrcoef(np.array(event_log['inter_arrival']).astype(float)[:-1],
+                             np.array(event_log['inter_arrival']).astype(float)[1:])
+            R2_departure = np.corrcoef(np.array(event_log['inter_departure']).astype(float)[:-1],
+                                       np.array(event_log['inter_departure']).astype(float)[1:])
+
+            sojourn_list.append(sojourn_arr)
+            inter_arrive_list.append(inter_arrival_arr)
+            inter_departure_list.append(inter_departure_arr)
+
+            inter_arrive_large_arr = np.concatenate(inter_arrive_list, axis=0)
+            inter_departure_large_arr = np.concatenate(inter_departure_list, axis=0)
+            sojourn_large_arr = np.concatenate(sojourn_list, axis=0)
+            corr_arrival_list.append(R2[0, 1])
+            corr_departure_list.append(R2_departure[0, 1])
+
+        moms_inter_arrival = []
+        moms_inter_departure = []
+        moms_sojourn = []
+
+        for power in range(1, 11):
+            moms_inter_arrival.append((inter_arrive_large_arr ** power).mean())
+            moms_inter_departure.append((inter_departure_large_arr ** power).mean())
+            moms_sojourn.append((sojourn_large_arr ** power).mean())
+
+        dump_path = args.dump_path
+        model_path = os.path.join(dump_path, str(model_num) + '_num_arrivals_' + str(g.num_arrivals)+ '_capacity_' + str(capacity) + '.pkl')
+        pkl.dump((moms_inter_arrival, moms_inter_departure, moms_sojourn, corr_departure_list, model_inputs), open(model_path, 'wb'))
+
+        # _ = [os.remove(os.path.join(args.read_path, file)) for file in curr_files]
 
 
 def parse_arguments(argv):
@@ -1716,14 +1727,15 @@ def parse_arguments(argv):
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='max num priority classes', default=10)
+    parser.add_argument('--num_iter_same_params', type=int, help='max num priority classes', default=1)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
     parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=100500)
-    parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=100000)
-    parser.add_argument('--read_path', type=str, help='the path of the files to read from', default= '/scratch/eliransc/gg1_inverse_service' ) #   r'C:\Users\user\workspace\data\gg1_inverse_service'
-    parser.add_argument('--dump_path', type=str, help='path to pkl folder', default='/scratch/eliransc/gg1_inverse_pkls'  ) # r'C:\Users\user\workspace\data\gg1_inverse_pkls'
+    parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=2)
+    parser.add_argument('--read_path', type=str, help='the path of the files to read from', default=r'C:\Users\user\workspace\data\gg1_inverse_service'  ) # /scratch/eliransc/gg1_inverse_service
+    parser.add_argument('--dump_path', type=str, help='path to pkl folder', default=r'C:\Users\user\workspace\data\gg1_inverse_pkls'  ) #/scratch/eliransc/gg1_inverse_pkls'
+
     args = parser.parse_args(argv)
 
     return args
