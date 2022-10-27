@@ -1575,7 +1575,7 @@ def main(args):
             arrival_dist = 4
             ser_dist = 4
 
-            arrivals_path = r'C:\Users\user\workspace\data\ph_random\arrivals' #'/scratch/eliransc/ph_random/arrivals'
+            arrivals_path = '/scratch/eliransc/ph_random/arrivals' # r'C:\Users\user\workspace\data\ph_random\arrivals'
             files = os.listdir(arrivals_path)
             num_files = len(files)
             file_num = np.random.randint(0, num_files)
@@ -1584,7 +1584,7 @@ def main(args):
             sample_num = np.random.randint(0, list_size)
             s_arrival, A_arrival, moms_arrive, arrivals = arrivals_[sample_num]
 
-            services_path = r'C:\Users\user\workspace\data\ph_random\services' # '/scratch/eliransc/ph_random/services'
+            services_path = '/scratch/eliransc/ph_random/services'  #  r'C:\Users\user\workspace\data\ph_random\services'
             files = os.listdir(services_path)
             num_files = len(files)
             file_num = np.random.randint(0, num_files)
