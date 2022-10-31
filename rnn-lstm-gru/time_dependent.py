@@ -1389,13 +1389,16 @@ class GG1:
 
         # print(self.end_time)
 
+        if np.random.rand()<0.5:
+            lenght1 = np.random.randint(5, 30)
+            lenght2 = g.end_time - lenght1
 
-        lenght1 = np.random.randint(5, 30)
-        lenght2 = g.end_time - lenght1
+            first_rate, second_rate = np.random.uniform(0.5, 2.5, 2)
 
-        first_rate, second_rate = np.random.uniform(0.8, 1.5, 2)
+            self.arrival_rates = np.append(np.ones(lenght1) * first_rate, np.ones(lenght2) * second_rate)
 
-        self.arrival_rates = np.append(np.ones(lenght1) * first_rate, np.ones(lenght2) * second_rate)
+        else:
+            self.arrival_rates = np.random.uniform(0.5, 2.5, self.end_time)
 
 
 
@@ -1547,7 +1550,7 @@ def main(args):
         full_path = os.path.join(args.read_path, curr_path)
 
 
-        pkl.dump((g.time_dict, ), open(full_path, 'wb'))
+        pkl.dump((g.time_dict, gg1.arrival_rates), open(full_path, 'wb'))
 
 
 
@@ -1568,8 +1571,8 @@ def parse_arguments(argv):
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
     parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=100500)
-    parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=5)
-    parser.add_argument('--read_path', type=str, help='the path of the files to read from', default='/scratch/eliransc/time_dependant') #   \gg1_inverse_service'  r'C:\Users\user\workspace\data\time_dependant
+    parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=50000)
+    parser.add_argument('--read_path', type=str, help='the path of the files to read from', default='/scratch/eliransc/time_dependant') #   \gg1_inverse_service' r'C:\Users\user\workspace\data\time_dependant'
     parser.add_argument('--dump_path', type=str, help='path to pkl folder', default='/scratch/eliransc/gg1_inverse_pkls') # r'C:\Users\user\workspace\data\gg1_inverse_pkls'
     args = parser.parse_args(argv)
 
