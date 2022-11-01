@@ -1349,7 +1349,8 @@ class Customer:
 
 class GG1:
 
-    def __init__(self,  model_input, services):
+    def __init__(self,  model_input, services, arrival_rates):
+        self.arrival_rates = arrival_rates
         self.inter_arrive_moms = np.zeros(g.num_moms)
         self.inter_depart_moms = np.zeros(g.num_moms)
         self.sojourn_moms = np.zeros(g.num_moms)
@@ -1389,16 +1390,7 @@ class GG1:
 
         # print(self.end_time)
 
-        if np.random.rand()<0.5:
-            lenght1 = np.random.randint(5, 30)
-            lenght2 = g.end_time - lenght1
 
-            first_rate, second_rate = np.random.uniform(0.5, 2.5, 2)
-
-            self.arrival_rates = np.append(np.ones(lenght1) * first_rate, np.ones(lenght2) * second_rate)
-
-        else:
-            self.arrival_rates = np.random.uniform(0.5, 2.5, self.end_time)
 
 
 
@@ -1506,6 +1498,18 @@ def main(args):
     for ind in tqdm(range(args.num_iterations)):
 
 
+        if np.random.rand()<0.5:
+            lenght1 = np.random.randint(5, 30)
+            lenght2 = g.end_time - lenght1
+
+            first_rate, second_rate = np.random.uniform(0.5, 2.5, 2)
+
+            arrival_rates = np.append(np.ones(lenght1) * first_rate, np.ones(lenght2) * second_rate)
+
+        else:
+            arrival_rates = np.random.uniform(0.5, 2.5, g.end_time)
+
+
         services_path =   r'C:\Users\user\workspace\data\ph_random\services'   #  '/scratch/eliransc/ph_random/services'
         files = os.listdir(services_path)
         num_files = len(files)
@@ -1523,7 +1527,7 @@ def main(args):
             now = datetime.now()
             np.random.seed(now.microsecond)
             np.random.shuffle(services)
-            gg1 = GG1(model_inputs, services)
+            gg1 = GG1(model_inputs, services, arrival_rates)
             gg1.run()
             steady_state = gg1.num_cust_durations / args.end_time
             # print("--- %s seconds the %d th iteration ---" % (time.time() - start_time, ind))
@@ -1550,7 +1554,7 @@ def main(args):
         full_path = os.path.join(args.read_path, curr_path)
 
 
-        pkl.dump((g.time_dict, gg1.arrival_rates), open(full_path, 'wb'))
+        pkl.dump((gg1.time_dict, arrival_rates, model_inputs), open(full_path, 'wb'))
 
 
 
