@@ -1331,9 +1331,7 @@ class g:
     # arrival_rates = np.random.uniform(0.8, 1.5, end_time)
     max_num_customers = 200
 
-    time_dict = {}
-    for time_ in range(end_time):
-        time_dict[time_] = np.zeros(max_num_customers)
+
 
     # time_dict2 = {}
     # for time_ in range(end_time):
@@ -1400,7 +1398,7 @@ class GG1:
 
         self.env.process(self.customer_arrivals())
 
-        self.env.run(until=self.end_time)
+        self.env.run(until=g.end_time)
 
     def get_gg1_input(self):
 
@@ -1520,6 +1518,10 @@ def main(args):
         s_service, A_service, moms_service, services = services_[sample_num]
         np.random.seed(now.microsecond)
         model_inputs =  (s_service, A_service, moms_service)
+
+        time_dict = {}
+        for time_ in range(gg1.end_time):
+            time_dict[time_] = np.zeros(g.max_num_customers)
 
 
         model_num = np.random.randint(1, 1000000)
