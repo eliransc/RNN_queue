@@ -1520,7 +1520,7 @@ def main(args):
         model_inputs =  (s_service, A_service, moms_service)
 
         time_dict = {}
-        for time_ in range(gg1.end_time):
+        for time_ in range(g.end_time):
             time_dict[time_] = np.zeros(g.max_num_customers)
 
 
