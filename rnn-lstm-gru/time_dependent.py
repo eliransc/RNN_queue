@@ -1543,7 +1543,7 @@ def main(args):
             resultDictionary = dict((x, y) for x, y in result)
 
             for time in resultDictionary.keys():
-                g.time_dict[time][resultDictionary[time]] += 1
+                time_dict[time][resultDictionary[time]] += 1
 
 
 
@@ -1556,7 +1556,7 @@ def main(args):
         full_path = os.path.join(args.read_path, curr_path)
 
 
-        pkl.dump((gg1.time_dict, arrival_rates, model_inputs), open(full_path, 'wb'))
+        pkl.dump((time_dict, arrival_rates, model_inputs), open(full_path, 'wb'))
 
 
 
