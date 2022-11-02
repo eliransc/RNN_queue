@@ -1516,6 +1516,7 @@ def main(args):
         list_size = len(services_)
         sample_num = np.random.randint(0, list_size)
         s_service, A_service, moms_service, services = services_[sample_num]
+        np.random.seed(now.microsecond)
 
         model_inputs =  (s_service, A_service, moms_service)
 
