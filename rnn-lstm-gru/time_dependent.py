@@ -1492,7 +1492,7 @@ def main(args):
 
     now = datetime.now()
     current_time = now.strftime("%H_%M_%S")
-
+    np.random.seed(now.microsecond)
     for ind in tqdm(range(args.num_iterations)):
 
 
@@ -1508,7 +1508,7 @@ def main(args):
             arrival_rates = np.random.uniform(0.5, 2.5, g.end_time)
 
 
-        services_path = '/scratch/eliransc/ph_random/services' # r'C:\Users\user\workspace\data\ph_random\services'
+        services_path =   r'C:\Users\user\workspace\data\ph_random\services' #'/scratch/eliransc/ph_random/services'
         files = os.listdir(services_path)
         num_files = len(files)
         file_num = np.random.randint(0, num_files)
@@ -1516,7 +1516,7 @@ def main(args):
         list_size = len(services_)
         sample_num = np.random.randint(0, list_size)
         s_service, A_service, moms_service, services = services_[sample_num]
-        np.random.seed(now.microsecond)
+
         model_inputs =  (s_service, A_service, moms_service)
 
         time_dict = {}
