@@ -55,7 +55,7 @@ def parse_arguments(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--probs_ub', type=int, help='path to pkl folder', default=99)
     parser.add_argument('--LB', type=int, help='path to pkl folder', default=0)
-    parser.add_argument('--UB', type=int, help='path to pkl folder', default=2000)
+    parser.add_argument('--UB', type=int, help='path to pkl folder', default=20000)
     parser.add_argument('--dump_path', type=str, help='path to pkl folder', default='/scratch/eliransc/pkl_data')
     parser.add_argument('--load_path', type=str, help='path to pkl folder', default='/scratch/eliransc/time_dependant')
     args = parser.parse_args(argv)
