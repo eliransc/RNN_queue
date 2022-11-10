@@ -22,7 +22,7 @@ def prepere_data(args):
     for file in tqdm(files[args.LB: args.UB]):
         res_input = np.array([])
         mean_queue_arr = np.array([])
-        time_dict, arrival_rates, model_inputs = pkl.load(open(os.path.join(path, file), 'rb'))
+        time_dict, arrival_rates, model_inputs = pkl.load(open(os.path.join(args.load_path, file), 'rb'))
         for t in range(len(time_dict)):
             arr_input = np.concatenate((model_inputs[2], np.array([t]), np.array([arrival_rates[t]])), axis=0)
             arr_input = arr_input.reshape(1, arr_input.shape[0])
