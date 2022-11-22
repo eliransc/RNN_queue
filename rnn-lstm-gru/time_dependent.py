@@ -1349,7 +1349,7 @@ class Customer:
 
 class GG1:
 
-    def __init__(self,  model_input, services, arrival_rates):
+    def __init__(self,  model_input, services, arrival_rates, initial):
         self.arrival_rates = arrival_rates
         self.inter_arrive_moms = np.zeros(g.num_moms)
         self.inter_depart_moms = np.zeros(g.num_moms)
@@ -1375,8 +1375,7 @@ class GG1:
         self.event_log_type_list = []
         self.event_log_time_stamp = []
         self.size_initial = 50
-        s = np.random.dirichlet(np.ones(5))
-        initial = np.concatenate((s, np.zeros(self.size_initial-5)))
+
         self.initial_probs = initial
 
 
@@ -1474,7 +1473,7 @@ class GG1:
         else:
             curr_inter_old = curr_inter
             curr_inter += int(envnow)+1-envnow
-            envnow +=  int(envnow)+1-envnow
+            envnow += int(envnow)+1-envnow
             return self.generate_arrival(curr_inter, envnow)
 
 
@@ -1529,14 +1528,14 @@ class GG1:
             self.last_time = self.env.now
             self.env.process(self.service(customer))
 
-def single_sim(services, model_inputs, arrival_rates, args):
+def single_sim(services, model_inputs, arrival_rates, initial,  args):
 
 
 
     now = datetime.now()
     np.random.seed(now.microsecond)
     np.random.shuffle(services)
-    gg1 = GG1(model_inputs, services, arrival_rates)
+    gg1 = GG1(model_inputs, services, arrival_rates, initial)
     gg1.run()
     steady_state = gg1.num_cust_durations / args.end_time
     # print("--- %s seconds the %d th iteration ---" % (time.time() - start_time, ind))
@@ -1590,7 +1589,7 @@ def run_single_setting():
 
     arrival_rates = generate_cycle_arrivals()
 
-    services_path =  '/scratch/eliransc/ph_random/services'   # r'C:\Users\user\workspace\data\ph_random\services'
+    services_path =   '/scratch/eliransc/ph_random/services' #  r'C:\Users\user\workspace\data\ph_random\services'
     files = os.listdir(services_path)
     num_files = len(files)
     file_num = np.random.randint(0, num_files)
@@ -1602,6 +1601,10 @@ def run_single_setting():
 
     model_inputs = (s_service, A_service, moms_service)
 
+    size_initial = 50
+    s = np.random.dirichlet(np.ones(5))
+    initial = np.concatenate((s, np.zeros(size_initial - 5)))
+
     time_dict = {}
     for time_ in range(g.end_time):
         time_dict[time_] = np.zeros(g.max_num_customers)
@@ -1610,7 +1613,7 @@ def run_single_setting():
 
     list_of_lists1 = []
     for ind in tqdm(range(10)):
-        list_of_dicts = [single_sim(services, model_inputs, arrival_rates, args) for ind in
+        list_of_dicts = [single_sim(services, model_inputs, arrival_rates, initial,  args) for ind in
                           range(1, args.num_iter_same_params + 1)]
         list_of_lists1.append(list_of_dicts)
 
@@ -1620,11 +1623,11 @@ def run_single_setting():
         for time1 in resultDictionary.keys():
             time_dict[time1][resultDictionary[time1]] += 1
 
-    curr_path1 = str(model_num) + '1.pkl'
+    curr_path1 = str(model_num) + '.pkl'
 
     full_path1 = os.path.join(args.read_path, curr_path1)
 
-    pkl.dump((time_dict, arrival_rates, model_inputs), open(full_path1, 'wb'))
+    pkl.dump((time_dict, arrival_rates, model_inputs, initial), open(full_path1, 'wb'))
 
 
 
