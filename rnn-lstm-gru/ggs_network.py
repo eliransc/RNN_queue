@@ -1220,11 +1220,6 @@ def generate_mmc(capacity, num_servers, transion_matrix ,util_lower = 0.7, util_
         moms_service_list.append(moms_service)
 
 
-
-
-
-
-
     return (arrival_dist_list, ser_dist_list, (s_arrival_list, A_arrival_list, moms_arrive_list), (s_service_list, A_service_list, moms_service_list))
 
 

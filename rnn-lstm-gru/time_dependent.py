@@ -1673,8 +1673,11 @@ def main(args):
             # else:
             #     arrival_rates = np.random.uniform(0.5, 2.5, g.end_time)
 
+            if 'dkrass' in os.getcwd().split('/'):
+                services_path =  '/scratch/d/dkrass/eliransc/services'
+            else:
+                services_path =  '/scratch/eliransc/ph_random/services'  # '/scratch/eliransc/ph_random/services'
 
-            services_path =  r'C:\Users\user\workspace\data\ph_random\services'  # '/scratch/eliransc/ph_random/services'
             files = os.listdir(services_path)
             num_files = len(files)
             file_num = np.random.randint(0, num_files)
