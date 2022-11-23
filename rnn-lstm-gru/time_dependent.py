@@ -1625,7 +1625,10 @@ def run_single_setting():
 
     curr_path1 = str(model_num) + '.pkl'
 
-    full_path1 = os.path.join(args.read_path, curr_path1)
+    if 'dkrass' in os.getcwd().split('/'):
+        full_path1 = os.path.join(args.read_path_niagara, curr_path1)
+    else:
+        full_path1 = os.path.join(args.read_path, curr_path1)
 
     pkl.dump((time_dict, arrival_rates, model_inputs, initial), open(full_path1, 'wb'))
 
@@ -1638,10 +1641,7 @@ def main(args):
     current_time = now.strftime("%H_%M_%S")
     np.random.seed(now.microsecond)
 
-    if os.path.exists('df_runtimes.pkl'):
-        df_runtimes = pkl.load(open('df_runtimes.pkl', 'rb'))
-    else:
-        df_runtimes = pd.DataFrame([])
+
 
     for ind in tqdm(range(args.num_iterations)):
 
@@ -1746,6 +1746,8 @@ def parse_arguments(argv):
     parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=100500)
     parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=50000)
     parser.add_argument('--read_path', type=str, help='the path of the files to read from', default='/scratch/eliransc/time_dependant_cyclic'  ) #     \gg1_inverse_service' r'C:\Users\user\workspace\data\time_dependant'
+    parser.add_argument('--read_path_niagara', type=str, help='the path of the files to read from',
+                        default='/scratch/d/dkrass/eliransc/time_dependant_cyclic')
     parser.add_argument('--dump_path', type=str, help='path to pkl folder', default= r'C:\Users\user\workspace\data\gg1_inverse_pkls' ) # '/scratch/eliransc/gg1_inverse_pkls'
     args = parser.parse_args(argv)
 
