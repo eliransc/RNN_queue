@@ -1362,7 +1362,7 @@ class GG1:
         ser_dist_params = model_input
         self.ser_dist_params = ser_dist_params
         self.num_cust_sys = 0
-        self.num_cust_durations = np.zeros(50)
+        self.num_cust_durations = np.zeros(120)
         self.last_event_time = 0
         self.last_time = 0
         self.last_departure = 0
@@ -1592,7 +1592,8 @@ def run_single_setting():
     if 'dkrass' in os.getcwd().split('/'):
         services_path = '/scratch/d/dkrass/eliransc/services'
     else:
-        services_path = '/scratch/eliransc/ph_random/services'#  r'C:\Users\user\workspace\data\ph_random\services'
+        services_path = '/scratch/eliransc/ph_random/services'   # r'C:\Users\user\workspace\data\ph_random\services'
+
     files = os.listdir(services_path)
     num_files = len(files)
     file_num = np.random.randint(0, num_files)
@@ -1751,7 +1752,7 @@ def parse_arguments(argv):
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
     parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=100500)
     parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=50000)
-    parser.add_argument('--read_path', type=str, help='the path of the files to read from', default='/scratch/eliransc/time_dependant_cyclic'  ) #     \gg1_inverse_service' r'C:\Users\user\workspace\data\time_dependant'
+    parser.add_argument('--read_path', type=str, help='the path of the files to read from', default=  '/scratch/eliransc/time_dependant_cyclic' ) # r'C:\Users\user\workspace\data\time_dependant'
     parser.add_argument('--read_path_niagara', type=str, help='the path of the files to read from',
                         default='/scratch/d/dkrass/eliransc/time_dependant_cyclic')
     parser.add_argument('--dump_path', type=str, help='path to pkl folder', default= r'C:\Users\user\workspace\data\gg1_inverse_pkls' ) # '/scratch/eliransc/gg1_inverse_pkls'
