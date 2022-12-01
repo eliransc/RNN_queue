@@ -1321,7 +1321,7 @@ class g:
     counter_for_moms_arrivals = 0
     counter_for_moms_depart_sojourn = 0
 
-    end_time = 50
+    end_time = 100
 
     # lenght1 = np.random.randint(5, 30)
     # lenght2 = end_time - lenght1
@@ -1374,7 +1374,7 @@ class GG1:
         self.event_log_num_cust_list = []
         self.event_log_type_list = []
         self.event_log_time_stamp = []
-        self.size_initial = 50
+        self.size_initial = 100
 
         self.initial_probs = initial
 
@@ -1390,7 +1390,7 @@ class GG1:
         elif self.sim_lenght_indicator == 1:
             self.end_time = 30
         else:
-            self.end_time = 50
+            self.end_time = 100
 
         # print(self.end_time)
 
@@ -1550,9 +1550,9 @@ def single_sim(services, model_inputs, arrival_rates, initial,  args):
     return resultDictionary
 
 
-def generate_cycle_arrivals():
-    vector_lenght = 50
-    cycle_size = np.random.randint(3, int(vector_lenght / 2))
+def generate_cycle_arrivals(number_sequences):
+    vector_lenght = number_sequences
+    cycle_size = np.random.randint(3, int(vector_lenght / 4))
     num_cycles = int(vector_lenght / cycle_size)
 
     last_cycle = vector_lenght - cycle_size * num_cycles
@@ -1581,18 +1581,20 @@ def generate_cycle_arrivals():
 
     return all_arrivals
 
-def run_single_setting():
+def run_single_setting(args):
 
     # s_service, A_service, moms_service = model_inputs
 
     now = datetime.now()
 
-    arrival_rates = generate_cycle_arrivals()
+    arrival_rates = generate_cycle_arrivals(args.number_sequences)
 
     if 'dkrass' in os.getcwd().split('/'):
         services_path = '/scratch/d/dkrass/eliransc/services'
+    elif 'C:' in os.getcwd().split('/')[0]:
+        services_path = r'C:\Users\user\workspace\data\ph_random\services'
     else:
-        services_path = '/scratch/eliransc/ph_random/services'   # r'C:\Users\user\workspace\data\ph_random\services'
+        services_path = '/scratch/eliransc/ph_random/services'   #
 
     files = os.listdir(services_path)
     num_files = len(files)
@@ -1605,7 +1607,7 @@ def run_single_setting():
 
     model_inputs = (s_service, A_service, moms_service)
 
-    size_initial = 50
+    size_initial = 100
     s = np.random.dirichlet(np.ones(5))
     initial = np.concatenate((s, np.zeros(size_initial - 5)))
 
@@ -1629,15 +1631,29 @@ def run_single_setting():
 
     curr_path1 = str(model_num) + '.pkl'
 
-    if 'dkrass' in os.getcwd().split('/'):
-        full_path1 = os.path.join(args.read_path_niagara, curr_path1)
-    else:
-        full_path1 = os.path.join(args.read_path, curr_path1)
+
+    full_path1 = os.path.join(args.read_path, curr_path1)
 
     pkl.dump((time_dict, arrival_rates, model_inputs, initial), open(full_path1, 'wb'))
 
 
-
+def create_single_data_point(path, files_list, ind):
+    res_input = np.array([])
+    prob_queue_arr = np.array([])
+    time_dict, arrival_rates, model_inputs, initial = pkl.load(open(os.path.join(path, files_list[ind]), 'rb'))
+    for t in range(len(time_dict)):
+        arr_input = np.concatenate((np.log(model_inputs[2][:5]), np.array([t]), np.array([arrival_rates[t]]), initial[:5]), axis =0)
+        arr_input = arr_input.reshape(1,arr_input.shape[0])
+        probs = (time_dict[t]/time_dict[t].sum())
+        fifty_or_more = probs[50:].sum()
+        probs_output = np.concatenate((probs[:50], np.array([fifty_or_more]) ), axis = 0)
+        if res_input.shape[0] == 0:
+            res_input = arr_input
+            prob_queue_arr = np.array(probs_output).reshape(1,probs_output.shape[0])
+        else:
+            res_input = np.concatenate((res_input, arr_input), axis = 0)
+            prob_queue_arr = np.concatenate((prob_queue_arr, np.array(probs_output).reshape(1,probs_output.shape[0])), axis = 0)
+    return (res_input, prob_queue_arr)
 
 def main(args):
 
@@ -1645,7 +1661,12 @@ def main(args):
     current_time = now.strftime("%H_%M_%S")
     np.random.seed(now.microsecond)
 
-
+    if 'dkrass' in os.getcwd().split('/'):
+        args.read_path = '/scratch/d/dkrass/eliransc/time_dependant_cyclic'
+    elif 'C:' in os.getcwd().split('/')[0]:
+        args.read_path = r'C:\Users\user\workspace\data\time_dependant_100'
+    else:
+        args.read_path = '/scratch/eliransc/time_dependant_cyclic_100_test'   #
 
     for ind in tqdm(range(args.num_iterations)):
 
@@ -1656,13 +1677,58 @@ def main(args):
 
         start = time.time()
         ####################
-        run_single_setting()
+        run_single_setting(args)
         ####################
         runtime = time.time() - start
 
         curr_ind = df_runtimes.shape[0]
         df_runtimes.loc[curr_ind, 'run_time'] = runtime
         pkl.dump(df_runtimes, open('df_runtimes.pkl', 'wb'))
+
+        # path = args.read_path
+        #
+        # files = os.listdir(args.read_path)
+        #
+        # batch_size = 4
+        # num_batches = int(len(files) / batch_size)
+        # df_files = pd.DataFrame([], columns=['file', 'batch'])
+        # for curr_batch in tqdm(range(num_batches)):
+        #     batch_input = np.array([])
+        #     batch_output = np.array([])
+        #
+        #     for ind in range(curr_batch * batch_size, (curr_batch + 1) * batch_size):
+        #         curr_file = files[ind]
+        #         curr_ind_df = df_files.shape[0]
+        #         df_files.loc[curr_ind_df, 'file'] = curr_file
+        #         df_files.loc[curr_ind_df, 'batch'] = curr_batch
+        #
+        #         pkl.dump(df_files, open('graham_df_files.pkl', 'wb'))
+        #         res_input, prob_queue_arr = create_single_data_point(path, files, ind)
+        #         res_input = res_input.reshape(1, res_input.shape[0], res_input.shape[1])
+        #         prob_queue_arr = prob_queue_arr.reshape(1, prob_queue_arr.shape[0], prob_queue_arr.shape[1])
+        #         if ind == curr_batch * batch_size:
+        #             batch_input = res_input
+        #             batch_output = prob_queue_arr
+        #         else:
+        #             batch_input = np.concatenate((batch_input, res_input), axis=0)
+        #             batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
+        #
+        #     if 'dkrass' in os.getcwd().split('/'):
+        #         pkl.dump((batch_input, batch_output), open(
+        #             '/scratch/eliransc/data_rnn_training/cyclic_poison/pkl_rnn/Graham_batch_' + str(
+        #                 curr_batch) + '.pkl',
+        #             'wb'))
+        #     elif 'C:' in os.getcwd().split('/')[0]:
+        #         pkl.dump((batch_input, batch_output), open(
+        #             r'C:\Users\user\workspace\data\PC_batch_' + str(
+        #                 curr_batch) + '.pkl',
+        #             'wb'))
+        #     else:
+        #         pkl.dump((batch_input, batch_output), open(
+        #             '/scratch/eliransc/data_rnn_training/cyclic_poison/pkl_rnn/Graham_batch_' + str(
+        #                 curr_batch) + '.pkl',
+        #             'wb'))
+
 
         if False:
             arrival_rates = generate_cycle_arrivals()
@@ -1738,20 +1804,19 @@ def main(args):
 
             # curr_files = [file for file in files if str(model_num) in file]
 
-
-
-
 def parse_arguments(argv):
 
 
     parser = argparse.ArgumentParser()
+
+    parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=100)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
     parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default=2000)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
     parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=100500)
-    parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=50000)
+    parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=64)
     parser.add_argument('--read_path', type=str, help='the path of the files to read from', default=  '/scratch/eliransc/time_dependant_cyclic' ) # r'C:\Users\user\workspace\data\time_dependant'
     parser.add_argument('--read_path_niagara', type=str, help='the path of the files to read from',
                         default='/scratch/d/dkrass/eliransc/time_dependant_cyclic')
