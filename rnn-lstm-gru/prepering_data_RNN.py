@@ -47,7 +47,6 @@ def main(args):
     df_files = pd.DataFrame([], columns=['file', 'batch'])
 
 
-
     batch_size = 64
     num_batches = int(len(files) / batch_size)
 
