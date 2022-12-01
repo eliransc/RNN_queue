@@ -1170,12 +1170,12 @@ def gg1_generator_arrivals( util_lower = 0.5, util_upper = 0.99, arrival_dist = 
 
 
     if np.random.rand() < 0.8:
-        s_arrival, A_arrival = create_gen_erlang_many_ph(np.random.randint(5, 50))
+        s_arrival, A_arrival = create_gen_erlang_many_ph(np.random.randint(5, 500))
     else:
         try:
-            s_arrival, A_arrival = create_mix_erlang_ph(np.random.randint(5, 50))
+            s_arrival, A_arrival = create_mix_erlang_ph(np.random.randint(5, 500))
         except:
-            s_arrival, A_arrival = create_gen_erlang_many_ph(np.random.randint(5, 50))
+            s_arrival, A_arrival = create_gen_erlang_many_ph(np.random.randint(5, 500))
 
     moms_arrive = np.array(compute_first_n_moments(s_arrival, A_arrival, 10)).flatten()
 
@@ -1235,24 +1235,24 @@ def gg1_generator( util_lower = 0.5, util_upper = 0.99, arrival_dist =  4, ser_d
 
 
     if np.random.rand() < 0.8:
-        s_arrival, A_arrival = create_gen_erlang_many_ph(np.random.randint(5, 50))
+        s_arrival, A_arrival = create_gen_erlang_many_ph(np.random.randint(5, 350))
     else:
         try:
-            s_arrival, A_arrival = create_mix_erlang_ph(np.random.randint(5, 50))
+            s_arrival, A_arrival = create_mix_erlang_ph(np.random.randint(5, 350))
         except:
-            s_arrival, A_arrival = create_gen_erlang_many_ph(np.random.randint(5, 50))
+            s_arrival, A_arrival = create_gen_erlang_many_ph(np.random.randint(5, 350))
 
     moms_arrive = np.array(compute_first_n_moments(s_arrival, A_arrival, 10)).flatten()
 
     arrival_rate = 1/moms_arrive[0]
 
     if np.random.rand() < 0.8:
-        s_service, A_service = create_gen_erlang_many_ph(np.random.randint(35, 101))
+        s_service, A_service = create_gen_erlang_many_ph(np.random.randint(35, 350))
     else:
         try:
-            s_service, A_service = create_mix_erlang_ph(np.random.randint(35, 101))
+            s_service, A_service = create_mix_erlang_ph(np.random.randint(35, 350))
         except:
-            s_service, A_service = create_gen_erlang_many_ph(np.random.randint(35, 101))
+            s_service, A_service = create_gen_erlang_many_ph(np.random.randint(35, 350))
 
 
     A_service = A_service/rho
@@ -1367,7 +1367,7 @@ class g:
     service_times = []
     queueing_time = {}
     inter_departure_time = []
-    num_arrivals = 450000
+    num_arrivals = 450
     warm_up_arrivals = 400
     num_moms  =  10
     counter_for_moms_arrivals = 0
@@ -1636,6 +1636,7 @@ def sample_single_arrive_ser(dist_type, num_arrivals):
     else:
         try:
             s_service, A_service, moms_service = gg1_generator_arrivals()
+
             services = SamplesFromPH(ml.matrix(s_service), A_service, int(g.num_arrivals * 1.25))
             return (s_service, A_service, moms_service, services)
         except:
@@ -1646,13 +1647,13 @@ def main(args):
 
 
         for ind in tqdm(range(args.num_iterations)):
-            arrivals_all_data_list = [sample_single_arrive_ser('arrivals', g.num_arrivals) for ind in range(args.list_size)]
-            now = datetime.now()
-            np.random.seed(now.microsecond)
-            pkl.dump(arrivals_all_data_list, open(os.path.join(args.arrivals_path, str(random.randint(0, 100000))+ '_num_arrivals_' + str(g.num_arrivals) + '.pkl'), 'wb'))
-            print('finish arrivals')
-            services_all_data_list = [sample_single_arrive_ser('service', g.num_arrivals) for ind in range(args.list_size)]
-            pkl.dump(services_all_data_list, open(os.path.join(args.services_path, str(random.randint(0, 100000)) + '_num_arrivals_' + str(g.num_arrivals) + '.pkl'), 'wb'))
+            # arrivals_all_data_list = [sample_single_arrive_ser('arrivals', g.num_arrivals) for ind in range(args.list_size)]
+            # now = datetime.now()
+            # np.random.seed(now.microsecond)
+            # pkl.dump(arrivals_all_data_list, open(os.path.join(args.arrivals_path, str(random.randint(0, 100000))+ '_num_arrivals_' + str(g.num_arrivals) + '.pkl'), 'wb'))
+            # print('finish arrivals')
+            services_all_data_list = [sample_single_arrive_ser('service', g.num_arrivals) for ind in tqdm(range(args.list_size))]
+            pkl.dump(services_all_data_list, open(os.path.join(args.services_path, str(random.randint(0, 10000000)) + '_num_arrivals_' + str(g.num_arrivals) + '.pkl'), 'wb'))
             print('finish services')
 
 
@@ -1667,9 +1668,9 @@ def parse_arguments(argv):
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
     parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=100500)
-    parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=10000)
+    parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=100000)
     parser.add_argument('--arrivals_path', type=str, help='the path of the files to read from', default='/scratch/eliransc/ph_random/arrivals') #   r'C:\Users\user\workspace\data\ph_random\arrivals'
-    parser.add_argument('--services_path', type=str, help='the path of the files to read from', default='/scratch/eliransc/ph_random/services' ) #    r'C:\Users\user\workspace\data\ph_random\services'
+    parser.add_argument('--services_path', type=str, help='the path of the files to read from', default='/scratch/eliransc/ph_random/large_ph' ) #    r'C:\Users\user\workspace\data\ph_random\services'
 
     args = parser.parse_args(argv)
 
