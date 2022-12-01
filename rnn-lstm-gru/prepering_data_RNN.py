@@ -58,6 +58,8 @@ def main(args):
             print('removing: ', file)
             os.remove(os.path.join(path, file))
 
+    files = os.listdir(path)
+
     batch_size = 64
     num_batches = int(len(files) / batch_size)
 
