@@ -41,10 +41,22 @@ def create_single_data_point(path, files_list, ind):
 
 def main(args):
 
-    path = '/scratch/eliransc/from_Graham/time_dependant_cyclic'
+    path = '/scratch/eliransc/time_dependant_cyclic'
     files = os.listdir(path)
 
     df_files = pd.DataFrame([], columns=['file', 'batch'])
+
+    for file in tqdm(files):
+
+        try:
+            time_dict, arrival_rates, model_inputs, initial = pkl.load(open(os.path.join(path, file), 'rb'))
+            t = 0
+
+            np.concatenate((np.log(model_inputs[2][:5]), np.array([t]), np.array([arrival_rates[t]]), initial[:5]),
+                           axis=0)
+        except:
+            print('removing: ', file)
+            os.remove(os.path.join(path, file))
 
     batch_size = 64
     num_batches = int(len(files) / batch_size)
@@ -59,7 +71,7 @@ def main(args):
             df_files.loc[curr_ind_df, 'file'] = curr_file
             df_files.loc[curr_ind_df, 'batch'] = curr_batch
 
-            pkl.dump(df_files, open('graham_df_files.pkl', 'wb'))
+            pkl.dump(df_files, open('BELUGA_df_files.pkl', 'wb'))
             res_input, prob_queue_arr = create_single_data_point(path, files, ind)
             res_input = res_input.reshape(1, res_input.shape[0], res_input.shape[1])
             prob_queue_arr = prob_queue_arr.reshape(1, prob_queue_arr.shape[0], prob_queue_arr.shape[1])
@@ -71,7 +83,7 @@ def main(args):
                 batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
 
         pkl.dump((batch_input, batch_output), open(
-            '/scratch/eliransc/data_rnn_training/cyclic_poison/pkl_rnn/Graham_batch_' + str(curr_batch) + '.pkl', 'wb'))
+            '/scratch/eliransc/data_rnn_training/cyclic_poison/pkl_rnn/Beluga_batch_' + str(curr_batch) + '.pkl', 'wb'))
 
 
 def parse_arguments(argv):
