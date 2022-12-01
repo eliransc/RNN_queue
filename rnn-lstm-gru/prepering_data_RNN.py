@@ -46,19 +46,7 @@ def main(args):
 
     df_files = pd.DataFrame([], columns=['file', 'batch'])
 
-    for file in tqdm(files):
 
-        try:
-            time_dict, arrival_rates, model_inputs, initial = pkl.load(open(os.path.join(path, file), 'rb'))
-            t = 0
-
-            np.concatenate((np.log(model_inputs[2][:5]), np.array([t]), np.array([arrival_rates[t]]), initial[:5]),
-                           axis=0)
-        except:
-            print('removing: ', file)
-            os.remove(os.path.join(path, file))
-
-    files = os.listdir(path)
 
     batch_size = 64
     num_batches = int(len(files) / batch_size)
