@@ -22,57 +22,62 @@ def find_num_cust_time_stamp(df, time):
 
 def single_sim():
 
-    arrivals = np.random.exponential(1, 60)
-    services = np.random.exponential(1.05, 60)
+    num_arrivals = [300]
 
-    waiting = [0]
-    for ind in range(1, arrivals.shape[0]):
-        waiting.append(max(waiting[-1 ] +services[ind-1] -arrivals[ind] ,0))
-    df = pd.DataFrame([], columns = ['inter_arrival', 'service', 'waiting'])
+    for num_arrive in num_arrivals:
+        now = time.time()
+        arrivals = np.random.exponential(1,num_arrive)
+        services = np.random.exponential(1.05, num_arrive)
 
-    df['inter_arrival'] = arrivals
-    df['service'] = services
-    df['waiting'] = waiting
-    df['index'] = df.index
+        waiting = [0]
+        for ind in range(1, arrivals.shape[0]):
+            waiting.append(max(waiting[-1 ] +services[ind-1] -arrivals[ind] ,0))
+        df = pd.DataFrame([], columns = ['inter_arrival', 'service', 'waiting'])
 
-    df['arrival_time'] = df['index'].apply(lambda x: compute_arrival_time(x, df ))
+        df['inter_arrival'] = arrivals
+        df['service'] = services
+        df['waiting'] = waiting
+        df['index'] = df.index
 
-    df['departure_time'] = df['arrival_time' ]+ df['waiting' ] +df['service']
+        df['arrival_time'] = df['index'].apply(lambda x: compute_arrival_time(x, df ))
 
-    df1 = pd.DataFrame([], columns = ['Time_stamp', 'Type' , 'Customer_id'])
-    df2 = pd.DataFrame([], columns = ['Time_stamp', 'Type', 'Customer_id'])
+        df['departure_time'] = df['arrival_time' ]+ df['waiting' ] +df['service']
 
-    df1['Time_stamp'] = df['arrival_time']
-    df1['Type'] = 'arrival'
-    df1['Customer_id'] = df['index']
+        df1 = pd.DataFrame([], columns = ['Time_stamp', 'Type' , 'Customer_id'])
+        df2 = pd.DataFrame([], columns = ['Time_stamp', 'Type', 'Customer_id'])
 
-    df2['Time_stamp'] = df['departure_time']
-    df2['Type'] = 'departure'
-    df2['Customer_id'] = df['index']
+        df1['Time_stamp'] = df['arrival_time']
+        df1['Type'] = 'arrival'
+        df1['Customer_id'] = df['index']
 
-    df3 = pd.concat([df1, df2])
+        df2['Time_stamp'] = df['departure_time']
+        df2['Type'] = 'departure'
+        df2['Customer_id'] = df['index']
+
+        df3 = pd.concat([df1, df2])
 
 
-    df3 = df3.sort_values(by=['Time_stamp'])
-    df3 = df3.reset_index()
-    df3['index1'] = df3.index
+        df3 = df3.sort_values(by=['Time_stamp'])
+        df3 = df3.reset_index()
+        df3['index1'] = df3.index
 
-    df3['num_cust'] = df3['index1'].apply(lambda x: compute_NIS(x, df3))
+        df3['num_cust'] = df3['index1'].apply(lambda x: compute_NIS(x, df3))
 
-    now = time.time()
-    df3.loc[0, 'num_cust'] = 1
-    for ind in range(1 ,df3.shape[0]):
-        if df3.loc[ind, 'Type'] == 'arrival':
-            df3.loc[ind, 'num_cust'] = df3.loc[ind -1, 'num_cust'] + 1
-        else:
-            df3.loc[ind, 'num_cust'] = df3.loc[ind -1, 'num_cust'] - 1
-    # print('num cust took: ', time.time( ) -now)
+        # now = time.time()
+        df3.loc[0, 'num_cust'] = 1
+        for ind in range(1 ,df3.shape[0]):
+            if df3.loc[ind, 'Type'] == 'arrival':
+                df3.loc[ind, 'num_cust'] = df3.loc[ind -1, 'num_cust'] + 1
+            else:
+                df3.loc[ind, 'num_cust'] = df3.loc[ind -1, 'num_cust'] - 1
+        # print('num cust took {} for {} arrivals: ' .format(num_arrive ,time.time( ) - now))
 
-    now = time.time()
-    result = [(time_epoch, find_num_cust_time_stamp(df3, time_epoch)) for time_epoch in range(50)]
-    resultDictionary = dict((x, y) for x, y in result)
+        # now = time.time()
+        result = [(time_epoch, find_num_cust_time_stamp(df3, time_epoch)) for time_epoch in range(num_arrive)]
+        resultDictionary = dict((x, y) for x, y in result)
 
-    # print('dict took: ', time.time( ) -now)
+        # print('num cust took {} for {} arrivals: '.format(num_arrive, time.time() - now))
+        # print('dict took: ', time.time( ) -now)
 
     return resultDictionary
 

@@ -1581,11 +1581,115 @@ def generate_cycle_arrivals(number_sequences):
 
     return all_arrivals
 
+
+def give_rhos(num_groups, pick_rho, num_pirets, is_increasing):
+    num_groups = min(np.random.geometric(p=0.35), num_pirets)
+    # print('num pirets {} num groups {}' .format(num_pirets, num_groups))
+    group_sizes = recursion_group_size(num_groups, np.array([]), num_pirets).astype(int)
+    if is_increasing:
+        rates = np.sort(np.random.uniform(0.5, pick_rho, num_groups))
+    else:
+        rates = np.flip(np.sort(np.random.uniform(pick_rho, 5, num_groups)))
+
+    rates_arr = np.array([])
+    for ind, rate in enumerate(rates):
+        rates_arr = np.concatenate((rates_arr, np.ones(group_sizes[ind]) * rate))
+
+    return (rates_arr, group_sizes)
+
+
+
+
+
+def give_rhos(pick_rho, num_pirets, is_increasing):
+    # num_groups = min(np.random.geometric(p=0.35), num_pirets)
+    # # print('num pirets {} num groups {}' .format(num_pirets, num_groups))
+    # group_sizes = recursion_group_size(num_groups, np.array([]), num_pirets).astype(int)
+
+    num_groups, group_sizes = give_group_size(num_pirets)
+
+    if is_increasing:
+        rates = np.sort(np.random.uniform(0.5, pick_rho, num_groups))
+    else:
+        rates = np.flip(np.sort(np.random.uniform(pick_rho, 5, num_groups)))
+
+    rates_arr = np.array([])
+    for ind, rate in enumerate(rates):
+        rates_arr = np.concatenate((rates_arr, np.ones(group_sizes[ind]) * rate))
+
+    return (rates_arr, group_sizes)
+
+
+def give_service_mean_within_cycle(cycle_size):
+    # num_groups = min(np.random.geometric(p=0.5),cycle_size)
+    num_groups, group_sizes = give_group_size(
+        cycle_size)  # recursion_group_size(num_groups, np.array([]), cycle_size).astype(int)
+    service_mean = np.random.uniform(0.5, 3, num_groups)
+    services_arr = np.array([])
+    for ind, ser_mean in enumerate(service_mean):
+        services_arr = np.concatenate((services_arr, np.ones(group_sizes[ind]) * ser_mean))
+
+    return (services_arr, group_sizes)
+
+
+def give_rhos_arrival_rates_ser_mean(vector_lenght=80):
+    cycle_size = np.random.randint(30, 70)
+    num_cycles = int(vector_lenght / cycle_size)
+
+    last_cycle = vector_lenght - cycle_size * num_cycles
+    # print('cycle size: {}, num cycles: {}, sum full cycles: {}, last cycle: {}.' .format(cycle_size, num_cycles, cycle_size*num_cycles, last_cycle))
+
+    avg_rho = np.random.uniform(0.7, 1)
+    pick = np.random.randint(3, cycle_size - 3)
+    pick_rho = np.random.uniform(0.5, 5, 1)
+
+    if pick_rho < 1.2:
+        first_is_low = True
+    else:
+        first_is_low = False
+
+    if first_is_low:
+        first_batch, rhos_groups_1 = give_rhos(pick_rho, pick - 1, True)
+        second_batch, rhos_groups_2 = give_rhos(pick_rho, cycle_size - pick, False)
+    else:
+        first_batch, rhos_groups_1 = give_rhos(pick_rho, pick - 1, False)
+        second_batch, rhos_groups_2 = give_rhos(pick_rho, cycle_size - pick, True)
+
+    rhos_groups = np.concatenate((rhos_groups_1, np.array([1]), rhos_groups_2), axis=0)
+    rhos = np.concatenate((first_batch, pick_rho, second_batch), axis=0)
+    mean_rhos = rhos.mean()
+    rhos = (rhos / mean_rhos) * avg_rho
+    all_rhos = np.tile(rhos, num_cycles + 1)[:vector_lenght]
+
+    ser_mean, service_groups = give_service_mean_within_cycle(cycle_size)
+    all_ser = np.tile(ser_mean, num_cycles + 1)[:vector_lenght]
+
+    all_rates = all_rhos / all_ser
+
+    unique_rates = np.array(list(set(all_rates[:cycle_size])))
+    all_rates[:cycle_size][all_rates[:cycle_size] == unique_rates[0]].shape
+    group_size_arrive = []
+    for rate in unique_rates:
+        group_size_arrive.append(all_rates[:cycle_size][all_rates[:cycle_size] == rate].shape[0])
+
+    return (all_rhos, all_rates, ser_mean, service_groups, group_size_arrive, rhos_groups, cycle_size)
+
+
+def give_group_size(phases):
+    num_groups = 1 + min(np.random.geometric(p=np.random.uniform(0.5, 0.7)), int(phases / 5))
+    group_size = np.ones(num_groups) + \
+                 np.random.multinomial(phases - num_groups, [1 / num_groups] * num_groups, size=1)[0]
+    return num_groups, group_size.astype(int)
+
+
 def run_single_setting(args):
 
     # s_service, A_service, moms_service = model_inputs
 
     now = datetime.now()
+
+    all_rhos, all_rates, ser_mean, service_groups, group_size_arrive, rhos_groups, cycle_size = give_rhos_arrival_rates_ser_mean()
+
 
     arrival_rates = generate_cycle_arrivals(args.number_sequences)
 
@@ -1618,7 +1722,7 @@ def run_single_setting(args):
     model_num = np.random.randint(1, 1000000)
 
     list_of_lists1 = []
-    for ind in tqdm(range(2)):
+    for ind in tqdm(range(10)):
         list_of_dicts = [single_sim(services, model_inputs, arrival_rates, initial,  args) for ind in
                           range(1, args.num_iter_same_params + 1)]
         list_of_lists1.append(list_of_dicts)
@@ -1811,7 +1915,7 @@ def parse_arguments(argv):
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=100)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default=200)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default=2000)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
