@@ -1822,10 +1822,7 @@ def main(args):
 
         for ind in tqdm(range(args.batch_size)):
 
-            if os.path.exists('df_runtimes.pkl'):
-                df_runtimes = pkl.load(open('df_runtimes.pkl', 'rb'))
-            else:
-                df_runtimes = pd.DataFrame([])
+
 
             start = time.time()
             ####################
@@ -1833,9 +1830,7 @@ def main(args):
             ####################
             runtime = time.time() - start
 
-            curr_ind = df_runtimes.shape[0]
-            df_runtimes.loc[curr_ind, 'run_time'] = runtime
-            pkl.dump(df_runtimes, open('df_runtimes.pkl', 'wb'))
+
 
         # pkl.dump(curr_batch_data, open(r'C:\Users\user\workspace\notebooks\time_dependant\batch_data.pkl', 'wb'))
 
