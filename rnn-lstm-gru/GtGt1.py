@@ -1714,19 +1714,19 @@ def run_single_setting(args):
 
     proecessed_cycle_data = (arrive_means_per_group, ser_means_per_group, arrivals_dicts, services_dicts)
 
-    # pkl.dump((time_dict, row_cycle_info, proecessed_cycle_data, initial), open(full_path1, 'wb'))
+    pkl.dump((time_dict, row_cycle_info, proecessed_cycle_data, initial), open(full_path1, 'wb'))
 
-    res_input, prob_queue_arr = create_single_data_point(args.read_path, curr_path1)
+    res_input, prob_queue_arr = create_single_data_point(args.read_path, curr_path1, time_dict, row_cycle_info, proecessed_cycle_data, initial)
 
     return res_input, prob_queue_arr
 
 
 
-def create_single_data_point(path, file_name, max_prob = 70):
+def create_single_data_point(path, file_name, time_dict, row_cycle_info, proecessed_cycle_data, initial, max_prob = 70):
 
     full_path = os.path.join(path, file_name)
 
-    time_dict, row_cycle_info, proecessed_cycle_data, initial = pkl.load(open(full_path, 'rb'))
+    # time_dict, row_cycle_info, proecessed_cycle_data, initial = pkl.load(open(full_path, 'rb'))
 
     all_rhos, all_arrival_means, ser_mean, service_groups, group_size_arrive, rhos_groups, cycle_size, num_cycle = row_cycle_info
 
