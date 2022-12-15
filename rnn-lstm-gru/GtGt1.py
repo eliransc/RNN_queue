@@ -1843,12 +1843,12 @@ def parse_arguments(argv):
     parser.add_argument('--num_batches', type=int, help='num batches in one run', default=800)
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=80)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default=3)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default=200)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
     parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=100500)
-    parser.add_argument('--batch_size', type=float, help='service rate of mismatched customers', default=32)
+    parser.add_argument('--batch_size', type=float, help='service rate of mismatched customers', default=16)
     parser.add_argument('--batch_finalized_data_path', type=str, help='service rate of mismatched customers', default='/scratch/eliransc/time_dependant_cyclic')
     parser.add_argument('--read_path', type=str, help='the path of the files to read from', default=  '/scratch/eliransc/time_dependant_cyclic' ) # r'C:\Users\user\workspace\data\time_dependant'
     parser.add_argument('--read_path_niagara', type=str, help='the path of the files to read from',
