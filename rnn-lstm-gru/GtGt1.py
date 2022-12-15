@@ -1322,22 +1322,8 @@ class g:
     counter_for_moms_depart_sojourn = 0
 
     end_time = 80
+    max_num_customers = 500
 
-    # lenght1 = np.random.randint(5, 30)
-    # lenght2 = end_time - lenght1
-    #
-    # first_rate, second_rate = np.random.uniform(0.8, 1.5, 2)
-    #
-    # arrival_rates = np.append(np.ones(lenght1) * first_rate, np.ones(lenght2) * second_rate)
-
-    # arrival_rates = np.random.uniform(0.8, 1.5, end_time)
-    max_num_customers = 200
-
-
-
-    # time_dict2 = {}
-    # for time_ in range(end_time):
-    #     time_dict2[time_] = np.zeros(max_num_customers)
 
 
 
@@ -1598,11 +1584,8 @@ def give_rhos_arrival_rates_ser_mean(vector_lenght=80):
 
     if np.random.rand() < 0.6:
         pick_rho = np.random.uniform(2, 30, 1)
-    elif np.random.rand() < 0.7:
-        pick_rho = np.random.uniform(70, 100, 1)
     else:
-        pick_rho = np.random.uniform(100, 200, 1)
-
+        pick_rho = np.random.uniform(70, 100, 1)
 
 
 
