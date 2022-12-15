@@ -12,3 +12,4 @@ for file in tqdm(files):
     dd = pkl.load(open(os.path.join(path, file), 'rb'))
     for ind, dist in enumerate(dd):
         pkl.dump(dist, open(os.path.join(new_path, file[:-4] + '_' + str(ind)+'.pkl'), 'wb'))
+
