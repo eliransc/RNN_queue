@@ -1601,7 +1601,7 @@ def give_rhos_arrival_rates_ser_mean(vector_lenght=80):
     elif np.random.rand() < 0.7:
         pick_rho = np.random.uniform(70, 100, 1)
     else:
-        pick_rho = np.random.uniform(200, 400, 1)
+        pick_rho = np.random.uniform(100, 200, 1)
 
 
 
