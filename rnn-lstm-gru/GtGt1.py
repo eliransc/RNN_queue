@@ -1714,7 +1714,7 @@ def run_single_setting(args):
 
     proecessed_cycle_data = (arrive_means_per_group, ser_means_per_group, arrivals_dicts, services_dicts)
 
-    pkl.dump((time_dict, row_cycle_info, proecessed_cycle_data, initial), open(full_path1, 'wb'))
+    # pkl.dump((time_dict, row_cycle_info, proecessed_cycle_data, initial), open(full_path1, 'wb'))
 
     res_input, prob_queue_arr = create_single_data_point(args.read_path, curr_path1)
 
