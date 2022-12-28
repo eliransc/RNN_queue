@@ -1813,7 +1813,7 @@ def main(args):
         args.batch_finalized_data_path = r'C:\Users\user\workspace\data\time_dependant_100'
     else:
         args.read_path = '/scratch/eliransc/sim_trans_gt_gt_1'
-        args.batch_finalized_data_path = '/scratch/eliransc/input_output_gt_gt_1_100'
+        args.batch_finalized_data_path = '/scratch/eliransc/input_output_gt_gt_1'
 
     for ind_num_batches in range(args.num_batches):
 
