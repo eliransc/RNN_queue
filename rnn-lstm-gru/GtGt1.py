@@ -1579,7 +1579,7 @@ def give_rhos_arrival_rates_ser_mean(vector_lenght=80):
     last_cycle = vector_lenght - cycle_size * num_cycles
     # print('cycle size: {}, num cycles: {}, sum full cycles: {}, last cycle: {}.' .format(cycle_size, num_cycles, cycle_size*num_cycles, last_cycle))
 
-    avg_rho = np.random.uniform(0.98, 1)
+    avg_rho = np.random.uniform(0.6, 1)
     pick = np.random.randint(3, cycle_size - 3)
 
     if np.random.rand() < 0.6:
@@ -1721,7 +1721,6 @@ def run_single_setting(args):
     return res_input, prob_queue_arr
 
 
-
 def create_single_data_point(path, file_name, time_dict, row_cycle_info, proecessed_cycle_data, initial, max_prob = 70):
 
     full_path = os.path.join(path, file_name)
@@ -1814,7 +1813,7 @@ def main(args):
         args.batch_finalized_data_path = r'C:\Users\user\workspace\data\time_dependant_100'
     else:
         args.read_path = '/scratch/eliransc/sim_trans_gt_gt_1'
-        args.batch_finalized_data_path = '/scratch/eliransc/input_output_gt_gt_1'
+        args.batch_finalized_data_path = '/scratch/eliransc/input_output_gt_gt_1_100'
 
     for ind_num_batches in range(args.num_batches):
 
@@ -1822,15 +1821,11 @@ def main(args):
 
         for ind in tqdm(range(args.batch_size)):
 
-
-
             start = time.time()
             ####################
             curr_batch_data.append(run_single_setting(args))
             ####################
             runtime = time.time() - start
-
-
 
         # pkl.dump(curr_batch_data, open(r'C:\Users\user\workspace\notebooks\time_dependant\batch_data.pkl', 'wb'))
 
