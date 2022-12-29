@@ -98,19 +98,13 @@ def main(args):
                               batch_size=batch_size,
                               shuffle=True,
                               num_workers=2)
+
     valid_loader = DataLoader(dataset=dataset_valid,
                               batch_size=batch_size,
                               shuffle=True,
                               num_workers=2)
 
-    train_loader = DataLoader(dataset=dataset,
-                              batch_size=batch_size,
-                              shuffle=True,
-                              num_workers=2)
-    valid_loader = DataLoader(dataset=dataset_valid,
-                              batch_size=batch_size,
-                              shuffle=True,
-                              num_workers=2)
+
 
     model = RNN(input_size, hidden_size, num_layers, output_size).to(device)
 
@@ -132,7 +126,7 @@ def main(args):
 
 
         optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-        learning_rate = learning_rate / (epoch + 1)
+        learning_rate = learning_rate*0.9
         print(learning_rate)
         for i, (inputs, labels) in enumerate(train_loader):
             inputs = inputs.reshape(inputs.shape[0] * inputs.shape[1], inputs.shape[2], inputs.shape[3])
@@ -158,13 +152,13 @@ def main(args):
                 if (i + 1) % 100 == 0:
                     print(f'Epoch [{epoch + 1}/{num_epochs}], Step [{i + 1}/{n_total_steps}], Loss: {loss.item():.4f}')
 
-    torch.save(model.state_dict(),
-               '/scratch/eliransc/RNN_models/pytorch_gt_gt_1_true_moms_new_data_' + setting_string + '_' + str(
-                   current_time) + '.pkl')
+        torch.save(model.state_dict(),
+                   '/scratch/eliransc/RNN_models/pytorch_gt_gt_1_true_moms_new_data_' + setting_string + '_' + str(
+                       current_time) + '.pkl')
 
-    pkl.dump(loss_list,
-             open('/scratch/eliransc/RNN_models/' + 'loss_' + setting_string + '_' + str(
-                 current_time) + '.pkl', 'wb'))
+        pkl.dump(loss_list,
+                 open('/scratch/eliransc/RNN_models/' + 'loss_' + setting_string + '_' + str(
+                     current_time) + '.pkl', 'wb'))
 
 
 def parse_arguments(argv):
