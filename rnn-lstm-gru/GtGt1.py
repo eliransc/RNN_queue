@@ -1573,13 +1573,13 @@ def give_service_mean_within_cycle(cycle_size):
 
 
 def give_rhos_arrival_rates_ser_mean(vector_lenght=80):
-    cycle_size = np.random.randint(30, 70)
+    cycle_size = np.random.randint(10, 40)
     num_cycles = int(vector_lenght / cycle_size)
 
     last_cycle = vector_lenght - cycle_size * num_cycles
     # print('cycle size: {}, num cycles: {}, sum full cycles: {}, last cycle: {}.' .format(cycle_size, num_cycles, cycle_size*num_cycles, last_cycle))
 
-    avg_rho = np.random.uniform(0.6, 0.97)
+    avg_rho = np.random.uniform(0.8, 0.97)
     pick = np.random.randint(3, cycle_size - 3)
 
     if np.random.rand() < 0.6:
@@ -1836,7 +1836,7 @@ def parse_arguments(argv):
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--num_batches', type=int, help='num batches in one run', default=800)
-    parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=80)
+    parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=40)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
     parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default=2000)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)

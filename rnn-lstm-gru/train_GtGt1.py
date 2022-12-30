@@ -29,8 +29,8 @@ class my_Dataset(Dataset):
     def __getitem__(self, index):
         # print(self.data_paths[index])
         x, y = pkl.load(open(self.data_paths[index], 'rb'))
-        x = torch.from_numpy(x[:, :, :21 + 15])
-        y = torch.from_numpy(y)
+        x = torch.from_numpy(x[:, :40, :21 + 15])
+        y = torch.from_numpy(y[:, :40, :])
 
         return x, y
 
