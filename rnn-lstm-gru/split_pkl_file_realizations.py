@@ -2,11 +2,11 @@ import os
 import pickle as pkl
 from tqdm import tqdm
 
-path = '/scratch/eliransc/ph_random/large_ph'
+path = '/scratch/eliransc/ph_random/medium_ph'
 
 files = os.listdir(path)
 
-new_path = '/scratch/eliransc/ph_random/large_ph_one_in_pkl'
+new_path = '/scratch/eliransc/ph_random/large_ph_one_in_pkl_mdium'
 
 for file in tqdm(files):
     dd = pkl.load(open(os.path.join(path, file), 'rb'))
