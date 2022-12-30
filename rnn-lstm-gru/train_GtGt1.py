@@ -90,7 +90,7 @@ def main(args):
     learning_rate = np.random.choice([0.0001, 0.005, 0.0005, 0.0002, 0.00001], p=[0.2, 0.2, 0.2, 0.2, 0.2])
 
     input_size = 36
-    sequence_length = 80
+    sequence_length = 40
     hidden_size = int(np.random.choice([32, 64, 128], p=[0.3, 0.4, 0.3]))
     num_layers = np.random.randint(2, 10)
     output_size = 71
