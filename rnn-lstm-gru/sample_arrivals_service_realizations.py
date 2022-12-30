@@ -1367,7 +1367,7 @@ class g:
     service_times = []
     queueing_time = {}
     inter_departure_time = []
-    num_arrivals = 450
+    num_arrivals = 75000
     warm_up_arrivals = 400
     num_moms  =  10
     counter_for_moms_arrivals = 0

@@ -1321,7 +1321,7 @@ class g:
     counter_for_moms_arrivals = 0
     counter_for_moms_depart_sojourn = 0
 
-    end_time = 80
+    end_time = 40
     max_num_customers = 500
 
 
@@ -1385,7 +1385,7 @@ class GG1:
         elif self.sim_lenght_indicator == 1:
             self.end_time = 30
         else:
-            self.end_time = 80
+            self.end_time = 40
 
 
 
@@ -1560,7 +1560,7 @@ def give_rhos(pick_rho, num_pirets, is_increasing):
     return (rates_arr, group_sizes)
 
 
-def give_service_mean_within_cycle(cycle_size):
+def give_service_mean_within_cycle(cycle_size ):
     # num_groups = min(np.random.geometric(p=0.5),cycle_size)
     num_groups, group_sizes = give_group_size(
         cycle_size)  # recursion_group_size(num_groups, np.array([]), cycle_size).astype(int)
@@ -1571,6 +1571,16 @@ def give_service_mean_within_cycle(cycle_size):
 
     return (services_arr, group_sizes)
 
+
+def give_service_mean_within_cycle(cycle_size ):
+    # num_groups = min(np.random.geometric(p=0.5),cycle_size)
+    num_groups, group_sizes = 1, np.array([cycle_size])
+    service_mean = np.random.uniform(0.5, 3, num_groups)
+    services_arr = np.array([])
+    for ind, ser_mean in enumerate(service_mean):
+        services_arr = np.concatenate((services_arr, np.ones(group_sizes[ind]) * ser_mean))
+
+    return (services_arr, group_sizes)
 
 def give_rhos_arrival_rates_ser_mean(vector_lenght=80):
     cycle_size = np.random.randint(10, 40)
@@ -1586,8 +1596,6 @@ def give_rhos_arrival_rates_ser_mean(vector_lenght=80):
         pick_rho = np.random.uniform(2, 30, 1)
     else:
         pick_rho = np.random.uniform(70, 100, 1)
-
-
 
     if pick_rho < 1.2:
         first_is_low = True
@@ -1622,6 +1630,59 @@ def give_rhos_arrival_rates_ser_mean(vector_lenght=80):
 
     return (all_rhos, all_arrival_means, all_ser, service_groups, np.array(group_size_arrive), rhos_groups, cycle_size,
             num_cycles)
+
+def give_rhos_arrival_rates_ser_mean(vector_lenght=80):
+
+    cycle_size = np.random.randint(10, 40)
+    num_cycles = int(vector_lenght / cycle_size)
+
+    last_cycle = vector_lenght - cycle_size * num_cycles
+    # print('cycle size: {}, num cycles: {}, sum full cycles: {}, last cycle: {}.' .format(cycle_size, num_cycles, cycle_size*num_cycles, last_cycle))
+
+    avg_rho = np.random.uniform(0.6, 0.97)
+    pick = np.random.randint(3, cycle_size - 3)
+
+    if np.random.rand() < 0.6:
+        pick_rho = np.random.uniform(2, 30, 1)
+    else:
+        pick_rho = np.random.uniform(70, 100, 1)
+
+    if pick_rho < 1.2:
+        first_is_low = True
+    else:
+        first_is_low = False
+
+    if first_is_low:
+        first_batch, rhos_groups_1 = give_rhos(pick_rho, pick - 1, True)
+        second_batch, rhos_groups_2 = give_rhos(pick_rho, cycle_size - pick, False)
+    else:
+        first_batch, rhos_groups_1 = give_rhos(pick_rho, pick - 1, False)
+        second_batch, rhos_groups_2 = give_rhos(pick_rho, cycle_size - pick, True)
+
+    rhos_groups = np.concatenate((rhos_groups_1, np.array([1]), rhos_groups_2), axis=0)
+    rhos = np.concatenate((first_batch, pick_rho, second_batch), axis=0)
+    rhos = np.ones(cycle_size)*avg_rho
+
+
+    all_rhos = np.tile(rhos, num_cycles + 1)[:vector_lenght]
+
+    ser_mean, service_groups = give_service_mean_within_cycle(cycle_size)
+    all_ser = np.tile(ser_mean, num_cycles + 1)[:vector_lenght]
+
+    all_rates = all_rhos / all_ser
+
+    all_arrival_means = 1 / all_rates
+
+    unique_rates = np.array(list(set(all_rates[:cycle_size])))
+    all_rates[:cycle_size][all_rates[:cycle_size] == unique_rates[0]].shape
+    group_size_arrive = []
+    for rate in unique_rates:
+        group_size_arrive.append(all_rates[:cycle_size][all_rates[:cycle_size] == rate].shape[0])
+
+    return (all_rhos, all_arrival_means, all_ser, service_groups, np.array(group_size_arrive), rhos_groups, cycle_size,
+            num_cycles)
+
+
 
 
 def give_group_size(phases):
