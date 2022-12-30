@@ -1729,7 +1729,7 @@ def run_single_setting(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         dists_path = r'C:\Users\user\workspace\data\ph_random\ph_mean_1_one_per_pkl'
     else:
-        dists_path = '/scratch/eliransc/ph_random/large_ph_one_in_pkl_mdium/ # large_ph_one_in_pkl'   #
+        dists_path = '/scratch/eliransc/ph_random/large_ph_one_in_pkl_mdium/' # large_ph_one_in_pkl'   #
 
     all_rhos, all_arrival_means, ser_mean, service_groups, group_size_arrive, rhos_groups, cycle_size, num_cycles\
         = give_rhos_arrival_rates_ser_mean(args.number_sequences)
