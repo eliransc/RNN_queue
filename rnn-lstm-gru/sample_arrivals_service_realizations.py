@@ -1170,12 +1170,12 @@ def gg1_generator_arrivals( util_lower = 0.5, util_upper = 0.99, arrival_dist = 
 
 
     if np.random.rand() < 0.8:
-        s_arrival, A_arrival = create_gen_erlang_many_ph(np.random.randint(5, 500))
+        s_arrival, A_arrival = create_gen_erlang_many_ph(np.random.randint(5, 250))
     else:
         try:
-            s_arrival, A_arrival = create_mix_erlang_ph(np.random.randint(5, 500))
+            s_arrival, A_arrival = create_mix_erlang_ph(np.random.randint(5, 250))
         except:
-            s_arrival, A_arrival = create_gen_erlang_many_ph(np.random.randint(5, 500))
+            s_arrival, A_arrival = create_gen_erlang_many_ph(np.random.randint(5, 250))
 
     moms_arrive = np.array(compute_first_n_moments(s_arrival, A_arrival, 10)).flatten()
 
@@ -1670,7 +1670,7 @@ def parse_arguments(argv):
     parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=100500)
     parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=100000)
     parser.add_argument('--arrivals_path', type=str, help='the path of the files to read from', default='/scratch/eliransc/ph_random/arrivals') #   r'C:\Users\user\workspace\data\ph_random\arrivals'
-    parser.add_argument('--services_path', type=str, help='the path of the files to read from', default='/scratch/eliransc/ph_random/large_ph' ) #    r'C:\Users\user\workspace\data\ph_random\services'
+    parser.add_argument('--services_path', type=str, help='the path of the files to read from', default='/scratch/eliransc/ph_random/medium_ph' ) #    r'C:\Users\user\workspace\data\ph_random\services'
 
     args = parser.parse_args(argv)
 
