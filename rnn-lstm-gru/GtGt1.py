@@ -1589,7 +1589,7 @@ def give_rhos_arrival_rates_ser_mean(vector_lenght=80):
     last_cycle = vector_lenght - cycle_size * num_cycles
     # print('cycle size: {}, num cycles: {}, sum full cycles: {}, last cycle: {}.' .format(cycle_size, num_cycles, cycle_size*num_cycles, last_cycle))
 
-    avg_rho = np.random.uniform(0.8, 0.97)
+    avg_rho = np.random.uniform(0.6, 0.97)
     pick = np.random.randint(3, cycle_size - 3)
 
     if np.random.rand() < 0.6:
@@ -1640,27 +1640,27 @@ def give_rhos_arrival_rates_ser_mean(vector_lenght=80):
     # print('cycle size: {}, num cycles: {}, sum full cycles: {}, last cycle: {}.' .format(cycle_size, num_cycles, cycle_size*num_cycles, last_cycle))
 
     avg_rho = np.random.uniform(0.6, 0.97)
-    pick = np.random.randint(3, cycle_size - 3)
+    # pick = np.random.randint(3, cycle_size - 3)
+    #
+    # if np.random.rand() < 0.6:
+    #     pick_rho = np.random.uniform(2, 30, 1)
+    # else:
+    #     pick_rho = np.random.uniform(70, 100, 1)
+    #
+    # if pick_rho < 1.2:
+    #     first_is_low = True
+    # else:
+    #     first_is_low = False
+    #
+    # if first_is_low:
+    #     first_batch, rhos_groups_1 = give_rhos(pick_rho, pick - 1, True)
+    #     second_batch, rhos_groups_2 = give_rhos(pick_rho, cycle_size - pick, False)
+    # else:
+    #     first_batch, rhos_groups_1 = give_rhos(pick_rho, pick - 1, False)
+    #     second_batch, rhos_groups_2 = give_rhos(pick_rho, cycle_size - pick, True)
 
-    if np.random.rand() < 0.6:
-        pick_rho = np.random.uniform(2, 30, 1)
-    else:
-        pick_rho = np.random.uniform(70, 100, 1)
-
-    if pick_rho < 1.2:
-        first_is_low = True
-    else:
-        first_is_low = False
-
-    if first_is_low:
-        first_batch, rhos_groups_1 = give_rhos(pick_rho, pick - 1, True)
-        second_batch, rhos_groups_2 = give_rhos(pick_rho, cycle_size - pick, False)
-    else:
-        first_batch, rhos_groups_1 = give_rhos(pick_rho, pick - 1, False)
-        second_batch, rhos_groups_2 = give_rhos(pick_rho, cycle_size - pick, True)
-
-    rhos_groups = np.concatenate((rhos_groups_1, np.array([1]), rhos_groups_2), axis=0)
-    rhos = np.concatenate((first_batch, pick_rho, second_batch), axis=0)
+    rhos_groups =  np.array([cycle_size])# np.concatenate((rhos_groups_1, np.array([1]), rhos_groups_2), axis=0)
+    # rhos = np.concatenate((first_batch, pick_rho, second_batch), axis=0)
     rhos = np.ones(cycle_size)*avg_rho
 
 
@@ -1729,7 +1729,7 @@ def run_single_setting(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         dists_path = r'C:\Users\user\workspace\data\ph_random\ph_mean_1_one_per_pkl'
     else:
-        dists_path = '/scratch/eliransc/ph_random/large_ph_one_in_pkl'   #
+        dists_path = '/scratch/eliransc/ph_random/large_ph_one_in_pkl_mdium/ # large_ph_one_in_pkl'   #
 
     all_rhos, all_arrival_means, ser_mean, service_groups, group_size_arrive, rhos_groups, cycle_size, num_cycles\
         = give_rhos_arrival_rates_ser_mean(args.number_sequences)
