@@ -1594,7 +1594,7 @@ def run_single_setting(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         services_path = r'C:\Users\user\workspace\data\ph_random\services'
     else:
-        services_path = '/scratch/eliransc/ph_random/services'   #
+        services_path = '/scratch/eliransc/ph_random/medium_ph'   #
 
     files = os.listdir(services_path)
     num_files = len(files)
@@ -1666,7 +1666,7 @@ def main(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         args.read_path = r'C:\Users\user\workspace\data\time_dependant_100'
     else:
-        args.read_path = '/scratch/eliransc/time_dependant_cyclic_100_test'   #
+        args.read_path = '/scratch/eliransc/pkl_rnn'   #
 
     for ind in tqdm(range(args.num_iterations)):
 
