@@ -1615,7 +1615,7 @@ def run_single_setting(args):
     for time_ in range(g.end_time):
         time_dict[time_] = np.zeros(g.max_num_customers)
 
-    model_num = np.random.randint(1, 1000000)
+    model_num = np.random.randint(1, 100000000)
 
     list_of_lists1 = []
     for ind in tqdm(range(2)):
