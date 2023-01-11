@@ -1849,7 +1849,7 @@ def dump_batch_data(curr_batch_data, args):
     now = datetime.now()
     current_time = now.strftime("%H_%M_%S")
     np.random.seed(now.microsecond)
-    model_name = np.random.randint(0,100000000)
+    model_name = np.random.randint(0, 100000000)
 
     curr_path1 ='Model_number_' + str(model_name) + '_sequence_length_'\
                 + str(args.number_sequences) + '_batch_size_' + str(args.batch_size) + '.pkl'

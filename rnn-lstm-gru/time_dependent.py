@@ -1321,7 +1321,7 @@ class g:
     counter_for_moms_arrivals = 0
     counter_for_moms_depart_sojourn = 0
 
-    end_time = 100
+    end_time = 40
 
     # lenght1 = np.random.randint(5, 30)
     # lenght2 = end_time - lenght1
@@ -1390,7 +1390,7 @@ class GG1:
         elif self.sim_lenght_indicator == 1:
             self.end_time = 30
         else:
-            self.end_time = 100
+            self.end_time = 40
 
         # print(self.end_time)
 
@@ -1634,13 +1634,17 @@ def run_single_setting(args):
 
     full_path1 = os.path.join(args.read_path, curr_path1)
 
-    pkl.dump((time_dict, arrival_rates, model_inputs, initial), open(full_path1, 'wb'))
+    res_input, prob_queue_arr = create_single_data_point(time_dict, arrival_rates, model_inputs, initial)
+    pkl.dump((res_input, prob_queue_arr), open(full_path1, 'wb'))
 
 
-def create_single_data_point(path, files_list, ind):
+    # pkl.dump((time_dict, arrival_rates, model_inputs, initial), open(full_path1, 'wb'))
+
+
+def create_single_data_point(time_dict, arrival_rates, model_inputs, initial):
     res_input = np.array([])
     prob_queue_arr = np.array([])
-    time_dict, arrival_rates, model_inputs, initial = pkl.load(open(os.path.join(path, files_list[ind]), 'rb'))
+    # time_dict, arrival_rates, model_inputs, initial = pkl.load(open(os.path.join(path, files_list[ind]), 'rb'))
     for t in range(len(time_dict)):
         arr_input = np.concatenate((np.log(model_inputs[2][:5]), np.array([t]), np.array([arrival_rates[t]]), initial[:5]), axis =0)
         arr_input = arr_input.reshape(1,arr_input.shape[0])
@@ -1664,9 +1668,9 @@ def main(args):
     if 'dkrass' in os.getcwd().split('/'):
         args.read_path = '/scratch/d/dkrass/eliransc/time_dependant_cyclic'
     elif 'C:' in os.getcwd().split('/')[0]:
-        args.read_path = r'C:\Users\user\workspace\data\time_dependant_100'
+        args.read_path = r'C:\Users\user\workspace\data\mt_g_1'
     else:
-        args.read_path = '/scratch/eliransc/pkl_rnn'   #
+        args.read_path = '/scratch/eliransc/pkl_mt_g_1' #
 
     for ind in tqdm(range(args.num_iterations)):
 
@@ -1811,7 +1815,7 @@ def parse_arguments(argv):
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=100)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default=200)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default=4000)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
