@@ -43,7 +43,7 @@ def main():
 
     folder_path = '/scratch/eliransc/all_mt_g_1_files'
 
-    folder_num = np.random.randint(1, 39)
+    folder_num = np.random.randint(1, 59)
 
     batch_size = 32
 
