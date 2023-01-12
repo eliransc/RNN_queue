@@ -1301,6 +1301,10 @@ def generate_ph(is_arrival, is_exponential):
 
 
 def find_num_cust_time_stamp(df, time):
+
+    if time == 0:
+        return df.loc[df['Time_stamp'] == 0, :].shape[0]
+
     if df.loc[df['Time_stamp'] < time, :].shape[0] == 0:
         return 0
     else:
@@ -1323,8 +1327,6 @@ class g:
 
     end_time = 40
     max_num_customers = 500
-
-
 
 
 
@@ -1387,9 +1389,6 @@ class GG1:
         else:
             self.end_time = 40
 
-
-
-
     def run(self):
 
         self.env.process(self.customer_arrivals())
@@ -1425,47 +1424,40 @@ class GG1:
 
             self.prev_departure = self.last_departure
             self.last_departure = self.env.now
-
-
             tot_time = self.env.now - self.last_event_time
             self.num_cust_sys -= 1
             self.last_event_time = self.env.now
             self.last_time = self.env.now
-
             self.event_log_customer_id_list.append(customer.id)
             self.event_log_time_stamp.append(self.env.now)
             self.event_log_num_cust_list.append(self.num_cust_sys)
             self.event_log_type_list.append('Departure')
 
 
-
-
     def customer_arrivals(self):
 
-        num_cust_init =  np.random.choice(self.size_initial, 1, p=self.initial_probs)[0]
+        num_cust_init = np.random.choice(self.size_initial, 1, p=self.initial_probs)[0]
 
         for ind in range(num_cust_init):
             yield self.env.timeout(0)
-
             arrival_time = self.env.now
             customer = Customer(self.customer_counter, arrival_time)
-
             self.customer_counter += 1
 
             self.event_log_customer_id_list.append(customer.id)
             self.event_log_time_stamp.append(self.env.now)
+            self.num_cust_sys += 1
             self.event_log_num_cust_list.append(self.num_cust_sys)
+
             self.event_log_type_list.append('Arrival')
 
             tot_time = self.env.now - self.last_event_time
             self.last_event_time = self.env.now
-            self.num_cust_sys += 1
+
             self.last_time = self.env.now
             self.env.process(self.service(customer))
 
-
         while True:
-
 
             time_period = int(self.env.now)
 
@@ -1478,18 +1470,14 @@ class GG1:
 
             arrival_time = self.env.now
             customer = Customer(self.customer_counter, arrival_time)
-
             self.customer_counter += 1
-
             self.event_log_customer_id_list.append(customer.id)
             self.event_log_time_stamp.append(self.env.now)
-            self.event_log_num_cust_list.append(self.num_cust_sys)
-            self.event_log_type_list.append('Arrival')
-
-
 
             self.last_event_time = self.env.now
             self.num_cust_sys += 1
+            self.event_log_num_cust_list.append(self.num_cust_sys)
+            self.event_log_type_list.append('Arrival')
             self.last_time = self.env.now
             self.env.process(self.service(customer))
 
@@ -1530,7 +1518,8 @@ def give_service_mean_within_cycle(cycle_size):
     # num_groups = min(np.random.geometric(p=0.5),cycle_size)
     num_groups, group_sizes = give_group_size(
         cycle_size)  # recursion_group_size(num_groups, np.array([]), cycle_size).astype(int)
-    service_mean = np.random.uniform(0.5, 3, num_groups)
+    service_mean = np.random.randint(1, 2, num_groups) #np.random.uniform(0.5, 3, num_groups)
+    service_mean = service_mean.astype(float)
     services_arr = np.array([])
     for ind, ser_mean in enumerate(service_mean):
         services_arr = np.concatenate((services_arr, np.ones(group_sizes[ind]) * ser_mean))
@@ -1575,7 +1564,7 @@ def give_service_mean_within_cycle(cycle_size ):
 def give_service_mean_within_cycle(cycle_size ):
     # num_groups = min(np.random.geometric(p=0.5),cycle_size)
     num_groups, group_sizes = 1, np.array([cycle_size])
-    service_mean = np.random.uniform(0.5, 3, num_groups)
+    service_mean = np.random.randint(1, 2, num_groups) #np.random.uniform(0.5, 3, num_groups)
     services_arr = np.array([])
     for ind, ser_mean in enumerate(service_mean):
         services_arr = np.concatenate((services_arr, np.ones(group_sizes[ind]) * ser_mean))
@@ -1583,13 +1572,13 @@ def give_service_mean_within_cycle(cycle_size ):
     return (services_arr, group_sizes)
 
 def give_rhos_arrival_rates_ser_mean(vector_lenght=80):
-    cycle_size = np.random.randint(10, 40)
+    cycle_size = np.random.randint(10, 30)
     num_cycles = int(vector_lenght / cycle_size)
 
     last_cycle = vector_lenght - cycle_size * num_cycles
     # print('cycle size: {}, num cycles: {}, sum full cycles: {}, last cycle: {}.' .format(cycle_size, num_cycles, cycle_size*num_cycles, last_cycle))
 
-    avg_rho = np.random.uniform(0.6, 0.97)
+    avg_rho = np.random.uniform(0.1, 0.12)
     pick = np.random.randint(3, cycle_size - 3)
 
     if np.random.rand() < 0.6:
@@ -1684,7 +1673,6 @@ def give_rhos_arrival_rates_ser_mean(vector_lenght=80):
 
 
 
-
 def give_group_size(phases):
     num_groups = 1 + min(np.random.geometric(p=np.random.uniform(0.5, 0.7)), int(phases / 5))
     group_size = np.ones(num_groups) + \
@@ -1741,7 +1729,6 @@ def run_single_setting(args):
     services_dicts = create_dist_dicts(dists_path, ser_means_per_group, service_groups)
 
     np.random.seed(now.microsecond)
-
 
     size_initial = 100
     num_positive_values = np.random.randint(5, 15)
@@ -1899,12 +1886,12 @@ def parse_arguments(argv):
     parser.add_argument('--num_batches', type=int, help='num batches in one run', default=800)
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=40)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default=2000)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default=1600)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
     parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=100500)
-    parser.add_argument('--batch_size', type=float, help='service rate of mismatched customers', default=16)
+    parser.add_argument('--batch_size', type=float, help='service rate of mismatched customers', default=2)
     parser.add_argument('--batch_finalized_data_path', type=str, help='service rate of mismatched customers', default='/scratch/eliransc/time_dependant_cyclic')
     parser.add_argument('--read_path', type=str, help='the path of the files to read from', default=  '/scratch/eliransc/time_dependant_cyclic' ) # r'C:\Users\user\workspace\data\time_dependant'
     parser.add_argument('--read_path_niagara', type=str, help='the path of the files to read from',

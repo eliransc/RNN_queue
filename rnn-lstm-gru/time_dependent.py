@@ -1307,6 +1307,7 @@ def find_num_cust_time_stamp(df, time):
         LB = df.loc[df['Time_stamp'] < time, :].index[-1]
         return df.loc[LB, 'num_cust']
 
+
 class g:
 
 
@@ -1333,11 +1334,6 @@ class g:
     # arrival_rates = np.random.uniform(0.8, 1.5, end_time)
     max_num_customers = 200
 
-
-
-    # time_dict2 = {}
-    # for time_ in range(end_time):
-    #     time_dict2[time_] = np.zeros(max_num_customers)
 
 
 
@@ -1673,7 +1669,7 @@ def main(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         args.read_path = r'C:\Users\user\workspace\data\mt_g_1'
     else:
-        args.read_path = '/scratch/eliransc/pkl_mt_g_1' #
+        args.read_path = '/scratch/eliransc/new_g_g_1_trans' #
 
     for ind in tqdm(range(args.num_iterations)):
 
