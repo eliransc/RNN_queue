@@ -78,6 +78,7 @@ def main():
                     batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
                 # print(os.path.join(path, files[ind]))
                 os.remove(os.path.join(path, files[ind]))
+            curr_batch = np.random.randint(1, 10000000)
             pkl.dump((batch_input, batch_output),
                      open(os.path.join('/scratch/eliransc/mt_g_1_batches', 'batch_' + str(curr_batch) + '.pkl'), 'wb'))
 
