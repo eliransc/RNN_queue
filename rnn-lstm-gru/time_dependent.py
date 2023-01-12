@@ -1615,6 +1615,9 @@ def run_single_setting(args):
     for time_ in range(g.end_time):
         time_dict[time_] = np.zeros(g.max_num_customers)
 
+    now = datetime.now()
+    current_time = now.strftime("%H_%M_%S")
+    np.random.seed(now.microsecond)
     model_num = np.random.randint(1, 100000000)
 
     list_of_lists1 = []
