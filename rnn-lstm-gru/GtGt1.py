@@ -1886,7 +1886,7 @@ def parse_arguments(argv):
     parser.add_argument('--num_batches', type=int, help='num batches in one run', default=800)
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=40)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default=1600)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default=1000)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
