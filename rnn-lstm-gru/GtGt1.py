@@ -1861,7 +1861,7 @@ def main(args):
         args.batch_finalized_data_path = r'C:\Users\user\workspace\data\time_dependant_100'
     else:
         args.read_path = '/scratch/eliransc/sim_trans_gt_gt_1'
-        args.batch_finalized_data_path = '/scratch/eliransc/input_output_g_g_1'
+        args.batch_finalized_data_path = '/scratch/eliransc/new_g_g_1_trans'
 
     for ind_num_batches in range(args.num_batches):
 
@@ -1891,7 +1891,7 @@ def parse_arguments(argv):
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
     parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=100500)
-    parser.add_argument('--batch_size', type=float, help='service rate of mismatched customers', default=2)
+    parser.add_argument('--batch_size', type=float, help='service rate of mismatched customers', default=16)
     parser.add_argument('--batch_finalized_data_path', type=str, help='service rate of mismatched customers', default='/scratch/eliransc/time_dependant_cyclic')
     parser.add_argument('--read_path', type=str, help='the path of the files to read from', default=  '/scratch/eliransc/time_dependant_cyclic' ) # r'C:\Users\user\workspace\data\time_dependant'
     parser.add_argument('--read_path_niagara', type=str, help='the path of the files to read from',
