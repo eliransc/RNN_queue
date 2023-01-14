@@ -3,6 +3,6 @@
 #SBATCH -A def-dkrass
 #SBATCH --mem 10000
 source /home/eliransc/projects/def-dkrass/eliransc/queues/bin/activate
-python /home/eliransc/projects/def-dkrass/eliransc/RNN_queue/rnn-lstm-gru/GtGt1.py
+python /home/eliransc/projects/def-dkrass/eliransc/RNN_queue/rnn-lstm-gru/new_gt_gt_1_sim.py
 
 
