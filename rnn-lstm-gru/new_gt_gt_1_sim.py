@@ -1675,7 +1675,7 @@ def create_single_data_point(time_dict, arrival_rates, model_inputs, initial):
     prob_queue_arr = np.array([])
     # time_dict, arrival_rates, model_inputs, initial = pkl.load(open(os.path.join(path, files_list[ind]), 'rb'))
     for t in range(len(time_dict)):
-        arr_input = np.concatenate((np.log(model_inputs[2][:5]), np.log(model_inputs[5][:5]/np.array([arrival_rates[t]])),np.array([t]), initial[:5]), axis =0)
+        arr_input = np.concatenate((np.log(model_inputs[2][:10]), np.log(model_inputs[5][:10]/np.array([arrival_rates[t]])),np.array([t]), initial[:5]), axis =0)
         arr_input = arr_input.reshape(1, arr_input.shape[0])
         probs = (time_dict[t]/time_dict[t].sum())
         fifty_or_more = probs[50:].sum()
@@ -1746,7 +1746,7 @@ def parse_arguments(argv):
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=40)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default= 1500)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default= 15)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
