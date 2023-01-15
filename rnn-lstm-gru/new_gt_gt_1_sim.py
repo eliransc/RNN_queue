@@ -1301,6 +1301,10 @@ def generate_ph(is_arrival, is_exponential):
 
 
 def find_num_cust_time_stamp(df, time):
+
+    if time == 0:
+        return df.loc[df['Time_stamp'] == 0, :].shape[0]
+
     if df.loc[df['Time_stamp'] < time, :].shape[0] == 0:
         return 0
     else:
@@ -1501,13 +1505,14 @@ class GG1:
 
             self.event_log_customer_id_list.append(customer.id)
             self.event_log_time_stamp.append(self.env.now)
+            self.num_cust_sys += 1
             self.event_log_num_cust_list.append(self.num_cust_sys)
             self.event_log_type_list.append('Arrival')
 
             tot_time = self.env.now - self.last_event_time
             self.num_cust_durations[self.num_cust_sys] += tot_time
             self.last_event_time = self.env.now
-            self.num_cust_sys += 1
+
             self.last_time = self.env.now
             self.env.process(self.service(customer))
 
@@ -1529,6 +1534,7 @@ class GG1:
 
             self.event_log_customer_id_list.append(customer.id)
             self.event_log_time_stamp.append(self.env.now)
+            self.num_cust_sys += 1
             self.event_log_num_cust_list.append(self.num_cust_sys)
             self.event_log_type_list.append('Arrival')
 
@@ -1536,7 +1542,7 @@ class GG1:
             tot_time = self.env.now - self.last_event_time
             self.num_cust_durations[self.num_cust_sys] += tot_time
             self.last_event_time = self.env.now
-            self.num_cust_sys += 1
+
             self.last_time = self.env.now
             self.env.process(self.service(customer))
 
@@ -1565,7 +1571,7 @@ def single_sim(services, arrivals, model_inputs, arrival_rates, initial,  args):
 
 def generate_cycle_arrivals(number_sequences):
     vector_lenght = number_sequences
-    cycle_size = np.random.randint(3, int(vector_lenght / 4))
+    cycle_size = np.random.randint(7, int(vector_lenght / 2))
     num_cycles = int(vector_lenght / cycle_size)
 
     last_cycle = vector_lenght - cycle_size * num_cycles
@@ -1590,6 +1596,7 @@ def generate_cycle_arrivals(number_sequences):
     arrivals = np.concatenate((first_batch, pick_rho, second_batch), axis=0)
     mean_arrivals = arrivals.mean()
     arrivals = (arrivals / mean_arrivals) * avg_rho
+    print(arrivals)
     all_arrivals = np.tile(arrivals, num_cycles + 1)[:vector_lenght]
 
     return all_arrivals
@@ -1668,14 +1675,14 @@ def create_single_data_point(time_dict, arrival_rates, model_inputs, initial):
     prob_queue_arr = np.array([])
     # time_dict, arrival_rates, model_inputs, initial = pkl.load(open(os.path.join(path, files_list[ind]), 'rb'))
     for t in range(len(time_dict)):
-        arr_input = np.concatenate((np.log(model_inputs[2][:5]), np.log(model_inputs[5][:5])/np.array([arrival_rates[t]]),np.array([t]), initial[:5]), axis =0)
+        arr_input = np.concatenate((np.log(model_inputs[2][:5]), np.log(model_inputs[5][:5]/np.array([arrival_rates[t]])),np.array([t]), initial[:5]), axis =0)
         arr_input = arr_input.reshape(1, arr_input.shape[0])
         probs = (time_dict[t]/time_dict[t].sum())
         fifty_or_more = probs[50:].sum()
         probs_output = np.concatenate((probs[:50], np.array([fifty_or_more]) ), axis = 0)
         if res_input.shape[0] == 0:
             res_input = arr_input
-            prob_queue_arr = np.array(probs_output).reshape(1,probs_output.shape[0])
+            prob_queue_arr = np.array(probs_output).reshape(1, probs_output.shape[0])
         else:
             res_input = np.concatenate((res_input, arr_input), axis = 0)
             prob_queue_arr = np.concatenate((prob_queue_arr, np.array(probs_output).reshape(1,probs_output.shape[0])), axis = 0)
@@ -1727,49 +1734,7 @@ def main(args):
         df_runtimes.loc[curr_ind, 'run_time'] = runtime
         pkl.dump(df_runtimes, open('df_runtimes.pkl', 'wb'))
 
-        # path = args.read_path
-        #
-        # files = os.listdir(args.read_path)
-        #
-        # batch_size = 4
-        # num_batches = int(len(files) / batch_size)
-        # df_files = pd.DataFrame([], columns=['file', 'batch'])
-        # for curr_batch in tqdm(range(num_batches)):
-        #     batch_input = np.array([])
-        #     batch_output = np.array([])
-        #
-        #     for ind in range(curr_batch * batch_size, (curr_batch + 1) * batch_size):
-        #         curr_file = files[ind]
-        #         curr_ind_df = df_files.shape[0]
-        #         df_files.loc[curr_ind_df, 'file'] = curr_file
-        #         df_files.loc[curr_ind_df, 'batch'] = curr_batch
-        #
-        #         pkl.dump(df_files, open('graham_df_files.pkl', 'wb'))
-        #         res_input, prob_queue_arr = create_single_data_point(path, files, ind)
-        #         res_input = res_input.reshape(1, res_input.shape[0], res_input.shape[1])
-        #         prob_queue_arr = prob_queue_arr.reshape(1, prob_queue_arr.shape[0], prob_queue_arr.shape[1])
-        #         if ind == curr_batch * batch_size:
-        #             batch_input = res_input
-        #             batch_output = prob_queue_arr
-        #         else:
-        #             batch_input = np.concatenate((batch_input, res_input), axis=0)
-        #             batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
-        #
-        #     if 'dkrass' in os.getcwd().split('/'):
-        #         pkl.dump((batch_input, batch_output), open(
-        #             '/scratch/eliransc/data_rnn_training/cyclic_poison/pkl_rnn/Graham_batch_' + str(
-        #                 curr_batch) + '.pkl',
-        #             'wb'))
-        #     elif 'C:' in os.getcwd().split('/')[0]:
-        #         pkl.dump((batch_input, batch_output), open(
-        #             r'C:\Users\user\workspace\data\PC_batch_' + str(
-        #                 curr_batch) + '.pkl',
-        #             'wb'))
-        #     else:
-        #         pkl.dump((batch_input, batch_output), open(
-        #             '/scratch/eliransc/data_rnn_training/cyclic_poison/pkl_rnn/Graham_batch_' + str(
-        #                 curr_batch) + '.pkl',
-        #             'wb'))
+
 
 
 
@@ -1781,7 +1746,7 @@ def parse_arguments(argv):
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=40)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default= 1600)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default= 1500)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)

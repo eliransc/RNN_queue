@@ -1578,7 +1578,7 @@ def give_rhos_arrival_rates_ser_mean(vector_lenght=80):
     last_cycle = vector_lenght - cycle_size * num_cycles
     # print('cycle size: {}, num cycles: {}, sum full cycles: {}, last cycle: {}.' .format(cycle_size, num_cycles, cycle_size*num_cycles, last_cycle))
 
-    avg_rho = np.random.uniform(0.1, 0.12)
+    avg_rho = np.random.uniform(0.7, 0.99)
     pick = np.random.randint(3, cycle_size - 3)
 
     if np.random.rand() < 0.6:
@@ -1628,7 +1628,7 @@ def give_rhos_arrival_rates_ser_mean(vector_lenght=80):
     last_cycle = vector_lenght - cycle_size * num_cycles
     # print('cycle size: {}, num cycles: {}, sum full cycles: {}, last cycle: {}.' .format(cycle_size, num_cycles, cycle_size*num_cycles, last_cycle))
 
-    avg_rho = np.random.uniform(0.6, 0.97)
+    avg_rho = np.random.uniform(0.8, 0.97)
     # pick = np.random.randint(3, cycle_size - 3)
     #
     # if np.random.rand() < 0.6:
