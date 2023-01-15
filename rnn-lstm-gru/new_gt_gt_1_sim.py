@@ -1571,7 +1571,7 @@ def single_sim(services, arrivals, model_inputs, arrival_rates, initial,  args):
 
 def generate_cycle_arrivals(number_sequences):
     vector_lenght = number_sequences
-    cycle_size = np.random.randint(7, int(vector_lenght / 2))
+    cycle_size = np.random.randint(5, int(vector_lenght / 3))
     num_cycles = int(vector_lenght / cycle_size)
 
     last_cycle = vector_lenght - cycle_size * num_cycles
