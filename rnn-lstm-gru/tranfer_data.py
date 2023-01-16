@@ -36,14 +36,14 @@ import matplotlib.pyplot as plt
 
 def main():
 
-    list_path = 'list_batch_numbers.pkl'
+    list_path = 'list_batch_numbers1.pkl'
 
     if not os.path.exists(list_path):
         pkl.dump([], open(list_path, 'wb'))
 
-    folder_path = '/scratch/eliransc/all_mt_g_1_files'
+    folder_path = '/scratch/eliransc/all_new_g_g_1_trans1'
 
-    folder_num = np.random.randint(1, 59)
+    folder_num = np.random.randint(1, 21)
 
     batch_size = 32
 
@@ -78,9 +78,9 @@ def main():
                     batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
                 # print(os.path.join(path, files[ind]))
                 os.remove(os.path.join(path, files[ind]))
-            batch_num = np.random.randint(1000, 10000000)
+            batch_num = np.random.randint(1000, 100000000)
             pkl.dump((batch_input, batch_output),
-                     open(os.path.join('/scratch/eliransc/mt_g_1_batches', 'batch_' + str(batch_num) + '.pkl'), 'wb'))
+                     open(os.path.join('/scratch/eliransc/new_gt_g_1_batches', 'batch_' + str(batch_num) + '.pkl'), 'wb'))
 
 
 
