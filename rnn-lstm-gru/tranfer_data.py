@@ -34,6 +34,7 @@ import matplotlib.pyplot as plt
 
 
 
+
 def main():
 
     list_path = 'list_batch_numbers1.pkl'
@@ -43,44 +44,45 @@ def main():
 
     folder_path = '/scratch/eliransc/all_new_g_g_1_trans1'
 
-    folder_num = np.random.randint(1, 35)
+    tot_list = list(np.arange(1, 35))
+
+    num_list = pkl.load(open(list_path, 'rb'))
+
+    temp3 = [x for x in tot_list if x not in num_list]
+    ind = np.random.randint(len(temp3))
+
+    folder_num = temp3[ind]
+
+    num_list.append(folder_num)
+    pkl.dump(num_list, open(list_path, 'wb'))
 
     batch_size = 32
 
     path = os.path.join(folder_path, 'folder_'+str(folder_num))
 
-    num_list = pkl.load(open(list_path, 'rb'))
 
+    files = os.listdir(path)
+    num_batches = int(len(files) / batch_size)
 
-    if folder_num in num_list:
-        print('skip')
+    for curr_batch in tqdm(range(num_batches)):
+        batch_input = np.array([])
+        batch_output = np.array([])
+        for ind in range(curr_batch * batch_size, (curr_batch + 1) * batch_size):
 
-    else:
-        num_list.append(folder_num)
-        pkl.dump(num_list, open(list_path, 'wb'))
-
-        files = os.listdir(path)
-        num_batches = int(len(files) / batch_size)
-
-        for curr_batch in tqdm(range(num_batches)):
-            batch_input = np.array([])
-            batch_output = np.array([])
-            for ind in range(curr_batch * batch_size, (curr_batch + 1) * batch_size):
-
-                res_input, prob_queue_arr = pkl.load(open(os.path.join(path, files[ind]), 'rb'))
-                res_input = res_input.reshape(1, res_input.shape[0], res_input.shape[1])
-                prob_queue_arr = prob_queue_arr.reshape(1, prob_queue_arr.shape[0], prob_queue_arr.shape[1])
-                if ind == curr_batch * batch_size:
-                    batch_input = res_input
-                    batch_output = prob_queue_arr
-                else:
-                    batch_input = np.concatenate((batch_input, res_input), axis=0)
-                    batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
-                # print(os.path.join(path, files[ind]))
-                os.remove(os.path.join(path, files[ind]))
-            batch_num = np.random.randint(1000, 100000000)
-            pkl.dump((batch_input, batch_output),
-                     open(os.path.join('/scratch/eliransc/new_gt_g_1_batches', 'batch_' + str(batch_num) + '.pkl'), 'wb'))
+            res_input, prob_queue_arr = pkl.load(open(os.path.join(path, files[ind]), 'rb'))
+            res_input = res_input.reshape(1, res_input.shape[0], res_input.shape[1])
+            prob_queue_arr = prob_queue_arr.reshape(1, prob_queue_arr.shape[0], prob_queue_arr.shape[1])
+            if ind == curr_batch * batch_size:
+                batch_input = res_input
+                batch_output = prob_queue_arr
+            else:
+                batch_input = np.concatenate((batch_input, res_input), axis=0)
+                batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
+            # print(os.path.join(path, files[ind]))
+            os.remove(os.path.join(path, files[ind]))
+        batch_num = np.random.randint(1000, 100000000)
+        pkl.dump((batch_input, batch_output),
+                 open(os.path.join('/scratch/eliransc/new_gt_g_1_batches', 'batch_' + str(batch_num) + '.pkl'), 'wb'))
 
 
 
