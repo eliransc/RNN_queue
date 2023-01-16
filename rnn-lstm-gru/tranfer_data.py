@@ -44,7 +44,7 @@ def main():
 
     folder_path = '/scratch/eliransc/all_new_g_g_1_trans1'
 
-    tot_list = list(np.arange(1, 22))
+    tot_list = list(np.arange(1, 23))
 
     num_list = pkl.load(open(list_path, 'rb'))
 
