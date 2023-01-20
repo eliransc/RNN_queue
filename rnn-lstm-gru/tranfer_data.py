@@ -31,20 +31,16 @@ import os
 import matplotlib.pyplot as plt
 
 
-
-
-
-
 def main():
 
-    list_path = 'list_batch_numbers1.pkl'
+    list_path = 'list_batch_numbers2.pkl'
 
     if not os.path.exists(list_path):
         pkl.dump([], open(list_path, 'wb'))
 
     folder_path = '/scratch/eliransc/all_new_g_g_1_trans1'
 
-    tot_list = list(np.arange(1, 23))
+    tot_list = list(np.arange(1, len(os.listdir(folder_path))+1))
 
     num_list = pkl.load(open(list_path, 'rb'))
 
@@ -82,7 +78,7 @@ def main():
             os.remove(os.path.join(path, files[ind]))
         batch_num = np.random.randint(1000, 100000000)
         pkl.dump((batch_input, batch_output),
-                 open(os.path.join('/scratch/eliransc/new_gt_g_1_batches', 'batch_' + str(batch_num) + '.pkl'), 'wb'))
+                 open(os.path.join('/scratch/eliransc/new_gt_g_1_batches1', 'batch_' + str(batch_num) + '.pkl'), 'wb'))
 
 
 
