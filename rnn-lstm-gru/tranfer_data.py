@@ -33,7 +33,7 @@ import matplotlib.pyplot as plt
 
 def main():
 
-    list_path = 'list_batch_numbers2.pkl'
+    list_path = 'list_batch_numbers3.pkl'
 
     if not os.path.exists(list_path):
         pkl.dump([], open(list_path, 'wb'))
