@@ -54,8 +54,7 @@ def main():
 
     batch_size = 32
 
-    path = os.path.join(folder_path, 'folder_'+str(folder_num))
-
+    path = os.path.join(folder_path, 'folder_' + str(folder_num))
 
     files = os.listdir(path)
     num_batches = int(len(files) / batch_size)
@@ -65,21 +64,25 @@ def main():
         batch_output = np.array([])
         for ind in range(curr_batch * batch_size, (curr_batch + 1) * batch_size):
 
-            res_input, prob_queue_arr = pkl.load(open(os.path.join(path, files[ind]), 'rb'))
-            res_input = res_input.reshape(1, res_input.shape[0], res_input.shape[1])
-            prob_queue_arr = prob_queue_arr.reshape(1, prob_queue_arr.shape[0], prob_queue_arr.shape[1])
-            if ind == curr_batch * batch_size:
-                batch_input = res_input
-                batch_output = prob_queue_arr
-            else:
-                batch_input = np.concatenate((batch_input, res_input), axis=0)
-                batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
-            # print(os.path.join(path, files[ind]))
-            os.remove(os.path.join(path, files[ind]))
+            try:
+                res_input, prob_queue_arr = pkl.load(open(os.path.join(path, files[ind]), 'rb'))
+                res_input = res_input.reshape(1, res_input.shape[0], res_input.shape[1])
+                prob_queue_arr = prob_queue_arr.reshape(1, prob_queue_arr.shape[0], prob_queue_arr.shape[1])
+                if ind == curr_batch * batch_size:
+                    batch_input = res_input
+                    batch_output = prob_queue_arr
+                else:
+                    batch_input = np.concatenate((batch_input, res_input), axis=0)
+                    batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
+                # print(os.path.join(path, files[ind]))
+                os.remove(os.path.join(path, files[ind]))
+            except:
+                print('could not open file')
         batch_num = np.random.randint(1000, 100000000)
-        pkl.dump((batch_input, batch_output),
-                 open(os.path.join('/scratch/eliransc/new_gt_g_1_batches1', 'batch_' + str(batch_num) + '.pkl'), 'wb'))
-
+        if batch_input.shape[0] == 32:
+            pkl.dump((batch_input, batch_output),
+                     open(os.path.join('/scratch/eliransc/new_gt_g_1_batches1', 'batch_' + str(batch_num) + '.pkl'),
+                          'wb'))
 
 
 
