@@ -37,7 +37,7 @@ import shutil
 def main():
 
 
-    batch_size = 6400
+    batch_size = 3200
     path = '/scratch/eliransc/new_gt_g_1_trans1'
     files = os.listdir(path)
     num_batches = int(len(files) / batch_size)
