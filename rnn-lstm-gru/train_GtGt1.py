@@ -133,7 +133,7 @@ def main(args):
     dataset = my_Dataset(data_paths)
     dataset_valid = my_Dataset(valid_path)
 
-    num_epochs = 10
+    num_epochs = 15
     lr_change = np.random.choice([1.025, 1.05, 1.1, 1.25, 1.3], p=[0.2, 0.2, 0.2, 0.2, 0.2])
     batch_size = int(np.random.choice([1, 2, 4, 8], p=[0.25, 0.35, 0.25, 0.15]))
     learning_rate = np.random.choice([0.001, 0.005, 0.0005, 0.0002, 0.0001], p=[0.2, 0.2, 0.2, 0.2, 0.2])
@@ -164,7 +164,7 @@ def main(args):
     # Dummy Training loop
 
     n_iterations = 5
-    n_total_steps = 10
+    n_total_steps = 20
     loss_list = []
     setting_string = 'batch_size_' + str(batch_size * 32) + '_num_layers_' + str(num_layers) + '_num_epochs_' + str(
         num_epochs) + '_learning_rate_' + str(learning_rate) + '_hidden_size_' + str(hidden_size) + '_lr_change_' + str(
