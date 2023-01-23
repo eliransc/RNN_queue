@@ -19,7 +19,7 @@ import sys
 from datetime import datetime
 
 time_ub = 60
-num_moments = 6
+num_moments = 3
 class my_Dataset(Dataset):
     # Characterizes a dataset for PyTorch
     def __init__(self, data_paths):
