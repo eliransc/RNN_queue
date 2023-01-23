@@ -19,6 +19,7 @@ import sys
 from datetime import datetime
 
 time_ub = 60
+num_moments = 6
 class my_Dataset(Dataset):
     # Characterizes a dataset for PyTorch
     def __init__(self, data_paths):
@@ -31,7 +32,7 @@ class my_Dataset(Dataset):
         # print(self.data_paths[index])
         x, y = pkl.load(open(self.data_paths[index], 'rb'))
         inputs = torch.from_numpy(x[:, :time_ub, :21 + 15])
-        x = torch.cat((inputs[:, :, :5], inputs[:, :, 10:15], inputs[:, :, 20:]), 2)
+        x = torch.cat((inputs[:, :, :num_moments], inputs[:, :, 10:10+num_moments], inputs[:, :, 20:]), 2)
         y = torch.from_numpy(y[:, :, :])
         # y = (y[:,:time_ub,:]*torch.arange(71)).sum(axis = 2)
         # y = y.reshape((16, time_ub,1))
@@ -138,12 +139,12 @@ def main(args):
     batch_size = int(np.random.choice([1, 2, 4, 8], p=[0.25, 0.35, 0.25, 0.15]))
     learning_rate = np.random.choice([0.001, 0.005, 0.0005, 0.0002, 0.0001], p=[0.2, 0.2, 0.2, 0.2, 0.2])
 
-    input_size = 36
+    # input_size = 36
     hidden_size = int(np.random.choice([32, 64, 128], p=[0.3, 0.4, 0.3]))
     num_layers = np.random.randint(2, 6)
 
 
-    input_size = 26
+    input_size = 16+2*num_moments
     sequence_length = time_ub
     output_size = 51
 
@@ -168,7 +169,7 @@ def main(args):
     loss_list = []
     setting_string = 'batch_size_' + str(batch_size * 32) + '_num_layers_' + str(num_layers) + '_num_epochs_' + str(
         num_epochs) + '_learning_rate_' + str(learning_rate) + '_hidden_size_' + str(hidden_size) + '_lr_change_' + str(
-        lr_change)
+        lr_change) + '_nummoms_' + str(num_moments)
     print(setting_string)
 
     valid_loss_list = []
