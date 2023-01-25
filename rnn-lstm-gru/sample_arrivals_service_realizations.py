@@ -1344,12 +1344,12 @@ def generate_ph(is_arrival, is_exponential):
         s1, A1 = create_gen_erlang_many_ph(1)
 
     if np.random.rand() < 0.8:
-        s1, A1 = create_gen_erlang_many_ph(np.random.randint(35, 201))
+        s1, A1 = create_gen_erlang_many_ph(np.random.randint(35, 401))
     else:
         try:
-            s1, A1 = create_mix_erlang_ph(np.random.randint(35, 201))
+            s1, A1 = create_mix_erlang_ph(np.random.randint(35, 401))
         except:
-            s1, A1 = create_gen_erlang_many_ph(np.random.randint(35, 101))
+            s1, A1 = create_gen_erlang_many_ph(np.random.randint(35, 401))
 
     if is_arrival:
         rho  = np.random.uniform(0.75, 1)
@@ -1367,7 +1367,7 @@ class g:
     service_times = []
     queueing_time = {}
     inter_departure_time = []
-    num_arrivals = 75000
+    num_arrivals = 750000
     warm_up_arrivals = 400
     num_moms  =  10
     counter_for_moms_arrivals = 0
@@ -1670,7 +1670,7 @@ def parse_arguments(argv):
     parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=100500)
     parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=100000)
     parser.add_argument('--arrivals_path', type=str, help='the path of the files to read from', default='/scratch/eliransc/ph_random/arrivals') #   r'C:\Users\user\workspace\data\ph_random\arrivals'
-    parser.add_argument('--services_path', type=str, help='the path of the files to read from', default='/scratch/eliransc/ph_random/medium_ph' ) #    r'C:\Users\user\workspace\data\ph_random\services'
+    parser.add_argument('--services_path', type=str, help='the path of the files to read from', default='/scratch/eliransc/ph_random/medium_ph_1' ) #    r'C:\Users\user\workspace\data\ph_random\services'
 
     args = parser.parse_args(argv)
 

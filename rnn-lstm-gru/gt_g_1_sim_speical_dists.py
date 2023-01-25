@@ -1312,6 +1312,63 @@ def find_num_cust_time_stamp(df, time):
         return df.loc[LB, 'num_cust']
 
 
+def log_normal_gener(mu, sig2, sample_size):
+    m = np.log((mu**2)/(sig2+mu**2)**0.5)
+    v = (np.log(sig2/mu**2+1))**0.5
+    s = np.random.lognormal(m, v, sample_size)
+    return s
+
+def compute_first_ten_moms_log_N(s):
+    moms = []
+    for ind in range(1,11):
+        moms.append((s**ind).mean())
+    return moms
+
+def generate_gamma(is_arrival, rho = 0.01):
+    if is_arrival:
+        # rho = np.random.uniform(0.7, 0.99)
+        shape = 0.25/rho # 0.25 # np.random.uniform(0.1, 100)
+        scale =  4 #1 / (rho * shape)
+        moms_arr = np.array([])
+        for mom in range(1, 11):
+            moms_arr = np.append(moms_arr, np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
+        return (shape, scale, moms_arr)
+    else:
+        shape = 0.25 # np.random.uniform(1, 100)
+        scale = 1 / shape
+        moms_ser = np.array([])
+        for mom in range(1, 11):
+            moms_ser = np.append(moms_ser, np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
+        return (shape, scale, moms_ser)
+
+def ser_moment_n(s, A, mom):
+    e = np.ones((A.shape[0], 1))
+    try:
+        mom_val = ((-1) ** mom) *factorial(mom)*np.dot(np.dot(s, matrix_power(A, -mom)), e)
+        if mom_val > 0:
+            return mom_val
+        else:
+            return False
+    except:
+        return False
+
+def compute_first_n_moments(s, A, n=3):
+    moment_list = []
+    for moment in range(1, n + 1):
+        moment_list.append(ser_moment_n(s, A, moment))
+    return moment_list
+
+def get_hyper_ph_representation(mu):
+    p1 = 0.5 + (-2. + 0.5 * mu) / (16. + -mu ** 2) ** 0.5
+    p2 = 1 - p1
+    lam1 = 1 / (2 + 0.5 * mu + 0.5 * (16 - mu ** 2) ** 0.5)
+    lam2 = 1 / (2 + 0.5 * mu - 0.5 * (16 - mu ** 2) ** 0.5)
+
+    s = np.array([[p1, p2]])
+    A = np.array([[-lam1, 0], [0, -lam2]])
+    return (s, A)
+
+
 class g:
 
 
@@ -1642,9 +1699,65 @@ def run_single_setting(args):
     s_service, A_service, moms_service, services = services_[sample_num]
     np.random.seed(now.microsecond)
 
+    sample_size = 50000
+    service_dist = 0
 
+    ser_dics = {0: 'LN025', 1: 'LN4', 2: 'G4', 3: 'E4', 4: 'H2', 5: 'M'}
 
-    file_nums = np.random.choice(num_files,num_groups)
+    if ser_dics[service_dist] == 'LN025':
+        mu = 1
+        sig2 = 0.25 * mu
+        services = log_normal_gener(mu, sig2, sample_size)
+        m = np.log((mu ** 2) / (sig2 + mu ** 2) ** 0.5)
+        v = (np.log(sig2 / mu ** 2 + 1)) ** 0.5
+        moms_service = compute_first_ten_moms_log_N(services)
+        service_csv = 0.25
+
+    elif ser_dics[service_dist] == 'LN4':
+
+        mu = 1
+        sig2 = 4 * mu
+        services = log_normal_gener(mu, sig2, sample_size)
+        m = np.log((mu ** 2) / (sig2 + mu ** 2) ** 0.5)
+        v = (np.log(sig2 / mu ** 2 + 1)) ** 0.5
+        moms_service = compute_first_ten_moms_log_N(services)
+        service_csv = 4
+
+    elif ser_dics[service_dist] == 'G4':
+
+        shape, scale, moms_service = generate_gamma(False)
+        services = np.random.gamma(shape, scale, sample_size)
+        moms_service = compute_first_ten_moms_log_N(services)
+        service_csv = 4
+
+    elif ser_dics[service_dist] == 'E4':
+
+        lam = 4
+        s, A = create_Erlang4(lam)
+        services = SamplesFromPH(ml.matrix(s), A, sample_size)
+        # moms_service = compute_first_n_moments(s, A, 10)
+        # moms_service = np.array(moms_service).flatten()
+        moms_service = compute_first_ten_moms_log_N(services)
+        service_csv = 1 / lam
+
+    elif ser_dics[service_dist] == 'H2':
+
+        mu = 1
+        s, A = get_hyper_ph_representation(mu)
+        services = SamplesFromPH(ml.matrix(s), A, sample_size)
+        # moms_service = compute_first_n_moments(s, A, 10)
+        # moms_service = np.array(moms_service).flatten()
+        moms_service = compute_first_ten_moms_log_N(services)
+        service_csv = 4
+
+    elif ser_dics[service_dist] == 'M':
+
+        mu = 1
+        services = np.random.exponential(1, sample_size)
+        moms_service = compute_first_ten_moms_log_N(services)
+        service_csv = 1
+
+    file_nums = np.random.choice(num_files, num_groups)
 
     arrivals_dict = {}
 
@@ -1660,8 +1773,8 @@ def run_single_setting(args):
     model_inputs = (s_service, A_service, moms_service,  arrivals_dict)
 
     size_initial = 100
-    s = np.random.dirichlet(np.ones(30))
-    initial = np.concatenate((s, np.zeros(size_initial - 30)))
+    s = np.random.dirichlet(np.ones(15))
+    initial = np.concatenate((s, np.zeros(size_initial - 15)))
 
     time_dict = {}
     for time_ in range(g.end_time):
@@ -1726,7 +1839,7 @@ def main(args):
     if 'dkrass' in os.getcwd().split('/'):
         dists_path = '/scratch/d/dkrass/eliransc/services'
     elif 'C:' in os.getcwd().split('/')[0]:
-        dists_path = r'C:\Users\user\workspace\data\ph_random\ph_mean_1_one_per_pkl'
+        dists_path = r'C:\Users\user\workspace\data\ph_random\speical'
     else:
         dists_path = '/scratch/eliransc/ph_random/large_ph_one_in_pkl_mdium/'
 
@@ -1757,8 +1870,6 @@ def main(args):
         curr_ind = df_runtimes.shape[0]
         df_runtimes.loc[curr_ind, 'run_time'] = runtime
         pkl.dump(df_runtimes, open('df_runtimes.pkl', 'wb'))
-
-
 
 
 
