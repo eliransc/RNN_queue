@@ -1091,16 +1091,16 @@ def is_dispatcher(id_case, df, ind_last_moved):
 
 
 def dispatcher_start_time(id_case, df, ind_last_moved):
-    arr = df.loc[df_['id_case'] == id_case, :].index
+    arr = df.loc[df['id_case'] == id_case, :].index
     ind_moved = np.where(arr == ind_last_moved)[0][0]
     ind_potential_dispatcher = ind_moved - 1
 
-    new_df = df_.loc[df_['id_case'] == id_case, :]
+    new_df = df.loc[df['id_case'] == id_case, :]
     new_df = new_df.reset_index()
     return new_df.loc[ind_potential_dispatcher, 'event_start_date']
 
 
-def moved_start_time(id_case, df, ind_last_moved):
+def moved_start_time(id_case, df_, ind_last_moved):
     arr = df.loc[df_['id_case'] == id_case, :].index
     ind_moved = np.where(arr == ind_last_moved)[0][0]
     ind_potential_dispatcher = ind_moved - 1
@@ -1118,7 +1118,7 @@ def find_depart_time(df, ind):
     return df.loc[ind, 'event_end_date']
 
 
-def moved_start_time(id_case, df, ind_last_moved):
+def moved_start_time(id_case, df_, ind_last_moved):
     arr = df.loc[df_['id_case'] == id_case, :].index
     ind_moved = np.where(arr == ind_last_moved)[0][0]
     ind_potential_dispatcher = ind_moved - 1
