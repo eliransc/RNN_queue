@@ -1326,7 +1326,7 @@ class g:
     counter_for_moms_arrivals = 0
     counter_for_moms_depart_sojourn = 0
 
-    end_time = 60
+    end_time = 20
 
     # lenght1 = np.random.randint(5, 30)
     # lenght2 = end_time - lenght1
@@ -1379,7 +1379,7 @@ class GG1:
         self.event_log_num_cust_list = []
         self.event_log_type_list = []
         self.event_log_time_stamp = []
-        self.size_initial = 100
+        self.size_initial = 51
 
         self.initial_probs = initial
 
@@ -1395,11 +1395,9 @@ class GG1:
         elif self.sim_lenght_indicator == 1:
             self.end_time = 30
         else:
-            self.end_time = 60
+            self.end_time = 20
 
         # print(self.end_time)
-
-
 
     def run(self):
 
@@ -1624,42 +1622,52 @@ def run_single_setting(args):
 
     now = datetime.now()
 
-    arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate = generate_cycle_arrivals(args.number_sequences)
+    path_data = r'C:\Users\user\workspace\data\mtg_new_data'
 
-    if 'dkrass' in os.getcwd().split('/'):
-        services_path = '/scratch/d/dkrass/eliransc/services'
-    elif 'C:' in os.getcwd().split('/')[0]:
-        services_path = r'C:\Users\user\workspace\data\ph_random\services'
-    else:
-        services_path = '/scratch/eliransc/ph_random/medium_ph'   #
+    files = os.listdir(path_data)
 
-    files = os.listdir(services_path)
-    num_files = len(files)
-    file_num = np.random.randint(0, num_files)
-    services_ = pkl.load(open(os.path.join(services_path, files[file_num]), 'rb'))
-    list_size = len(services_)
-    sample_num = np.random.randint(0, list_size)
-    s_service, A_service, moms_service, services = services_[sample_num]
+    ind_file = np.random.randint(len(len(files)))
+
+    arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate, s_service, A_service, moms_service, \
+    services, arrivals_dict, initial =\
+        pkl.load(open(os.path.join(path_data, files[ind_file]), 'rb'))
+
+    # arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate = generate_cycle_arrivals(args.number_sequences)
+    #
+    # if 'dkrass' in os.getcwd().split('/'):
+    #     services_path = '/scratch/d/dkrass/eliransc/services'
+    # elif 'C:' in os.getcwd().split('/')[0]:
+    #     services_path = r'C:\Users\user\workspace\data\ph_random\services'
+    # else:
+    #     services_path = '/scratch/eliransc/ph_random/medium_ph'   #
+    #
+    # files = os.listdir(services_path)
+    # num_files = len(files)
+    # file_num = np.random.randint(0, num_files)
+    # services_ = pkl.load(open(os.path.join(services_path, files[file_num]), 'rb'))
+    # list_size = len(services_)
+    # sample_num = np.random.randint(0, list_size)
+    # s_service, A_service, moms_service, services = services_[sample_num]
     np.random.seed(now.microsecond)
 
-    file_nums = np.random.choice(num_files,num_groups)
+    # file_nums = np.random.choice(num_files,num_groups)
 
-    arrivals_dict = {}
-
-    for ind, file_num in enumerate(file_nums):
-
-        arrivals_ = pkl.load(open(os.path.join(services_path, files[file_num]), 'rb'))
-        list_size = len(arrivals_)
-        sample_num = np.random.randint(0, list_size)
-        arrivals_dict[ind] = (arrivals_[sample_num], rate_dict_code_rate[ind])
+    # arrivals_dict = {}
+    #
+    # for ind, file_num in enumerate(file_nums):
+    #
+    #     arrivals_ = pkl.load(open(os.path.join(services_path, files[file_num]), 'rb'))
+    #     list_size = len(arrivals_)
+    #     sample_num = np.random.randint(0, list_size)
+    #     arrivals_dict[ind] = (arrivals_[sample_num], rate_dict_code_rate[ind])
 
     np.random.seed(now.microsecond)
 
     model_inputs = (s_service, A_service, moms_service,  arrivals_dict)
 
-    size_initial = 100
-    s = np.random.dirichlet(np.ones(30))
-    initial = np.concatenate((s, np.zeros(size_initial - 30)))
+    # size_initial = 100
+    # s = np.random.dirichlet(np.ones(30))
+    # initial = np.concatenate((s, np.zeros(size_initial - 30)))
 
     time_dict = {}
     for time_ in range(g.end_time):
@@ -1672,7 +1680,7 @@ def run_single_setting(args):
 
     list_of_lists1 = []
     for ind in tqdm(range(10)):
-        list_of_dicts = [single_sim(services, arrivals_dict, model_inputs, arrival_rates, initial,df,   args) for ind in
+        list_of_dicts = [single_sim(services, arrivals_dict, model_inputs, arrival_rates, initial, df,   args) for ind in
                           range(1, args.num_iter_same_params + 1)] #
         list_of_lists1.append(list_of_dicts)
 
@@ -1716,7 +1724,6 @@ def main(args):
     current_time = now.strftime("%H_%M_%S")
     np.random.seed(now.microsecond)
 
-
     # s_service, A_service, moms_service = model_inputs
 
     now = datetime.now()
@@ -1729,7 +1736,6 @@ def main(args):
         dists_path = '/scratch/eliransc/ph_random/large_ph_one_in_pkl_mdium/'
 
     args.dists_path = dists_path
-
 
 
     if 'dkrass' in os.getcwd().split('/'):
@@ -1757,16 +1763,12 @@ def main(args):
         pkl.dump(df_runtimes, open('df_runtimes.pkl', 'wb'))
 
 
-
-
-
-
 def parse_arguments(argv):
 
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
+    parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=20)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
     parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default= 2)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
