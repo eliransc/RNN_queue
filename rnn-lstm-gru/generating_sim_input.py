@@ -1078,11 +1078,11 @@ def generate_erlangs(batch_size, max_ph_size, num_moms, data_path, data_sample_n
 
 
 def is_dispatcher(id_case, df, ind_last_moved):
-    arr = df.loc[df_['id_case'] == id_case, :].index
+    arr = df.loc[df['id_case'] == id_case, :].index
     ind_moved = np.where(arr == ind_last_moved)[0][0]
     ind_potential_dispatcher = ind_moved - 1
 
-    new_df = df_.loc[df_['id_case'] == id_case, :]
+    new_df = df.loc[df['id_case'] == id_case, :]
     new_df = new_df.reset_index()
     if new_df.loc[ind_potential_dispatcher, 'service_name'] == 'Dispatcher':
         return True
