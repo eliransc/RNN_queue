@@ -1119,7 +1119,7 @@ def find_depart_time(df, ind):
 
 
 def moved_start_time(id_case, df_, ind_last_moved):
-    arr = df.loc[df_['id_case'] == id_case, :].index
+    arr = df_.loc[df_['id_case'] == id_case, :].index
     ind_moved = np.where(arr == ind_last_moved)[0][0]
     ind_potential_dispatcher = ind_moved - 1
 
