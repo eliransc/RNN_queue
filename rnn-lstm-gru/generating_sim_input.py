@@ -1276,8 +1276,8 @@ def main():
     service_dict[35] = 'Flight Personnel Exam'
     service_dict[36] = 'Occupational Exam'
 
-    df_15 = pd.read_excel(r'C:\Users\user\workspace\data\users_history_2015.xlsx')
-    df_16 = pd.read_excel(r'C:\Users\user\workspace\data\users_history_2016.xlsx')
+    df_15 = pd.read_excel('/home/eliransc/projects/def-dkrass/eliransc/RNN_queue/users_history_2015.xlsx')
+    df_16 = pd.read_excel('/home/eliransc/projects/def-dkrass/eliransc/RNN_queue/users_history_2016.xlsx')
 
     df_16['day'] = df_16.apply(lambda x: str(x.event_start_date.year) + '_' + str(x.event_start_date.month) + '_' + str(
         x.event_start_date.day), axis=1)
