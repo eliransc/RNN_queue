@@ -1279,6 +1279,8 @@ def main():
     df_15 = pd.read_excel('/home/eliransc/projects/def-dkrass/eliransc/RNN_queue/users_history_2015.xlsx')
     df_16 = pd.read_excel('/home/eliransc/projects/def-dkrass/eliransc/RNN_queue/users_history_2016.xlsx')
 
+    service_name = 'Cardiologist'
+
     df_16['day'] = df_16.apply(lambda x: str(x.event_start_date.year) + '_' + str(x.event_start_date.month) + '_' + str(
         x.event_start_date.day), axis=1)
     df_16['service'].unique()
@@ -1313,7 +1315,7 @@ def main():
         df_["start_date"] = df_["start_date"].dt.strftime('%Y-%m-%d %H:%M:%S')
         df_["event_start_date"] = df_["event_start_date"].dt.strftime('%Y-%m-%d %H:%M:%S')
         df_["event_end_date"] = df_["event_end_date"].dt.strftime('%Y-%m-%d %H:%M:%S')
-        service_name = 'Ophthalmologist'
+
 
         id_cases = df_.loc[df_['service_name'] == service_name, 'id_case'].unique()
 
@@ -1371,7 +1373,7 @@ def main():
         df_["start_date"] = df_["start_date"].dt.strftime('%Y-%m-%d %H:%M:%S')
         df_["event_start_date"] = df_["event_start_date"].dt.strftime('%Y-%m-%d %H:%M:%S')
         df_["event_end_date"] = df_["event_end_date"].dt.strftime('%Y-%m-%d %H:%M:%S')
-        service_name = 'Ophthalmologist'
+        # service_name = 'Ophthalmologist'
 
         id_cases = df_.loc[df_['service_name'] == service_name, 'id_case'].unique()
 
@@ -1545,7 +1547,7 @@ def main():
 
         sertimes = np.array(sertimes)
 
-        if np.random.rand() > 0.5:
+        if np.random.rand() > 0.01:
             sertimes = np.abs(sertimes + np.random.uniform(20, 100, sertimes.shape[0]))
         else:
             sertimes = np.abs(sertimes - np.random.uniform(20, 40, sertimes.shape[0]))
