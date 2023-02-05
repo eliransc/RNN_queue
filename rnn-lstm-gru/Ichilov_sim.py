@@ -1496,7 +1496,7 @@ class GG1:
 
 
             time_period = int(self.env.now)
-            inter_arrival_rate = self.arrival_rates[time_period]
+            # inter_arrival_rate = self.arrival_rates[time_period]
             arrival_code = self.df.loc[self.df['time'] == time_period, 'arrival_code']
             arrivals = self.arrival_dist_params[arrival_code.item()][0][3]
             np.random.shuffle(arrivals)
@@ -1642,9 +1642,9 @@ def run_single_setting(args):
         pkl.load(open(os.path.join(path_data, file_name), 'rb'))
 
     import shutil
-    used_path = '/scratch/eliransc/sim_sets_ichilov_used'
-
-    shutil.move(os.path.join(path_data, file_name), os.path.join(used_path, file_name))
+    # used_path = '/scratch/eliransc/sim_sets_ichilov_used'
+    #
+    # shutil.move(os.path.join(path_data, file_name), os.path.join(used_path, file_name))
 
     np.random.seed(now.microsecond)
 
@@ -1749,7 +1749,7 @@ def parse_arguments(argv):
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default= 1000)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default= 10)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
