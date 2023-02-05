@@ -1632,7 +1632,8 @@ def run_single_setting(args):
 
     files = os.listdir(path_data)
 
-    ind_file = np.random.randint(len(len(files)))
+    ind_file = np.random.randint(len(files))
+
 
     arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate, s_service, A_service, moms_service, \
     services, arrivals_dict, initial =\
