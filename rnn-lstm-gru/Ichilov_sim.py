@@ -1626,7 +1626,7 @@ def run_single_setting(args):
     if 'C:' in os.getcwd().split('/')[0]:
         path_data = r'C:\Users\user\workspace\data\mtg_new_data'
     else:
-        path_data = 'scratch/eliransc/sim_sets_ichilov'
+        path_data = '/scsim_sets_ichilovratch/eliransc/'
 
 
 
