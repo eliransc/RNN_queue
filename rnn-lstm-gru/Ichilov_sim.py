@@ -1634,11 +1634,17 @@ def run_single_setting(args):
 
     ind_file = np.random.randint(len(files))
 
+    file_name = files[ind_file]
+
 
     arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate, s_service, A_service, moms_service, \
     services, arrivals_dict, initial =\
-        pkl.load(open(os.path.join(path_data, files[ind_file]), 'rb'))
+        pkl.load(open(os.path.join(path_data, file_name), 'rb'))
 
+    import shutil
+    used_path =  '/scratch/eliransc/sim_sets_ichilov_used'
+
+    shutil.move(os.path.join(path_data, file_name), os.path.join(used_path, file_name))
 
     np.random.seed(now.microsecond)
 
