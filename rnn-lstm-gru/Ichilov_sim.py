@@ -1642,7 +1642,7 @@ def run_single_setting(args):
         pkl.load(open(os.path.join(path_data, file_name), 'rb'))
 
     import shutil
-    used_path =  '/scratch/eliransc/sim_sets_ichilov_used'
+    used_path = '/scratch/eliransc/sim_sets_ichilov_used'
 
     shutil.move(os.path.join(path_data, file_name), os.path.join(used_path, file_name))
 
@@ -1679,6 +1679,7 @@ def run_single_setting(args):
     pkl.dump((res_input, prob_queue_arr), open(full_path1, 'wb'))
 
 def create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df):
+
     res_input = np.array([])
     prob_queue_arr = np.array([])
     # time_dict, arrival_rates, model_inputs, initial = pkl.load(open(os.path.join(path, files_list[ind]), 'rb'))
@@ -1746,7 +1747,7 @@ def parse_arguments(argv):
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=20)
+    parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
     parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default= 1000)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
