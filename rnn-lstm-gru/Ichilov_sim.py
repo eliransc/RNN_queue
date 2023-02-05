@@ -1622,7 +1622,13 @@ def run_single_setting(args):
 
     now = datetime.now()
 
-    path_data = r'C:\Users\user\workspace\data\mtg_new_data'
+
+    if 'C:' in os.getcwd().split('/')[0]:
+        path_data = r'C:\Users\user\workspace\data\mtg_new_data'
+    else:
+        path_data = 'scratch/eliransc/sim_sets_ichilov'
+
+
 
     files = os.listdir(path_data)
 
@@ -1632,42 +1638,11 @@ def run_single_setting(args):
     services, arrivals_dict, initial =\
         pkl.load(open(os.path.join(path_data, files[ind_file]), 'rb'))
 
-    # arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate = generate_cycle_arrivals(args.number_sequences)
-    #
-    # if 'dkrass' in os.getcwd().split('/'):
-    #     services_path = '/scratch/d/dkrass/eliransc/services'
-    # elif 'C:' in os.getcwd().split('/')[0]:
-    #     services_path = r'C:\Users\user\workspace\data\ph_random\services'
-    # else:
-    #     services_path = '/scratch/eliransc/ph_random/medium_ph'   #
-    #
-    # files = os.listdir(services_path)
-    # num_files = len(files)
-    # file_num = np.random.randint(0, num_files)
-    # services_ = pkl.load(open(os.path.join(services_path, files[file_num]), 'rb'))
-    # list_size = len(services_)
-    # sample_num = np.random.randint(0, list_size)
-    # s_service, A_service, moms_service, services = services_[sample_num]
-    np.random.seed(now.microsecond)
-
-    # file_nums = np.random.choice(num_files,num_groups)
-
-    # arrivals_dict = {}
-    #
-    # for ind, file_num in enumerate(file_nums):
-    #
-    #     arrivals_ = pkl.load(open(os.path.join(services_path, files[file_num]), 'rb'))
-    #     list_size = len(arrivals_)
-    #     sample_num = np.random.randint(0, list_size)
-    #     arrivals_dict[ind] = (arrivals_[sample_num], rate_dict_code_rate[ind])
 
     np.random.seed(now.microsecond)
+
 
     model_inputs = (s_service, A_service, moms_service,  arrivals_dict)
-
-    # size_initial = 100
-    # s = np.random.dirichlet(np.ones(30))
-    # initial = np.concatenate((s, np.zeros(size_initial - 30)))
 
     time_dict = {}
     for time_ in range(g.end_time):
@@ -1695,10 +1670,6 @@ def run_single_setting(args):
 
     res_input, prob_queue_arr = create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df)
     pkl.dump((res_input, prob_queue_arr), open(full_path1, 'wb'))
-
-
-    # pkl.dump((time_dict, arrival_rates, model_inputs, initial), open(full_path1, 'wb'))
-
 
 def create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df):
     res_input = np.array([])
@@ -1743,7 +1714,7 @@ def main(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         args.read_path = r'C:\Users\user\workspace\data\mt_g_1'
     else:
-        args.read_path = '/scratch/eliransc/new_gt_g_1_trans1' #
+        args.read_path = '/scratch/eliransc/ichilov_sims_data' #
 
     for ind in tqdm(range(args.num_iterations)):
 
