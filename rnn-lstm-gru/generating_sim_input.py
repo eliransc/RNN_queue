@@ -1728,7 +1728,7 @@ def main():
 
         mod_number = np.random.randint(1, 1000000000)
 
-        pkl.dump(sim_input, open('/scratch/eliransc/sim_sets_ichilov/sim_input_Ichilov_'+str(mod_number)+'.pkl','wb'))
+        pkl.dump(sim_input, open('/scratch/eliransc/sim_sets_ichilov/sim_input_Ichilov1_'+str(mod_number)+'.pkl','wb'))
 
 
 if __name__ == '__main__':
