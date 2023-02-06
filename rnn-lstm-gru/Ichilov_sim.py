@@ -1622,12 +1622,10 @@ def run_single_setting(args):
 
     now = datetime.now()
 
-
     if 'C:' in os.getcwd().split('/')[0]:
         path_data = r'C:\Users\user\workspace\data\mtg_new_data'
     else:
         path_data = '/scratch/eliransc/sim_sets_ichilov'
-
 
 
     files = os.listdir(path_data)
@@ -1647,7 +1645,6 @@ def run_single_setting(args):
     shutil.move(os.path.join(path_data, file_name), os.path.join(used_path, file_name))
 
     np.random.seed(now.microsecond)
-
 
     model_inputs = (s_service, A_service, moms_service,  arrivals_dict)
 
