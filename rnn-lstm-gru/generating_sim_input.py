@@ -1282,7 +1282,7 @@ def main():
     # df_15 = pd.read_excel(r'C:\Users\user\workspace\data\users_history_2015.xlsx')
     # df_16 = pd.read_excel(r'C:\Users\user\workspace\data\users_history_2016.xlsx')
 
-    service_name = 'Cardiologist'
+    service_name = 'Ophthalmologist'
 
     df_16['day'] = df_16.apply(lambda x: str(x.event_start_date.year) + '_' + str(x.event_start_date.month) + '_' + str(
         x.event_start_date.day), axis=1)
