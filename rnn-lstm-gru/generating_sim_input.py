@@ -1279,6 +1279,9 @@ def main():
     df_15 = pd.read_excel('/home/eliransc/projects/def-dkrass/eliransc/RNN_queue/users_history_2015.xlsx')
     df_16 = pd.read_excel('/home/eliransc/projects/def-dkrass/eliransc/RNN_queue/users_history_2016.xlsx')
 
+    # df_15 = pd.read_excel(r'C:\Users\user\workspace\data\users_history_2015.xlsx')
+    # df_16 = pd.read_excel(r'C:\Users\user\workspace\data\users_history_2016.xlsx')
+
     service_name = 'Cardiologist'
 
     df_16['day'] = df_16.apply(lambda x: str(x.event_start_date.year) + '_' + str(x.event_start_date.month) + '_' + str(
@@ -1728,6 +1731,7 @@ def main():
 
         mod_number = np.random.randint(1, 1000000000)
 
+        # pkl.dump(sim_input, open(r'C:\Users\user\workspace\data\mtg_new_data\sim_input_Ichilov1_' + str(mod_number) + '.pkl', 'wb'))
         pkl.dump(sim_input, open('/scratch/eliransc/sim_sets_ichilov/sim_input_Ichilov1_'+str(mod_number)+'.pkl','wb'))
 
 

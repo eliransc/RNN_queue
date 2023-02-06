@@ -1326,7 +1326,7 @@ class g:
     counter_for_moms_arrivals = 0
     counter_for_moms_depart_sojourn = 0
 
-    end_time = 20
+    end_time = 60
 
     # lenght1 = np.random.randint(5, 30)
     # lenght2 = end_time - lenght1
@@ -1395,7 +1395,7 @@ class GG1:
         elif self.sim_lenght_indicator == 1:
             self.end_time = 30
         else:
-            self.end_time = 20
+            self.end_time = 60
 
         # print(self.end_time)
 
@@ -1642,9 +1642,9 @@ def run_single_setting(args):
         pkl.load(open(os.path.join(path_data, file_name), 'rb'))
 
     import shutil
-    # used_path = '/scratch/eliransc/sim_sets_ichilov_used'
-    #
-    # shutil.move(os.path.join(path_data, file_name), os.path.join(used_path, file_name))
+    used_path = '/scratch/eliransc/sim_sets_ichilov_used'
+
+    shutil.move(os.path.join(path_data, file_name), os.path.join(used_path, file_name))
 
     np.random.seed(now.microsecond)
 
@@ -1680,11 +1680,16 @@ def run_single_setting(args):
 
 def create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df):
 
+    vector_lenght = df.shape[0]
+    num_cycles = int(vector_lenght / arrival_rates.shape[0])
+    all_arrivals1 = np.tile(arrival_rates, num_cycles + 1)[:vector_lenght]
+
+
     res_input = np.array([])
     prob_queue_arr = np.array([])
     # time_dict, arrival_rates, model_inputs, initial = pkl.load(open(os.path.join(path, files_list[ind]), 'rb'))
     for t in range(len(time_dict)):
-        arr_input = np.concatenate((np.log(model_inputs[2][:10]), np.log(model_inputs[3][df.loc[t, 'arrival_code']][0][2] / np.array([arrival_rates[t]])), np.array([t]), initial[:15]), axis =0)
+        arr_input = np.concatenate((np.log(model_inputs[2][:10]), np.log(model_inputs[3][df.loc[t, 'arrival_code']][0][2] / np.array([all_arrivals1[t]])), np.array([t]), initial[:15]), axis =0)
         arr_input = arr_input.reshape(1, arr_input.shape[0])
         probs = (time_dict[t]/time_dict[t].sum())
         fifty_or_more = probs[50:].sum()
