@@ -40,6 +40,8 @@ class my_Dataset(Dataset):
             x = torch.cat((inputs[:, :,:5], inputs[:, :,10:15], inputs[:,:,20:]), 2)
         y = torch.from_numpy(y[:,:,:])
 
+        return x, y
+
     # def __getitem__(self, index):
     #     # print(self.data_paths[index])
     #     x, y = pkl.load(open(self.data_paths[index], 'rb'))
