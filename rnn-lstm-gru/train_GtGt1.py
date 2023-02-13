@@ -19,7 +19,7 @@ import sys
 from datetime import datetime
 
 time_ub = 60
-num_moments = 2
+num_moments = 5
 class my_Dataset(Dataset):
     # Characterizes a dataset for PyTorch
     def __init__(self, data_paths):
@@ -28,18 +28,30 @@ class my_Dataset(Dataset):
     def __len__(self):
         return len(self.data_paths)
 
+
     def __getitem__(self, index):
         # print(self.data_paths[index])
-        x, y = pkl.load(open(self.data_paths[index], 'rb'))
-        inputs = torch.from_numpy(x[:, :time_ub, :21 + 15])
-        x = torch.cat((inputs[:, :, :num_moments], inputs[:, :, 10:10+num_moments], inputs[:, :, 20:]), 2)
-        y = torch.from_numpy(y[:, :, :])
-        # y = (y[:,:time_ub,:]*torch.arange(71)).sum(axis = 2)
-        # y = y.reshape((16, time_ub,1))
+        x, y = pkl.load(open(self.data_paths[index] , 'rb'))
+        if self.data_paths[index].split('/')[-1].startswith('ich'):
+            inputs = torch.from_numpy(x[:,:time_ub,:])
+            x = inputs #torch.cat((inputs[:, :,:5], inputs[:, :,10:15], inputs[:,:,20:]), 2)
+        else:
+            inputs = torch.from_numpy(x[:,:time_ub,:21+15])
+            x = torch.cat((inputs[:, :,:5], inputs[:, :,10:15], inputs[:,:,20:]), 2)
+        y = torch.from_numpy(y[:,:,:])
 
-        # x= torch.cat((torch.exp(inputs[:, :,:4]), inputs[:, :,10:14], inputs[:,:,20:]), 2)
-
-        return x, y
+    # def __getitem__(self, index):
+    #     # print(self.data_paths[index])
+    #     x, y = pkl.load(open(self.data_paths[index], 'rb'))
+    #     inputs = torch.from_numpy(x[:, :time_ub, :21 + 15])
+    #     x = torch.cat((inputs[:, :, :num_moments], inputs[:, :, 10:10+num_moments], inputs[:, :, 20:]), 2)
+    #     y = torch.from_numpy(y[:, :, :])
+    #     # y = (y[:,:time_ub,:]*torch.arange(71)).sum(axis = 2)
+    #     # y = y.reshape((16, time_ub,1))
+    #
+    #     # x= torch.cat((torch.exp(inputs[:, :,:4]), inputs[:, :,10:14], inputs[:,:,20:]), 2)
+    #
+    #     return x, y
 
 
 class RNN1(nn.Module):
@@ -251,7 +263,7 @@ def main(args):
 
         valid_loss_list.append(torch.tensor(totloss).mean())
         pkl.dump((loss_list, valid_loss_list),
-                 open('/scratch/eliransc/RNN_loss_vals/' + 'loss_' + setting_string + '_' + str(current_time) + '.pkl',
+                 open('/scratch/eliransc/RNN_loss_vals/' + 'ichilov_loss_' + setting_string + '_' + str(current_time) + '.pkl',
                       'wb'))
 
 
