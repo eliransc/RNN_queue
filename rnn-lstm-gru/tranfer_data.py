@@ -38,7 +38,7 @@ def main():
     if not os.path.exists(list_path):
         pkl.dump([], open(list_path, 'wb'))
 
-    folder_path = '/scratch/eliransc/all_new_g_g_1_trans1'
+    folder_path = '/scratch/eliransc/Ichilov_gt_g_1_folders'
 
     tot_list = list(np.arange(1, len(os.listdir(folder_path))+1))
 
@@ -75,13 +75,13 @@ def main():
                     batch_input = np.concatenate((batch_input, res_input), axis=0)
                     batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
                 # print(os.path.join(path, files[ind]))
-                os.remove(os.path.join(path, files[ind]))
+                # os.remove(os.path.join(path, files[ind]))
             except:
                 print('could not open file')
         batch_num = np.random.randint(1000, 100000000)
         if batch_input.shape[0] == 32:
             pkl.dump((batch_input, batch_output),
-                     open(os.path.join('/scratch/eliransc/new_gt_g_1_batches1', 'batch_' + str(batch_num) + '.pkl'),
+                     open(os.path.join('/scratch/eliransc/batch_ichilov', 'ichilov_batch_' + str(batch_num) + '.pkl'),
                           'wb'))
 
 
