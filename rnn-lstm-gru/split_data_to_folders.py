@@ -37,13 +37,13 @@ import shutil
 def main():
 
 
-    batch_size = 3200
-    path = '/scratch/eliransc/new_gt_g_1_trans1'
+    batch_size = 1600
+    path = '/scratch/eliransc/ichilov_sims_data'
     files = os.listdir(path)
     num_batches = int(len(files) / batch_size)
     counter = 1
     for curr_batch in tqdm(range(num_batches)):
-        new_dst_folder = '/scratch/eliransc/all_new_g_g_1_trans1/folder_' + str(counter)
+        new_dst_folder = '/scratch/eliransc/Ichilov_gt_g_1_folders/folder_' + str(counter)
         if not os.path.exists(new_dst_folder):
             os.mkdir(new_dst_folder)
         for ind in range(curr_batch * batch_size, (curr_batch + 1) * batch_size):
