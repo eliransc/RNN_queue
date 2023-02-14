@@ -1326,7 +1326,7 @@ class g:
     counter_for_moms_arrivals = 0
     counter_for_moms_depart_sojourn = 0
 
-    end_time = 60
+    end_time = 20
 
     # lenght1 = np.random.randint(5, 30)
     # lenght2 = end_time - lenght1
@@ -1395,7 +1395,7 @@ class GG1:
         elif self.sim_lenght_indicator == 1:
             self.end_time = 30
         else:
-            self.end_time = 60
+            self.end_time = 20
 
         # print(self.end_time)
 
@@ -1634,15 +1634,18 @@ def run_single_setting(args):
 
     file_name = files[ind_file]
 
-
     arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate, s_service, A_service, moms_service, \
-    services, arrivals_dict, initial =\
-        pkl.load(open(os.path.join(path_data, file_name), 'rb'))
+    services, arrivals_dict, initial = pkl.load(
+        open(r'C:\Users\user\workspace\RNN_queue\RNN_queue\rnn-lstm-gru\sim_input_Ichilov.pkl', 'rb'))
 
-    import shutil
-    used_path = '/scratch/eliransc/sim_sets_ichilov_used'
+    # arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate, s_service, A_service, moms_service, \
+    # services, arrivals_dict, initial =\
+    #     pkl.load(open(os.path.join(path_data, file_name), 'rb'))
 
-    shutil.move(os.path.join(path_data, file_name), os.path.join(used_path, file_name))
+    # import shutil
+    # used_path = '/scratch/eliransc/sim_sets_ichilov_used'
+    #
+    # shutil.move(os.path.join(path_data, file_name), os.path.join(used_path, file_name))
 
     np.random.seed(now.microsecond)
 
@@ -1660,7 +1663,7 @@ def run_single_setting(args):
     list_of_lists1 = []
     for ind in tqdm(range(10)):
         list_of_dicts = [single_sim(services, arrivals_dict, model_inputs, arrival_rates, initial, df,   args) for ind in
-                          range(1, args.num_iter_same_params + 1)] #
+                          range(1, args.num_iter_same_params + 1)]  #
         list_of_lists1.append(list_of_dicts)
 
     merged1 = list(itertools.chain(*list_of_lists1))
@@ -1669,7 +1672,7 @@ def run_single_setting(args):
         for time1 in resultDictionary.keys():
             time_dict[time1][resultDictionary[time1]] += 1
 
-    curr_path1 = str(model_num) + '.pkl'
+    curr_path1 = str(model_num) + 'ichilov_input.pkl'
     full_path1 = os.path.join(args.read_path, curr_path1)
 
     res_input, prob_queue_arr = create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df)
@@ -1749,9 +1752,9 @@ def parse_arguments(argv):
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
+    parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=20)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default= 1200)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default= 1000)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)

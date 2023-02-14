@@ -38,7 +38,7 @@ class my_Dataset(Dataset):
         else:
             inputs = torch.from_numpy(x[:,:time_ub,:21+15])
             x = torch.cat((inputs[:, :,:5], inputs[:, :,10:15], inputs[:,:,20:]), 2)
-        y = torch.from_numpy(y[:,:,:])
+        y = torch.from_numpy(y[:, :, :])
 
         return x, y
 
@@ -135,11 +135,11 @@ def valid_score(soft, labels):
 def main(args):
 
 
-    path = '/scratch/eliransc/new_gt_g_1_batches1/'
+    path = '/scratch/eliransc/Ichilov_gt_g_1_folders/'  # new_gt_g_1_batches1
     file_list = os.listdir(path)
     data_paths = [os.path.join(path, name) for name in file_list]
 
-    valid_path_ = '/scratch/eliransc/new_gt_g_1_batches1_valid'
+    valid_path_ = '/scratch/eliransc/Ichilov_gt_g_1_folders/'  # new_gt_g_1_batches1_valid
     valid_path = os.listdir(valid_path_)
 
     valid_path = [os.path.join(valid_path_, name) for name in valid_path]
@@ -223,7 +223,7 @@ def main(args):
 
 
                     torch.save(model.state_dict(),
-                               '/scratch/eliransc/RNN_models/pytorch_gt_gt_1_true_moms_new_data_' + setting_string + '_' + str(
+                               '/scratch/eliransc/RNN_models_ichilov/pytorch_gt_gt_1_true_moms_new_data_' + setting_string + '_' + str(
                                    current_time) + '.pkl')
 
 
@@ -234,11 +234,11 @@ def main(args):
         # print(inputs[inputs<0].shape)
 
         torch.save(model.state_dict(),
-                   '/scratch/eliransc/RNN_models/pytorch_gt_gt_1_true_moms_new_data_' + setting_string + '_' + str(
+                   '/scratch/eliransc/RNN_models_ichilov/pytorch_gt_gt_1_true_moms_new_data_' + setting_string + '_' + str(
                        current_time) + '.pkl')
 
         model1.load_state_dict(
-            torch.load('/scratch/eliransc/RNN_models/pytorch_gt_gt_1_true_moms_new_data_' + setting_string + '_' + str(
+            torch.load('/scratch/eliransc/RNN_models_ichilov/pytorch_gt_gt_1_true_moms_new_data_' + setting_string + '_' + str(
                 current_time) + '.pkl', map_location=torch.device('cpu')))
         totloss = []
 
@@ -265,7 +265,7 @@ def main(args):
 
         valid_loss_list.append(torch.tensor(totloss).mean())
         pkl.dump((loss_list, valid_loss_list),
-                 open('/scratch/eliransc/RNN_loss_vals/' + 'ichilov_loss_' + setting_string + '_' + str(current_time) + '.pkl',
+                 open('/scratch/eliransc/RNN_loss_vals_ichilov/' + 'ichilov_loss_' + setting_string + '_' + str(current_time) + '.pkl',
                       'wb'))
 
 
