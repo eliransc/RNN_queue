@@ -64,9 +64,6 @@ class RNN1(nn.Module):
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
         # -> x needs to be: (batch_size, seq, input_size)
 
-        # or:
-        # self.gru = nn.GRU(input_size, hidden_size, num_layers, batch_first=True)
-        # self.gru = nn.GRU(input_size, hidden_size, num_layers, batch_first=True)
         self.fc = nn.Linear(hidden_size, output_size)
 
     def forward(self, x):
@@ -74,18 +71,11 @@ class RNN1(nn.Module):
         h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size)  # .to(device)
         c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size)  # .to(device)
 
-        # x: (n, 28, 28), h0: (2, n, 128)
-
-        # Forward propagate RNN
-        # out, _ = self.gru(x.float(), h0.float())
-        # or:
         out, _ = self.lstm(x.float(), (h0.float(), c0.float()))
 
-        # out: (n, 128)
 
         out = self.fc(out)
 
-        # out: (n, 10)
         return out
 
 
@@ -97,9 +87,6 @@ class RNN(nn.Module):
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
         # -> x needs to be: (batch_size, seq, input_size)
 
-        # or:
-        # self.gru = nn.GRU(input_size, hidden_size, num_layers, batch_first=True)
-        # self.gru = nn.GRU(input_size, hidden_size, num_layers, batch_first=True)
         self.fc = nn.Linear(hidden_size, output_size)
 
     def forward(self, x):
@@ -107,22 +94,15 @@ class RNN(nn.Module):
         h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(device)
         c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(device)
 
-        # x: (n, 28, 28), h0: (2, n, 128)
-
-        # Forward propagate RNN
-        # out, _ = self.gru(x.float(), h0.float())
-        # or:
         out, _ = self.lstm(x.float(), (h0.float(), c0.float()))
 
-        # out: (n, 128)
 
         out = self.fc(out)
 
-        # out: (n, 10)
         return out
 
 def loss_queue(soft, labels):
-    return ((torch.abs(soft[:,1:,:] - labels[:,1:,:])).sum(axis = [2]) + torch.max(torch.abs(soft[:,1:,:] - labels[:,1:,:]), axis = 2)[0]).mean()
+    return ((torch.abs(soft[:,:,:] - labels[:,:,:])).sum(axis = [2]) + torch.max(torch.abs(soft[:,:,:] - labels[:,:,:]), axis = 2)[0]).mean()
 
 
 def valid_score(soft, labels):
