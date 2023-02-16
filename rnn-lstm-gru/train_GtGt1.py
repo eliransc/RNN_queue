@@ -109,7 +109,7 @@ def loss_queue(soft, labels):
 
 
 def valid_score(soft, labels):
-    return ((torch.abs(soft[:, 1:,:] - labels[:,1:,:])).sum(axis = [2]) ).mean()
+    return ((torch.abs(soft[:, 0:20,:] - labels[:,0:20,:])).sum(axis = [2]) ).mean()
 
 
 
@@ -205,7 +205,7 @@ def main(args):
 
 
                     torch.save(model.state_dict(),
-                               '/scratch/eliransc/RNN_models_ichilov_trial/pytorch_gt_gt_1_true_moms_new_data1_' + setting_string + '_' + str(
+                               '/scratch/eliransc/RNN_models_ichilov_trial/pytorch_gt_gt_1_true_moms_new_data2_' + setting_string + '_' + str(
                                    current_time) + '.pkl')
 
 
@@ -216,11 +216,11 @@ def main(args):
         # print(inputs[inputs<0].shape)
 
         torch.save(model.state_dict(),
-                   '/scratch/eliransc/RNN_models_ichilov_trial/pytorch_gt_gt_1_true_moms_new_data1_' + setting_string + '_' + str(
+                   '/scratch/eliransc/RNN_models_ichilov_trial/pytorch_gt_gt_1_true_moms_new_data2_' + setting_string + '_' + str(
                        current_time) + '.pkl')
 
         model1.load_state_dict(
-            torch.load('/scratch/eliransc/RNN_models_ichilov_trial/pytorch_gt_gt_1_true_moms_new_data1_' + setting_string + '_' + str(
+            torch.load('/scratch/eliransc/RNN_models_ichilov_trial/pytorch_gt_gt_1_true_moms_new_data2_' + setting_string + '_' + str(
                 current_time) + '.pkl', map_location=torch.device('cpu')))
         totloss = []
 
@@ -247,7 +247,7 @@ def main(args):
 
         valid_loss_list.append(torch.tensor(totloss).mean())
         pkl.dump((loss_list, valid_loss_list),
-                 open('/scratch/eliransc/RNN_loss_vals_ichilov_trial/' + 'ichilov_loss1_' + setting_string + '_' + str(current_time) + '.pkl',
+                 open('/scratch/eliransc/RNN_loss_vals_ichilov_trial/' + 'ichilov_loss2_' + setting_string + '_' + str(current_time) + '.pkl',
                       'wb'))
 
 
