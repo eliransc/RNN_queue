@@ -1299,6 +1299,13 @@ def generate_ph(is_arrival, is_exponential):
 
     return (s1, A1, moms_ser)
 
+def create_Erlang4(lam):
+    s = np.array([[1, 0, 0, 0]])
+
+    A = np.array([[-lam, lam, 0, 0], [0, -lam, lam, 0], [0, 0, -lam, lam], [0, 0, 0, -lam]])
+
+    return (s, A)
+
 
 def find_num_cust_time_stamp(df, time):
 
@@ -1419,10 +1426,10 @@ class GG1:
         self.env = simpy.Environment()
         self.patient_counter = 0
         self.server = simpy.PriorityResource(self.env, capacity=1)
-        ser_dist_params = model_input[:3]
-        arrival_dist_params = model_input[3]
-        self.ser_dist_params = ser_dist_params
-        self.arrival_dist_params = arrival_dist_params
+        # ser_dist_params = model_input[1]
+        # arrival_dist_params =
+        # self.ser_dist_params = ser_dist_params
+        self.arrival_dist_params = model_input[2]
         self.num_cust_sys = 0
         self.num_cust_durations = np.zeros(120)
         self.last_event_time = 0
@@ -1557,11 +1564,13 @@ class GG1:
             time_period = int(self.env.now)
             inter_arrival_rate = self.arrival_rates[time_period]
             arrival_code = self.df.loc[self.df['time'] == time_period, 'arrival_code']
-            arrivals = self.arrival_dist_params[arrival_code.item()][0][3]
+            arrivals = self.arrival_dist_params[arrival_code.item()][0]
+
             np.random.shuffle(arrivals)
+
             inter_arrival = arrivals[self.customer_counter]
             rate = self.generate_arrival_rate(self.env.now)
-            yield self.env.timeout(inter_arrival/rate) #self.env.timeout(np.random.exponential(1/inter_arrival_rate))
+            yield self.env.timeout(inter_arrival) #self.env.timeout(np.random.exponential(1/inter_arrival_rate))
 
             arrival_time = self.env.now
             customer = Customer(self.customer_counter, arrival_time)
@@ -1614,9 +1623,9 @@ def give_group_size(phases):
                  np.random.multinomial(phases - num_groups, [1 / num_groups] * num_groups, size=1)[0]
     return num_groups, group_size.astype(int)
 
-def generate_cycle_arrivals(number_sequences):
+def generate_cycle_arrivals(number_sequences, avg_rho):
 
-    avg_rho = np.random.uniform(0.6, 1)
+    # avg_rho = np.random.uniform(0.6, 1)
 
     vector_lenght = number_sequences
     cycle_size = np.random.randint(4, int(vector_lenght / 2))
@@ -1675,32 +1684,70 @@ def generate_cycle_arrivals(number_sequences):
 
     return (all_arrivals, num_groups, df, rates_dict_rate_code, rate_dict_code_rate)
 
-def run_single_setting(args):
 
-    # s_service, A_service, moms_service = model_inputs
+def get_inter_specical_dist( arrival_dist, arrival_rate ,sample_size):
 
-    now = datetime.now()
+    arrival_dics = {0: 'LN025', 1: 'LN4', 2: 'G4', 3: 'E4', 4: 'H2', 5: 'M'}
 
-    arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate = generate_cycle_arrivals(args.number_sequences)
+    if arrival_dics[arrival_dist] == 'LN025':
+        mu = 1 / arrival_rate
+        sig2 = 0.25 * mu
+        inter_arrival = log_normal_gener(mu, sig2, sample_size)
+        m = np.log((mu ** 2) / (sig2 + mu ** 2) ** 0.5)
+        v = (np.log(sig2 / mu ** 2 + 1)) ** 0.5
+        moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
+        arrival_csv = 0.25
 
-    if 'dkrass' in os.getcwd().split('/'):
-        services_path = '/scratch/d/dkrass/eliransc/services'
-    elif 'C:' in os.getcwd().split('/')[0]:
-        services_path = r'C:\Users\user\workspace\data\ph_random\services'
-    else:
-        services_path = '/scratch/eliransc/ph_random/medium_ph'   #
+    elif arrival_dics[arrival_dist] == 'LN4':
 
-    files = os.listdir(services_path)
-    num_files = len(files)
-    file_num = np.random.randint(0, num_files)
-    services_ = pkl.load(open(os.path.join(services_path, files[file_num]), 'rb'))
-    list_size = len(services_)
-    sample_num = np.random.randint(0, list_size)
-    s_service, A_service, moms_service, services = services_[sample_num]
-    np.random.seed(now.microsecond)
+        mu = 1 / arrival_rate
+        sig2 = 4 * mu
+        inter_arrival = log_normal_gener(mu, sig2, sample_size)
+        m = np.log((mu ** 2) / (sig2 + mu ** 2) ** 0.5)
+        v = (np.log(sig2 / mu ** 2 + 1)) ** 0.5
+        moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
+        arrival_csv = 4
 
-    sample_size = 50000
-    service_dist = 0
+    elif arrival_dics[arrival_dist] == 'G4':
+
+        shape, scale, moms_arrive = generate_gamma(True, arrival_rate)
+        # moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
+        inter_arrival = np.random.gamma(shape, scale, sample_size)
+        moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
+        arrival_csv = 4
+
+    elif arrival_dics[arrival_dist] == 'E4':
+
+        lam = 4 * arrival_rate
+        s, A = create_Erlang4(lam)
+        inter_arrival = SamplesFromPH(ml.matrix(s), A, sample_size)
+        # moms_arrive = compute_first_n_moments(s, A, 10)
+        # moms_arrive = np.array(moms_arrive).flatten()
+        moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
+        arrival_csv = 1 / lam
+
+    elif arrival_dics[arrival_dist] == 'H2':
+
+        mu = 1 / arrival_rate
+        s, A = get_hyper_ph_representation(mu)
+        inter_arrival = SamplesFromPH(ml.matrix(s), A, sample_size)
+        # moms_arrive = compute_first_n_moments(s, A, 10)
+        # moms_arrive = np.array(moms_arrive).flatten()
+        moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
+        arrival_csv = 4
+
+
+    elif arrival_dics[arrival_dist] == 'M':
+
+        mu = 1/arrival_rate
+        services = np.random.exponential(1, sample_size)
+        moms_service = compute_first_ten_moms_log_N(services)
+        service_csv = 1
+
+    return (inter_arrival, moms_arrive)
+
+
+def get_ser_special_dist( service_dist, sample_size):
 
     ser_dics = {0: 'LN025', 1: 'LN4', 2: 'G4', 3: 'E4', 4: 'H2', 5: 'M'}
 
@@ -1757,54 +1804,85 @@ def run_single_setting(args):
         moms_service = compute_first_ten_moms_log_N(services)
         service_csv = 1
 
-    file_nums = np.random.choice(num_files, num_groups)
 
-    arrivals_dict = {}
+    return (services, moms_service)
 
-    for ind, file_num in enumerate(file_nums):
 
-        arrivals_ = pkl.load(open(os.path.join(services_path, files[file_num]), 'rb'))
-        list_size = len(arrivals_)
-        sample_num = np.random.randint(0, list_size)
-        arrivals_dict[ind] = (arrivals_[sample_num], rate_dict_code_rate[ind])
+def run_single_setting(args):
 
-    np.random.seed(now.microsecond)
-
-    model_inputs = (s_service, A_service, moms_service,  arrivals_dict)
-
-    size_initial = 100
-    s = np.random.dirichlet(np.ones(15))
-    initial = np.concatenate((s, np.zeros(size_initial - 15)))
-
-    time_dict = {}
-    for time_ in range(g.end_time):
-        time_dict[time_] = np.zeros(g.max_num_customers)
+    if 'dkrass' in os.getcwd().split('/'):
+        ind_list_path = '/scratch/eliransc/inds_ind_dir/ind_list.pkl'
+    elif 'C:' in os.getcwd().split('/')[0]:
+        ind_list_path = 'ind_list.pkl'
+    else:
+        ind_list_path = '/scratch/eliransc/inds_ind_dir/ind_list.pkl'
 
     now = datetime.now()
-    current_time = now.strftime("%H_%M_%S")
-    np.random.seed(now.microsecond)
-    model_num = np.random.randint(1, 100000000)
 
-    list_of_lists1 = []
-    for ind in tqdm(range(10)):
-        list_of_dicts = [single_sim(services, arrivals_dict, model_inputs, arrival_rates, initial,df,   args) for ind in
-                          range(1, args.num_iter_same_params + 1)] #
-        list_of_lists1.append(list_of_dicts)
+    sample_size = 500000
 
-    merged1 = list(itertools.chain(*list_of_lists1))
+    inds_list = pkl.load(open(ind_list_path, 'rb'))
 
-    for resultDictionary in merged1:
-        for time1 in resultDictionary.keys():
-            time_dict[time1][resultDictionary[time1]] += 1
+    arrival_dist, service_dist = inds_list[0][0], inds_list[0][1]
+    inds_list.remove(inds_list[0])
+    pkl.dump(inds_list, open(ind_list_path, 'wb'))
 
-    curr_path1 = str(model_num) + '.pkl'
-    full_path1 = os.path.join(args.read_path, curr_path1)
+    print(arrival_dist, service_dist)
 
-    res_input, prob_queue_arr = create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df)
-    pkl.dump((res_input, prob_queue_arr), open(full_path1, 'wb'))
+    for avg_rho in ([0.6, 0.7, 0.8, 0.9, 1]):
 
+        print(avg_rho)
 
-    # pkl.dump((time_dict, arrival_rates, model_inputs, initial), open(full_path1, 'wb'))
+        arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate = generate_cycle_arrivals(args.number_sequences, avg_rho)
+
+        np.random.seed(now.microsecond)
+
+        services, moms_service = get_ser_special_dist(service_dist, sample_size)
+
+        arrivals_dict = {}
+
+        sample_size = 500000
+
+        for ind_rate in range(num_groups):
+
+            arrival_rate = rate_dict_code_rate[ind_rate]
+
+            arrivals_dict[ind_rate] = get_inter_specical_dist( arrival_dist, arrival_rate, sample_size)
+
+        np.random.seed(now.microsecond)
+
+        model_inputs = (services, moms_service,  arrivals_dict)
+
+        size_initial = 100
+        s = np.random.dirichlet(np.ones(15))
+        initial = np.concatenate((s, np.zeros(size_initial - 15)))
+
+        time_dict = {}
+        for time_ in range(g.end_time):
+            time_dict[time_] = np.zeros(g.max_num_customers)
+
+        now = datetime.now()
+        current_time = now.strftime("%H_%M_%S")
+        np.random.seed(now.microsecond)
+        model_num = np.random.randint(1, 100000000)
+
+        list_of_lists1 = []
+        for ind in tqdm(range(10)):
+            list_of_dicts = [single_sim(services, arrivals_dict, model_inputs, arrival_rates, initial,df,   args) for ind in
+                              range(1, args.num_iter_same_params + 1)] #
+            list_of_lists1.append(list_of_dicts)
+
+        merged1 = list(itertools.chain(*list_of_lists1))
+
+        for resultDictionary in merged1:
+            for time1 in resultDictionary.keys():
+                time_dict[time1][resultDictionary[time1]] += 1
+
+        curr_path1 = str(model_num) + '_arrive_dist_'+ str(arrival_dist) + '_ser_dist_' + str( service_dist) + '_avg_rho_' + str(avg_rho)  +  '.pkl'
+        full_path1 = os.path.join(args.read_path, curr_path1)
+
+        res_input, prob_queue_arr = create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df)
+        pkl.dump((res_input, prob_queue_arr), open(full_path1, 'wb'))
 
 
 def create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df):
@@ -1812,7 +1890,7 @@ def create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df
     prob_queue_arr = np.array([])
     # time_dict, arrival_rates, model_inputs, initial = pkl.load(open(os.path.join(path, files_list[ind]), 'rb'))
     for t in range(len(time_dict)):
-        arr_input = np.concatenate((np.log(model_inputs[2][:10]), np.log(model_inputs[3][df.loc[t, 'arrival_code']][0][2] / np.array([arrival_rates[t]])), np.array([t]), initial[:15]), axis =0)
+        arr_input = np.concatenate((np.array([0]), np.log(model_inputs[1][1:10]), np.log(model_inputs[2][df.loc[t, 'arrival_code']][1]), np.array([t]), initial[:15]), axis =0)
         arr_input = arr_input.reshape(1, arr_input.shape[0])
         probs = (time_dict[t]/time_dict[t].sum())
         fifty_or_more = probs[50:].sum()
@@ -1881,12 +1959,12 @@ def parse_arguments(argv):
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default= 2000)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default= 3000)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
     parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=100500)
-    parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=10064)
+    parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=1)
     parser.add_argument('--read_path', type=str, help='the path of the files to read from', default=  '/scratch/eliransc/time_dependant_cyclic' ) # r'C:\Users\user\workspace\data\time_dependant'
     parser.add_argument('--dists_path', type=str, help='the path of the files to read from', default=  '' ) # r'C:\Users\user\workspace\data\time_dependant'
     parser.add_argument('--read_path_niagara', type=str, help='the path of the files to read from',
