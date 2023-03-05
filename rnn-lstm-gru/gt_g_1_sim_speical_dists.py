@@ -1118,22 +1118,22 @@ def generate_unif(is_arrival):
 
 
 
-def generate_gamma(is_arrival):
-    if is_arrival:
-        rho = np.random.uniform(0.9, 0.99)
-        shape = 1 # np.random.uniform(0.1, 100)
-        scale = 1 / (rho * shape)
-        moms_arr = np.array([])
-        for mom in range(1, 11):
-            moms_arr = np.append(moms_arr, np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
-        return (shape, scale, moms_arr)
-    else:
-        shape = np.random.uniform(1, 100)
-        scale = 1 / shape
-        moms_ser = np.array([])
-        for mom in range(1, 11):
-            moms_ser = np.append(moms_ser, np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
-        return (shape, scale, moms_ser)
+# def generate_gamma(is_arrival):
+#     if is_arrival:
+#         rho = np.random.uniform(0.9, 0.99)
+#         shape = 1 # np.random.uniform(0.1, 100)
+#         scale = 1 / (rho * shape)
+#         moms_arr = np.array([])
+#         for mom in range(1, 11):
+#             moms_arr = np.append(moms_arr, np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
+#         return (shape, scale, moms_arr)
+#     else:
+#         shape = np.random.uniform(1, 100)
+#         scale = 1 / shape
+#         moms_ser = np.array([])
+#         for mom in range(1, 11):
+#             moms_ser = np.append(moms_ser, np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
+#         return (shape, scale, moms_ser)
 
 
 def generate_normal(is_arrival):
@@ -1685,7 +1685,7 @@ def generate_cycle_arrivals(number_sequences, avg_rho):
     return (all_arrivals, num_groups, df, rates_dict_rate_code, rate_dict_code_rate)
 
 
-def get_inter_specical_dist( arrival_dist, arrival_rate ,sample_size):
+def get_inter_specical_dist(arrival_dist, arrival_rate ,sample_size):
 
     arrival_dics = {0: 'LN025', 1: 'LN4', 2: 'G4', 3: 'E4', 4: 'H2', 5: 'M'}
 
@@ -1821,68 +1821,81 @@ def run_single_setting(args):
 
     sample_size = 500000
 
-    inds_list = pkl.load(open(ind_list_path, 'rb'))
+    # inds_list = pkl.load(open(ind_list_path, 'rb'))
+    #
+    # arrival_dist, service_dist = 2, 2 #inds_list[0][0], inds_list[0][1]
+    # # inds_list.remove(inds_list[0])
+    # # pkl.dump(inds_list, open(ind_list_path, 'wb'))
 
-    arrival_dist, service_dist = inds_list[0][0], inds_list[0][1]
-    inds_list.remove(inds_list[0])
-    pkl.dump(inds_list, open(ind_list_path, 'wb'))
 
-    print(arrival_dist, service_dist)
 
-    for avg_rho in ([0.6, 0.7, 0.8, 0.9, 1]):
+    path_df = '/home/eliransc/projects/def-dkrass/eliransc/RNN_queue/rnn-lstm-gru'
+    df_counts1 = pkl.load(open(os.path.join(path_df, 'combs_df.pkl'), 'rb'))
 
-        print(avg_rho)
+    ind = df_counts1.loc[df_counts1['status'] == 'Pending', :].index.values.tolist()[0]
+    df_counts1.loc[ind, 'status'] = 'Done'
 
-        arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate = generate_cycle_arrivals(args.number_sequences, avg_rho)
+    arrival_dist = df_counts1.loc[ind, 'arrive']
+    service_dist = df_counts1.loc[ind, 'ser']
+    avg_rho = df_counts1.loc[ind, 'rho']
 
-        np.random.seed(now.microsecond)
+    print(arrival_dist, service_dist, avg_rho)
+    print(df_counts1.loc[df_counts1['status'] == 'Pending', :].shape)
+    pkl.dump(df_counts1, open(os.path.join(path_df, 'combs_df.pkl'), 'wb'))
 
-        services, moms_service = get_ser_special_dist(service_dist, sample_size)
 
-        arrivals_dict = {}
+    print(avg_rho)
 
-        sample_size = 500000
+    arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate = generate_cycle_arrivals(args.number_sequences, avg_rho)
 
-        for ind_rate in range(num_groups):
+    np.random.seed(now.microsecond)
 
-            arrival_rate = rate_dict_code_rate[ind_rate]
+    services, moms_service = get_ser_special_dist(service_dist, sample_size)
 
-            arrivals_dict[ind_rate] = get_inter_specical_dist( arrival_dist, arrival_rate, sample_size)
+    arrivals_dict = {}
 
-        np.random.seed(now.microsecond)
+    sample_size = 500000
 
-        model_inputs = (services, moms_service,  arrivals_dict)
+    for ind_rate in range(num_groups):
 
-        size_initial = 100
-        s = np.random.dirichlet(np.ones(15))
-        initial = np.concatenate((s, np.zeros(size_initial - 15)))
+        arrival_rate = rate_dict_code_rate[ind_rate]
 
-        time_dict = {}
-        for time_ in range(g.end_time):
-            time_dict[time_] = np.zeros(g.max_num_customers)
+        arrivals_dict[ind_rate] = get_inter_specical_dist( arrival_dist, arrival_rate, sample_size)
 
-        now = datetime.now()
-        current_time = now.strftime("%H_%M_%S")
-        np.random.seed(now.microsecond)
-        model_num = np.random.randint(1, 100000000)
+    np.random.seed(now.microsecond)
 
-        list_of_lists1 = []
-        for ind in tqdm(range(10)):
-            list_of_dicts = [single_sim(services, arrivals_dict, model_inputs, arrival_rates, initial,df,   args) for ind in
-                              range(1, args.num_iter_same_params + 1)] #
-            list_of_lists1.append(list_of_dicts)
+    model_inputs = (services, moms_service,  arrivals_dict)
 
-        merged1 = list(itertools.chain(*list_of_lists1))
+    size_initial = 100
+    s = np.random.dirichlet(np.ones(15))
+    initial = np.concatenate((s, np.zeros(size_initial - 15)))
 
-        for resultDictionary in merged1:
-            for time1 in resultDictionary.keys():
-                time_dict[time1][resultDictionary[time1]] += 1
+    time_dict = {}
+    for time_ in range(g.end_time):
+        time_dict[time_] = np.zeros(g.max_num_customers)
 
-        curr_path1 = str(model_num) + '_arrive_dist_'+ str(arrival_dist) + '_ser_dist_' + str( service_dist) + '_avg_rho_' + str(avg_rho)  +  '.pkl'
-        full_path1 = os.path.join(args.read_path, curr_path1)
+    now = datetime.now()
+    current_time = now.strftime("%H_%M_%S")
+    np.random.seed(now.microsecond)
+    model_num = np.random.randint(1, 100000000)
 
-        res_input, prob_queue_arr = create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df)
-        pkl.dump((res_input, prob_queue_arr), open(full_path1, 'wb'))
+    list_of_lists1 = []
+    for ind in tqdm(range(10)):
+        list_of_dicts = [single_sim(services, arrivals_dict, model_inputs, arrival_rates, initial,df,   args) for ind in
+                          range(1, args.num_iter_same_params + 1)] #
+        list_of_lists1.append(list_of_dicts)
+
+    merged1 = list(itertools.chain(*list_of_lists1))
+
+    for resultDictionary in merged1:
+        for time1 in resultDictionary.keys():
+            time_dict[time1][resultDictionary[time1]] += 1
+
+    curr_path1 = str(model_num) + '_arrive_dist_'+ str(arrival_dist) + '_ser_dist_' + str( service_dist) + '_avg_rho_' + str(avg_rho)  +  '.pkl'
+    full_path1 = os.path.join(args.read_path, curr_path1)
+
+    res_input, prob_queue_arr = create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df)
+    pkl.dump((res_input, prob_queue_arr), open(full_path1, 'wb'))
 
 
 def create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df):
