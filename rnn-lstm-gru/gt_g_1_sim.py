@@ -1737,7 +1737,7 @@ def main(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         args.read_path = r'C:\Users\user\workspace\data\mt_g_1'
     else:
-        args.read_path = '/scratch/eliransc/new_gt_g_1_trans1' #
+        args.read_path = '/scratch/eliransc/new_gt_g_1_trans2' #
 
     for ind in tqdm(range(args.num_iterations)):
 
@@ -1768,7 +1768,7 @@ def parse_arguments(argv):
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default= 2)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 2000)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)

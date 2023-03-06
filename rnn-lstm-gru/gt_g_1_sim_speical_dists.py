@@ -1827,8 +1827,6 @@ def run_single_setting(args):
     # # inds_list.remove(inds_list[0])
     # # pkl.dump(inds_list, open(ind_list_path, 'wb'))
 
-
-
     path_df = '/home/eliransc/projects/def-dkrass/eliransc/RNN_queue/rnn-lstm-gru'
     df_counts1 = pkl.load(open(os.path.join(path_df, 'combs_df.pkl'), 'rb'))
 
