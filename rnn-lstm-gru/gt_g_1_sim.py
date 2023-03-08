@@ -1559,7 +1559,7 @@ def give_group_size(phases):
 
 def generate_cycle_arrivals(number_sequences):
 
-    avg_rho = np.random.uniform(0.6, 1)
+    avg_rho = np.random.uniform(0.5, 1)
 
     vector_lenght = number_sequences
     cycle_size = np.random.randint(4, int(vector_lenght / 2))
