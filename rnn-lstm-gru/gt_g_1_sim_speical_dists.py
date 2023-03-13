@@ -1331,17 +1331,25 @@ def compute_first_ten_moms_log_N(s):
         moms.append((s**ind).mean())
     return moms
 
-def generate_gamma(is_arrival, rho = 0.01):
+def generate_gamma(is_arrival, scv,rho = 0.01):
     if is_arrival:
         # rho = np.random.uniform(0.7, 0.99)
-        shape = 0.25/rho # 0.25 # np.random.uniform(0.1, 100)
-        scale =  4 #1 / (rho * shape)
+        if scv == 4:
+            shape = 0.25/rho # 0.25 # np.random.uniform(0.1, 100)
+            scale =  4 #1 / (rho * shape)
+        else:
+            shape = 4 / rho  # 0.25 # np.random.uniform(0.1, 100)
+            scale = 0.25
         moms_arr = np.array([])
         for mom in range(1, 11):
             moms_arr = np.append(moms_arr, np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
         return (shape, scale, moms_arr)
     else:
-        shape = 0.25 # np.random.uniform(1, 100)
+        if scv == 4:
+            shape = 0.25 # np.random.uniform(1, 100)
+        else:
+            shape = 4
+
         scale = 1 / shape
         moms_ser = np.array([])
         for mom in range(1, 11):
@@ -1687,7 +1695,7 @@ def generate_cycle_arrivals(number_sequences, avg_rho):
 
 def get_inter_specical_dist(arrival_dist, arrival_rate ,sample_size):
 
-    arrival_dics = {0: 'LN025', 1: 'LN4', 2: 'G4', 3: 'E4', 4: 'H2', 5: 'M'}
+    arrival_dics = {0: 'LN025', 1: 'LN4', 2: 'G4', 3: 'G025', 4: 'M'}
 
     if arrival_dics[arrival_dist] == 'LN025':
         mu = 1 / arrival_rate
@@ -1710,46 +1718,54 @@ def get_inter_specical_dist(arrival_dist, arrival_rate ,sample_size):
 
     elif arrival_dics[arrival_dist] == 'G4':
 
-        shape, scale, moms_arrive = generate_gamma(True, arrival_rate)
+        shape, scale, moms_arrive = generate_gamma(True, 4,  arrival_rate)
         # moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
         inter_arrival = np.random.gamma(shape, scale, sample_size)
         moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
         arrival_csv = 4
 
-    elif arrival_dics[arrival_dist] == 'E4':
+    elif arrival_dics[arrival_dist] == 'G025':
 
-        lam = 4 * arrival_rate
-        s, A = create_Erlang4(lam)
-        inter_arrival = SamplesFromPH(ml.matrix(s), A, sample_size)
-        # moms_arrive = compute_first_n_moments(s, A, 10)
-        # moms_arrive = np.array(moms_arrive).flatten()
+        shape, scale, moms_arrive = generate_gamma(True, 0.25, arrival_rate)
+        # moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
+        inter_arrival = np.random.gamma(shape, scale, sample_size)
         moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
-        arrival_csv = 1 / lam
+        arrival_csv = 0.25
 
-    elif arrival_dics[arrival_dist] == 'H2':
-
-        mu = 1 / arrival_rate
-        s, A = get_hyper_ph_representation(mu)
-        inter_arrival = SamplesFromPH(ml.matrix(s), A, sample_size)
-        # moms_arrive = compute_first_n_moments(s, A, 10)
-        # moms_arrive = np.array(moms_arrive).flatten()
-        moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
-        arrival_csv = 4
+    # elif arrival_dics[arrival_dist] == 'E4':
+    #
+    #     lam = 4 * arrival_rate
+    #     s, A = create_Erlang4(lam)
+    #     inter_arrival = SamplesFromPH(ml.matrix(s), A, sample_size)
+    #     # moms_arrive = compute_first_n_moments(s, A, 10)
+    #     # moms_arrive = np.array(moms_arrive).flatten()
+    #     moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
+    #     arrival_csv = 1 / lam
+    #
+    # elif arrival_dics[arrival_dist] == 'H2':
+    #
+    #     mu = 1 / arrival_rate
+    #     s, A = get_hyper_ph_representation(mu)
+    #     inter_arrival = SamplesFromPH(ml.matrix(s), A, sample_size)
+    #     # moms_arrive = compute_first_n_moments(s, A, 10)
+    #     # moms_arrive = np.array(moms_arrive).flatten()
+    #     moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
+    #     arrival_csv = 4
 
 
     elif arrival_dics[arrival_dist] == 'M':
 
         mu = 1/arrival_rate
-        services = np.random.exponential(1, sample_size)
-        moms_service = compute_first_ten_moms_log_N(services)
-        service_csv = 1
+        inter_arrival = np.random.exponential(1, sample_size)
+        moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
+        arrival_csv = 1
 
     return (inter_arrival, moms_arrive)
 
 
 def get_ser_special_dist( service_dist, sample_size):
 
-    ser_dics = {0: 'LN025', 1: 'LN4', 2: 'G4', 3: 'E4', 4: 'H2', 5: 'M'}
+    ser_dics = {0: 'LN025', 1: 'LN4', 2: 'G4', 3: 'G025', 4: 'M'}
 
     if ser_dics[service_dist] == 'LN025':
         mu = 1
@@ -1772,30 +1788,37 @@ def get_ser_special_dist( service_dist, sample_size):
 
     elif ser_dics[service_dist] == 'G4':
 
-        shape, scale, moms_service = generate_gamma(False)
+        shape, scale, moms_service = generate_gamma(False, 4)
         services = np.random.gamma(shape, scale, sample_size)
         moms_service = compute_first_ten_moms_log_N(services)
         service_csv = 4
 
-    elif ser_dics[service_dist] == 'E4':
+    elif ser_dics[service_dist] == 'G025':
 
-        lam = 4
-        s, A = create_Erlang4(lam)
-        services = SamplesFromPH(ml.matrix(s), A, sample_size)
-        # moms_service = compute_first_n_moments(s, A, 10)
-        # moms_service = np.array(moms_service).flatten()
+        shape, scale, moms_service = generate_gamma(False, 0.25)
+        services = np.random.gamma(shape, scale, sample_size)
         moms_service = compute_first_ten_moms_log_N(services)
-        service_csv = 1 / lam
+        service_csv = 0.25
 
-    elif ser_dics[service_dist] == 'H2':
-
-        mu = 1
-        s, A = get_hyper_ph_representation(mu)
-        services = SamplesFromPH(ml.matrix(s), A, sample_size)
-        # moms_service = compute_first_n_moments(s, A, 10)
-        # moms_service = np.array(moms_service).flatten()
-        moms_service = compute_first_ten_moms_log_N(services)
-        service_csv = 4
+    # elif ser_dics[service_dist] == 'E4':
+    #
+    #     lam = 4
+    #     s, A = create_Erlang4(lam)
+    #     services = SamplesFromPH(ml.matrix(s), A, sample_size)
+    #     # moms_service = compute_first_n_moments(s, A, 10)
+    #     # moms_service = np.array(moms_service).flatten()
+    #     moms_service = compute_first_ten_moms_log_N(services)
+    #     service_csv = 1 / lam
+    #
+    # elif ser_dics[service_dist] == 'H2':
+    #
+    #     mu = 1
+    #     s, A = get_hyper_ph_representation(mu)
+    #     services = SamplesFromPH(ml.matrix(s), A, sample_size)
+    #     # moms_service = compute_first_n_moments(s, A, 10)
+    #     # moms_service = np.array(moms_service).flatten()
+    #     moms_service = compute_first_ten_moms_log_N(services)
+    #     service_csv = 4
 
     elif ser_dics[service_dist] == 'M':
 
@@ -1821,28 +1844,47 @@ def run_single_setting(args):
 
     sample_size = 500000
 
-    # inds_list = pkl.load(open(ind_list_path, 'rb'))
+    inds_list = pkl.load(open(ind_list_path, 'rb'))
+
+    arrival_dist, service_dist = 5, 5  #inds_list[0][0], inds_list[0][1]
+
+    df_counter = pkl.load(open('/scratch/eliransc/special_dists_counter/df_counter.pkl', 'rb'))
+    inds = df_counter.loc[df_counter['counter'] < 10, :].index.values
+
+    ind_rand = np.random.randint(inds.shape[0])
+    ind = inds[ind_rand]
+
+    arrival_dist = df_counter.loc[ind, 'arrive_ind']
+    service_dist = df_counter.loc[ind, 'ser_ind']
+    avg_rho = df_counter.loc[ind, 'avg_rho']
+    df_counter.loc[ind, 'counter'] += 1
+
+    pkl.dump(df_counter, open('/scratch/eliransc/special_dists_counter/df_counter.pkl', 'wb'))
+
+    # inds_list.remove(inds_list[0])
+    # pkl.dump(inds_list, open(ind_list_path, 'wb'))
+
+    # avg_rho = 0.5
+
+    # path_df = '/home/eliransc/projects/def-dkrass/eliransc/RNN_queue/rnn-lstm-gru'
+    # df_counts1 = pkl.load(open(os.path.join(path_df, 'combs_df.pkl'), 'rb'))
     #
-    # arrival_dist, service_dist = 2, 2 #inds_list[0][0], inds_list[0][1]
-    # # inds_list.remove(inds_list[0])
-    # # pkl.dump(inds_list, open(ind_list_path, 'wb'))
+    # ind = df_counts1.loc[df_counts1['status'] == 'Pending', :].index.values.tolist()[0]
+    # df_counts1.loc[ind, 'status'] = 'Done'
+    #
+    # arrival_dist = df_counts1.loc[ind, 'arrive']
+    # service_dist = df_counts1.loc[ind, 'ser']
+    # avg_rho = df_counts1.loc[ind, 'rho']
+    #
+    # print(arrival_dist, service_dist, avg_rho)
+    # print(df_counts1.loc[df_counts1['status'] == 'Pending', :].shape)
+    # pkl.dump(df_counts1, open(os.path.join(path_df, 'combs_df.pkl'), 'wb'))
+    #
+    #
+    print(avg_rho, arrival_dist, service_dist)
 
-    path_df = '/home/eliransc/projects/def-dkrass/eliransc/RNN_queue/rnn-lstm-gru'
-    df_counts1 = pkl.load(open(os.path.join(path_df, 'combs_df.pkl'), 'rb'))
-
-    ind = df_counts1.loc[df_counts1['status'] == 'Pending', :].index.values.tolist()[0]
-    df_counts1.loc[ind, 'status'] = 'Done'
-
-    arrival_dist = df_counts1.loc[ind, 'arrive']
-    service_dist = df_counts1.loc[ind, 'ser']
-    avg_rho = df_counts1.loc[ind, 'rho']
-
-    print(arrival_dist, service_dist, avg_rho)
-    print(df_counts1.loc[df_counts1['status'] == 'Pending', :].shape)
-    pkl.dump(df_counts1, open(os.path.join(path_df, 'combs_df.pkl'), 'wb'))
-
-
-    print(avg_rho)
+    # arrival_dist = 3
+    # service_dist = 3
 
     arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate = generate_cycle_arrivals(args.number_sequences, avg_rho)
 
@@ -1858,7 +1900,7 @@ def run_single_setting(args):
 
         arrival_rate = rate_dict_code_rate[ind_rate]
 
-        arrivals_dict[ind_rate] = get_inter_specical_dist( arrival_dist, arrival_rate, sample_size)
+        arrivals_dict[ind_rate] = get_inter_specical_dist(arrival_dist, arrival_rate, sample_size)
 
     np.random.seed(now.microsecond)
 
@@ -1975,7 +2017,7 @@ def parse_arguments(argv):
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
     parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=100500)
-    parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=1)
+    parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=3)
     parser.add_argument('--read_path', type=str, help='the path of the files to read from', default=  '/scratch/eliransc/time_dependant_cyclic' ) # r'C:\Users\user\workspace\data\time_dependant'
     parser.add_argument('--dists_path', type=str, help='the path of the files to read from', default=  '' ) # r'C:\Users\user\workspace\data\time_dependant'
     parser.add_argument('--read_path_niagara', type=str, help='the path of the files to read from',
