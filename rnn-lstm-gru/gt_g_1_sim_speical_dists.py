@@ -1334,12 +1334,8 @@ def compute_first_ten_moms_log_N(s):
 def generate_gamma(is_arrival, scv,rho = 0.01):
     if is_arrival:
         # rho = np.random.uniform(0.7, 0.99)
-        if scv == 4:
-            shape = 0.25/rho # 0.25 # np.random.uniform(0.1, 100)
-            scale =  4 #1 / (rho * shape)
-        else:
-            shape = 4 / rho  # 0.25 # np.random.uniform(0.1, 100)
-            scale = 0.25
+        shape = 1 / scv  # 0.25 # np.random.uniform(0.1, 100)
+        scale = scv / rho
         moms_arr = np.array([])
         for mom in range(1, 11):
             moms_arr = np.append(moms_arr, np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
@@ -1626,7 +1622,7 @@ def single_sim(services, arrivals, model_inputs, arrival_rates, initial, df,  ar
 
 
 def give_group_size(phases):
-    num_groups = np.random.randint(min(3,int(phases/2)-1 ), int(phases/2))
+    num_groups = np.random.randint(min(3, int(phases/2)-1 ), int(phases/2))
     group_size = np.ones(num_groups) + \
                  np.random.multinomial(phases - num_groups, [1 / num_groups] * num_groups, size=1)[0]
     return num_groups, group_size.astype(int)
@@ -1699,7 +1695,7 @@ def get_inter_specical_dist(arrival_dist, arrival_rate ,sample_size):
 
     if arrival_dics[arrival_dist] == 'LN025':
         mu = 1 / arrival_rate
-        sig2 = 0.25 * mu
+        sig2 = 0.25 * mu**2
         inter_arrival = log_normal_gener(mu, sig2, sample_size)
         m = np.log((mu ** 2) / (sig2 + mu ** 2) ** 0.5)
         v = (np.log(sig2 / mu ** 2 + 1)) ** 0.5
@@ -1709,7 +1705,7 @@ def get_inter_specical_dist(arrival_dist, arrival_rate ,sample_size):
     elif arrival_dics[arrival_dist] == 'LN4':
 
         mu = 1 / arrival_rate
-        sig2 = 4 * mu
+        sig2 = 4 * mu**2
         inter_arrival = log_normal_gener(mu, sig2, sample_size)
         m = np.log((mu ** 2) / (sig2 + mu ** 2) ** 0.5)
         v = (np.log(sig2 / mu ** 2 + 1)) ** 0.5
@@ -1881,10 +1877,11 @@ def run_single_setting(args):
     # pkl.dump(df_counts1, open(os.path.join(path_df, 'combs_df.pkl'), 'wb'))
     #
     #
-    print(avg_rho, arrival_dist, service_dist)
 
-    # arrival_dist = 3
-    # service_dist = 3
+
+
+
+    print(avg_rho, arrival_dist, service_dist)
 
     arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate = generate_cycle_arrivals(args.number_sequences, avg_rho)
 

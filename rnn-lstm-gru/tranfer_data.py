@@ -38,7 +38,7 @@ def main():
     if not os.path.exists(list_path):
         pkl.dump([], open(list_path, 'wb'))
 
-    folder_path = '/scratch/eliransc/Ichilov_gt_g_1_folders'
+    folder_path = '/scratch/eliransc/rnn_data_round2'
 
     tot_list = list(np.arange(1, len(os.listdir(folder_path))+1))
 
@@ -81,7 +81,7 @@ def main():
         batch_num = np.random.randint(1000, 100000000)
         if batch_input.shape[0] == 32:
             pkl.dump((batch_input, batch_output),
-                     open(os.path.join('/scratch/eliransc/batch_ichilov', 'ichilov_batch_' + str(batch_num) + '.pkl'),
+                     open(os.path.join('/scratch/eliransc/new_gt_g_1_batches2', 'batch2_' + str(batch_num) + '.pkl'),
                           'wb'))
 
 
