@@ -102,14 +102,13 @@ class RNN(nn.Module):
         return out
 
 def loss_queue(soft, labels):
-
-    return ((torch.abs(soft[:,:20,:] - labels[:,:20,:])).sum(axis = [2]) + torch.max(torch.abs(soft[:,:20,:] - labels[:,:20,:]), axis = 2)[0]+(torch.abs(soft[:,0:1,:] - labels[:,0:1,:])).sum(axis = [2])+(torch.abs(soft[:,19:20,:] - labels[:,19:20,:])).sum(axis = [2])).mean()
+    return ((torch.abs(soft[:, :, :] - labels[:, :, :])).sum(axis = [2]) + torch.max(torch.abs(soft[:, :, :] - labels[:,:,:]), axis = 2)[0]).mean()
 
     # return ((torch.abs(soft[:,:,:] - labels[:,:,:])).sum(axis = [2]) + torch.max(torch.abs(soft[:,:,:] - labels[:,:,:]), axis = 2)[0]).mean()
 
 
 def valid_score(soft, labels):
-    return ((torch.abs(soft[:, 0:20,:] - labels[:,0:20,:])).sum(axis = [2]) ).mean()
+    return ((torch.abs(soft[:, :,:] - labels[:,:,:])).sum(axis = [2]) ).mean()
 
 
 
