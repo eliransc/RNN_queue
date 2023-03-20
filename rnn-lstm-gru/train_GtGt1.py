@@ -117,11 +117,14 @@ def valid_score(soft, labels):
 
 def main(args):
 
-    path = '/scratch/eliransc/Ichilov_gt_g_1_folders/'  # new_gt_g_1_batches1
+    loss_path = '/scratch/eliransc/RNN_loss_new'
+    models_path = '/scratch/eliransc/RNN_models_new'
+
+    path = '/scratch/eliransc/new_gt_g_1_batches1/' # Ichilov_gt_g_1_folders/'
     file_list = os.listdir(path)
     data_paths = [os.path.join(path, name) for name in file_list]
 
-    valid_path_ = '/scratch/eliransc/Ichilov_gt_g_1_folders/'  # new_gt_g_1_batches1_valid
+    valid_path_ = '/scratch/eliransc/new_gt_g_1_batches1_valid/'  # Ichilov_gt_g_1_folders
     valid_path = os.listdir(valid_path_)
 
     valid_path = [os.path.join(valid_path_, name) for name in valid_path]
@@ -204,9 +207,8 @@ def main(args):
                     print(f'Epoch [{epoch + 1}/{num_epochs}], Step [{i + 1}/{n_total_steps}], Loss: {loss.item():.4f}')
 
 
-                    torch.save(model.state_dict(),
-                               '/scratch/eliransc/RNN_models_ichilov_trial/pytorch_gt_gt_1_true_moms_new_data3_' + setting_string + '_' + str(
-                                   current_time) + '.pkl')
+                    torch.save(model.state_dict(), os.path.join(models_path, 'pytorch_gt_gt_1_true_moms_new_data__' + setting_string + '_' + str(
+                                   current_time) + '.pkl'))
 
 
             else:
@@ -215,13 +217,12 @@ def main(args):
         learning_rate = learning_rate ** lr_change
         # print(inputs[inputs<0].shape)
 
-        torch.save(model.state_dict(),
-                   '/scratch/eliransc/RNN_models_ichilov_trial/pytorch_gt_gt_1_true_moms_new_data3_' + setting_string + '_' + str(
-                       current_time) + '.pkl')
+        torch.save(model.state_dict(), os.path.join(models_path, 'pytorch_gt_gt_1_true_moms_new_data__' + setting_string + '_' + str(
+                                   current_time) + '.pkl'))
 
         model1.load_state_dict(
-            torch.load('/scratch/eliransc/RNN_models_ichilov_trial/pytorch_gt_gt_1_true_moms_new_data3_' + setting_string + '_' + str(
-                current_time) + '.pkl', map_location=torch.device('cpu')))
+            torch.load(os.path.join(models_path, 'pytorch_gt_gt_1_true_moms_new_data__' + setting_string + '_' + str(
+                                   current_time) + '.pkl'), map_location=torch.device('cpu')))
         totloss = []
 
         for i, (inputs, labels) in tqdm(enumerate(valid_loader)):
@@ -247,8 +248,8 @@ def main(args):
 
         valid_loss_list.append(torch.tensor(totloss).mean())
         pkl.dump((loss_list, valid_loss_list),
-                 open('/scratch/eliransc/RNN_loss_vals_ichilov_trial/' + 'ichilov_loss3_' + setting_string + '_' + str(current_time) + '.pkl',
-                      'wb'))
+                 open(os.path.join(loss_path, 'pytorch_gt_gt_1_true_moms_new_data__' + setting_string + '_' + str(
+                                   current_time) + '.pkl')))
 
 
 
