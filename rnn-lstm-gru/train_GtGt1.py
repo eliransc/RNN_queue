@@ -20,6 +20,7 @@ from datetime import datetime
 
 time_ub = 60
 num_moments = 5
+
 class my_Dataset(Dataset):
     # Characterizes a dataset for PyTorch
     def __init__(self, data_paths):
@@ -206,21 +207,19 @@ def main(args):
                     print(f'Epoch [{epoch + 1}/{num_epochs}], Step [{i + 1}/{n_total_steps}], Loss: {loss.item():.4f}')
 
 
-                    torch.save(model.state_dict(), os.path.join(models_path, 'pytorch_gt_gt_1_true_moms_new_data__' + setting_string + '_' + str(
+                    torch.save(model.state_dict(), os.path.join(models_path, 'pytorch_gt_gt_1_true_moms_new_data_withtest2_' + setting_string + '_' + str(
                                    current_time) + '.pkl'))
-
-
             else:
                 print(i)
 
         learning_rate = learning_rate ** lr_change
         # print(inputs[inputs<0].shape)
 
-        torch.save(model.state_dict(), os.path.join(models_path, 'pytorch_gt_gt_1_true_moms_new_data__' + setting_string + '_' + str(
+        torch.save(model.state_dict(), os.path.join(models_path, 'pytorch_gt_gt_1_true_moms_new_data_withtest2_' + setting_string + '_' + str(
                                    current_time) + '.pkl'))
 
         model1.load_state_dict(
-            torch.load(os.path.join(models_path, 'pytorch_gt_gt_1_true_moms_new_data__' + setting_string + '_' + str(
+            torch.load(os.path.join(models_path, 'pytorch_gt_gt_1_true_moms_new_data_withtest2_' + setting_string + '_' + str(
                                    current_time) + '.pkl'), map_location=torch.device('cpu')))
         totloss = []
 
@@ -247,7 +246,7 @@ def main(args):
 
         valid_loss_list.append(torch.tensor(totloss).mean())
         pkl.dump((loss_list, valid_loss_list),
-                 open(os.path.join(loss_path, 'pytorch_gt_gt_1_true_moms_new_data__' + setting_string + '_' + str(
+                 open(os.path.join(loss_path, 'pytorch_gt_gt_1_true_moms_new_data_withtest2_' + setting_string + '_' + str(
                                    current_time) + '.pkl'), 'wb'))
 
 
