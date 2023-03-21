@@ -142,6 +142,8 @@ def main(args):
     hidden_size = int(np.random.choice([32, 64, 128], p=[0.3, 0.4, 0.3]))
     num_layers = np.random.randint(2, 6)
 
+    num_moments = np.random.randint(5, 8)
+
 
     input_size = 16+2*num_moments
     sequence_length = time_ub
