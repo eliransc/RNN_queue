@@ -1829,6 +1829,25 @@ def get_ser_special_dist( service_dist, sample_size):
 
 def run_single_setting(args):
 
+    if not os.path.exists('/scratch/eliransc/special_dists_counter/df_counter.pkl'):
+
+        df_counter = pd.DataFrame([])
+
+        for arrive_ind in range(5):
+            for ser_ind in range(5):
+                for avg_rho in [0.5, 0.6, 0.7, 0.8, 0.9, 1]:
+                    curr_ind = df_counter.shape[0]
+                    df_counter.loc[curr_ind, 'arrive_ind'] = int(arrive_ind)
+                    df_counter.loc[curr_ind, 'ser_ind'] = int(ser_ind)
+                    df_counter.loc[curr_ind, 'avg_rho'] = avg_rho
+                    df_counter.loc[curr_ind, 'counter'] = 0
+
+        df_counter['arrive_ind'] = df_counter['arrive_ind'].astype('int')
+        df_counter['ser_ind'] = df_counter['ser_ind'].astype('int')
+
+        pkl.dump(df_counter, open('/scratch/eliransc/special_dists_counter/df_counter.pkl', 'wb'))
+
+
     if 'dkrass' in os.getcwd().split('/'):
         ind_list_path = '/scratch/eliransc/inds_ind_dir/ind_list.pkl'
     elif 'C:' in os.getcwd().split('/')[0]:
