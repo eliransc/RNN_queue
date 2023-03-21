@@ -1864,7 +1864,7 @@ def run_single_setting(args):
     arrival_dist, service_dist = 5, 5  #inds_list[0][0], inds_list[0][1]
 
     df_counter = pkl.load(open('/scratch/eliransc/special_dists_counter/df_counter.pkl', 'rb'))
-    inds = df_counter.loc[df_counter['counter'] < 10, :].index.values
+    inds = df_counter.loc[df_counter['counter'] < 1000, :].index.values
 
     ind_rand = np.random.randint(inds.shape[0])
     ind = inds[ind_rand]
