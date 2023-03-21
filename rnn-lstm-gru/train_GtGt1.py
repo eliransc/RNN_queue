@@ -116,7 +116,7 @@ def valid_score(soft, labels):
 
 def main(args):
 
-    loss_path = '/scratch/eliransc/RNN_loss_new'
+    loss_path =   '/scratch/eliransc/RNN_loss_new'
     models_path = '/scratch/eliransc/RNN_models_new'
 
     path = '/scratch/eliransc/new_gt_g_1_batches1/' # Ichilov_gt_g_1_folders/'
@@ -248,7 +248,7 @@ def main(args):
         valid_loss_list.append(torch.tensor(totloss).mean())
         pkl.dump((loss_list, valid_loss_list),
                  open(os.path.join(loss_path, 'pytorch_gt_gt_1_true_moms_new_data__' + setting_string + '_' + str(
-                                   current_time) + '.pkl')))
+                                   current_time) + '.pkl'), 'wb'))
 
 
 
