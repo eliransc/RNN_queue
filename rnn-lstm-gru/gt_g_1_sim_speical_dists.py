@@ -1848,20 +1848,20 @@ def run_single_setting(args):
         pkl.dump(df_counter, open('/scratch/eliransc/special_dists_counter/df_counter.pkl', 'wb'))
 
 
-    if 'dkrass' in os.getcwd().split('/'):
-        ind_list_path = '/scratch/eliransc/inds_ind_dir/ind_list.pkl'
-    elif 'C:' in os.getcwd().split('/')[0]:
-        ind_list_path = 'ind_list.pkl'
-    else:
-        ind_list_path = '/scratch/eliransc/inds_ind_dir/ind_list.pkl'
+    # if 'dkrass' in os.getcwd().split('/'):
+    #     ind_list_path = '/scratch/eliransc/inds_ind_dir/ind_list.pkl'
+    # elif 'C:' in os.getcwd().split('/')[0]:
+    #     ind_list_path = 'ind_list.pkl'
+    # else:
+    #     ind_list_path = '/scratch/eliransc/inds_ind_dir/ind_list.pkl'
 
     now = datetime.now()
 
     sample_size = 500000
 
-    inds_list = pkl.load(open(ind_list_path, 'rb'))
+    # inds_list = pkl.load(open(ind_list_path, 'rb'))
 
-    arrival_dist, service_dist = 5, 5  #inds_list[0][0], inds_list[0][1]
+    # arrival_dist, service_dist = 5, 5  #inds_list[0][0], inds_list[0][1]
 
     for inddd in range(500):
 
