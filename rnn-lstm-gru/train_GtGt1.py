@@ -175,7 +175,7 @@ def main(args):
     loss_list = []
     setting_string = 'batch_size_' + str(batch_size * 32) + '_num_layers_' + str(num_layers) + '_num_epochs_' + str(
         num_epochs) + '_learning_rate_' + str(learning_rate) + '_hidden_size_' + str(hidden_size) + '_lr_change_' + str(
-        lr_change) + '_nummoms_' + str(num_moments)
+        lr_change) + '_nummoms_' + str(num_moments)+ 'a'
     print(setting_string)
 
     valid_loss_list = []
