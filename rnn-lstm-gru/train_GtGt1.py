@@ -19,7 +19,7 @@ import sys
 from datetime import datetime
 
 time_ub = 60
-num_moments = 5
+# num_moments = 5
 
 class my_Dataset(Dataset):
     # Characterizes a dataset for PyTorch
@@ -139,7 +139,7 @@ def main(args):
     learning_rate = np.random.choice([0.001, 0.005, 0.0005, 0.0002, 0.0001], p=[0.2, 0.2, 0.2, 0.2, 0.2])
 
     # input_size = 36
-    hidden_size = int(np.random.choice([32, 64, 128], p=[0.3, 0.4, 0.3]))
+    hidden_size = int(np.random.choice([32, 64, 128, 256], p=[0.25, 0.25, 0.25, 0.25]))
     num_layers = np.random.randint(2, 6)
 
     num_moments = np.random.randint(5, 8)
