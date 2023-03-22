@@ -105,6 +105,11 @@ class RNN(nn.Module):
 def loss_queue(soft, labels):
     return ((torch.abs(soft[:, :, :] - labels[:, :, :])).sum(axis = [2]) + torch.max(torch.abs(soft[:, :, :] - labels[:,:,:]), axis = 2)[0]).mean()
 
+def loss_queue1(soft, labels):
+    return ((torch.abs(soft[:, :3, :] - labels[:, :3, :])).sum(axis=[2])).mean() + (
+                (torch.abs(soft[:, :, :] - labels[:, :, :])).sum(axis=[2]) +
+                torch.max(torch.abs(soft[:, :, :] - labels[:, :, :]), axis=2)[0]).mean()
+
     # return ((torch.abs(soft[:,:,:] - labels[:,:,:])).sum(axis = [2]) + torch.max(torch.abs(soft[:,:,:] - labels[:,:,:]), axis = 2)[0]).mean()
 
 
@@ -134,7 +139,7 @@ def main(args):
     dataset_valid = my_Dataset(valid_path)
 
     num_epochs = 15
-    lr_change = np.random.choice([1.025, 1.05, 1.1, 1.25, 1.3], p=[0.2, 0.2, 0.2, 0.2, 0.2])
+    lr_change = np.random.choice([1.0025, 1.015, 1.025, 1.15, 1.25], p=[0.2, 0.2, 0.2, 0.2, 0.2])
     batch_size = int(np.random.choice([1, 2, 4, 8], p=[0.25, 0.35, 0.25, 0.15]))
     learning_rate = np.random.choice([0.001, 0.005, 0.0005, 0.0002, 0.0001], p=[0.2, 0.2, 0.2, 0.2, 0.2])
 
@@ -197,7 +202,7 @@ def main(args):
                 # Forward pass
                 outputs = model(inputs)
                 soft = m(outputs)
-                loss = loss_queue(soft, labels)  # criterion(outputs, labels)
+                loss = loss_queue1(soft, labels)  # criterion(outputs, labels)
                 # Backward and optimize
                 optimizer.zero_grad()
                 loss.backward()
