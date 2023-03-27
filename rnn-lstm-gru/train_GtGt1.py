@@ -106,7 +106,7 @@ def loss_queue(soft, labels):
     return ((torch.abs(soft[:, :, :] - labels[:, :, :])).sum(axis = [2]) + torch.max(torch.abs(soft[:, :, :] - labels[:,:,:]), axis = 2)[0]).mean()
 
 def loss_queue1(soft, labels):
-    return ((torch.abs(soft[:, :3, :] - labels[:, :3, :])).sum(axis=[2])).mean() + (
+    return (5*(torch.abs(soft[:, :3, :] - labels[:, :3, :])).sum(axis=[2])).mean() + (
                 (torch.abs(soft[:, :, :] - labels[:, :, :])).sum(axis=[2]) +
                 torch.max(torch.abs(soft[:, :, :] - labels[:, :, :]), axis=2)[0]).mean()
 
