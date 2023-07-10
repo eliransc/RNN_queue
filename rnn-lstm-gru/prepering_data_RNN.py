@@ -3,20 +3,14 @@ import numpy as np
 import pandas as pd
 import pickle as pkl
 import os
-from tqdm import tqdm
 import matplotlib.pyplot as plt
-from fastai.vision.all import *
 import argparse
 import torch
-import torch.nn as nn
-import torchvision
-import torchvision.transforms as transforms
 import pickle as pkl
-from fastai.vision.all import *
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 from tqdm import tqdm
-
+import sys
 
 
 def create_single_data_point(path, files_list, ind):
@@ -41,13 +35,13 @@ def create_single_data_point(path, files_list, ind):
 
 def main(args):
 
-    path = '/scratch/eliransc/time_dependant_cyclic'
+    path = r'C:\Users\user\workspace\data\mt_g_1'
     files = os.listdir(path)
 
     df_files = pd.DataFrame([], columns=['file', 'batch'])
 
 
-    batch_size = 64
+    batch_size = 16
     num_batches = int(len(files) / batch_size)
 
     for curr_batch in tqdm(range(num_batches)):
@@ -61,7 +55,8 @@ def main(args):
             df_files.loc[curr_ind_df, 'batch'] = curr_batch
 
             pkl.dump(df_files, open('BELUGA_df_files.pkl', 'wb'))
-            res_input, prob_queue_arr = create_single_data_point(path, files, ind)
+            res_input, prob_queue_arr = pkl.load(open(os.path.join(path, files[ind]), 'rb'))
+            # res_input, prob_queue_arr = create_single_data_point(path, files, ind)
             res_input = res_input.reshape(1, res_input.shape[0], res_input.shape[1])
             prob_queue_arr = prob_queue_arr.reshape(1, prob_queue_arr.shape[0], prob_queue_arr.shape[1])
             if ind == curr_batch * batch_size:

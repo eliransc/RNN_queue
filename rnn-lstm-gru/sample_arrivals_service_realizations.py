@@ -1653,7 +1653,7 @@ def main(args):
             # pkl.dump(arrivals_all_data_list, open(os.path.join(args.arrivals_path, str(random.randint(0, 100000))+ '_num_arrivals_' + str(g.num_arrivals) + '.pkl'), 'wb'))
             # print('finish arrivals')
             services_all_data_list = [sample_single_arrive_ser('service', g.num_arrivals) for ind in tqdm(range(args.list_size))]
-            pkl.dump(services_all_data_list, open(os.path.join(args.services_path, str(random.randint(0, 10000000)) + '_num_arrivals_' + str(g.num_arrivals) + '.pkl'), 'wb'))
+            pkl.dump(services_all_data_list, open(os.path.join(args.services_path, str(random.randint(0, 10000000)) + '_num_samples_' + str(g.num_arrivals) + '.pkl'), 'wb'))
             print('finish services')
 
 
@@ -1667,7 +1667,7 @@ def parse_arguments(argv):
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
-    parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=100500)
+    parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=500) # 100500
     parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=100000)
     parser.add_argument('--arrivals_path', type=str, help='the path of the files to read from', default='/scratch/eliransc/ph_random/arrivals') #   r'C:\Users\user\workspace\data\ph_random\arrivals'
     parser.add_argument('--services_path', type=str, help='the path of the files to read from', default='/scratch/eliransc/ph_random/medium_ph_1' ) #    r'C:\Users\user\workspace\data\ph_random\services'

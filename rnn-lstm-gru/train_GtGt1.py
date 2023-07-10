@@ -73,8 +73,6 @@ class RNN1(nn.Module):
         c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size)  # .to(device)
 
         out, _ = self.lstm(x.float(), (h0.float(), c0.float()))
-
-
         out = self.fc(out)
 
         return out

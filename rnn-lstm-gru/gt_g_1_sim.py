@@ -1616,7 +1616,7 @@ def generate_cycle_arrivals(number_sequences):
     for ind in range(df.shape[0]):
         df.loc[ind, 'arrival_code'] = rates_dict_rate_code[df.loc[ind, 'arrival_rate']]
 
-    return (all_arrivals, num_groups, df, rates_dict_rate_code, rate_dict_code_rate)
+    return (all_arrivals, num_groups, df, rates_dict_rate_code, rate_dict_code_rate, avg_rho)
 
 def run_single_setting(args):
 
@@ -1624,7 +1624,7 @@ def run_single_setting(args):
 
     now = datetime.now()
 
-    arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate = generate_cycle_arrivals(args.number_sequences)
+    arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate, avg_rho = generate_cycle_arrivals(args.number_sequences)
 
     if 'dkrass' in os.getcwd().split('/'):
         services_path = '/scratch/d/dkrass/eliransc/services'
@@ -1682,22 +1682,19 @@ def run_single_setting(args):
         for time1 in resultDictionary.keys():
             time_dict[time1][resultDictionary[time1]] += 1
 
-    curr_path1 = str(model_num) + '.pkl'
+    curr_path1 = str(model_num) + '_avg_rho_'+ str(avg_rho) + '.pkl'
     full_path1 = os.path.join(args.read_path, curr_path1)
 
     res_input, prob_queue_arr = create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df)
     pkl.dump((res_input, prob_queue_arr), open(full_path1, 'wb'))
 
 
-    # pkl.dump((time_dict, arrival_rates, model_inputs, initial), open(full_path1, 'wb'))
-
-
 def create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df):
     res_input = np.array([])
     prob_queue_arr = np.array([])
-    # time_dict, arrival_rates, model_inputs, initial = pkl.load(open(os.path.join(path, files_list[ind]), 'rb'))
+
     for t in range(len(time_dict)):
-        arr_input = np.concatenate((np.log(model_inputs[2][:10]), np.log(model_inputs[3][df.loc[t, 'arrival_code']][0][2] / np.array([arrival_rates[t]])), np.array([t]), initial[:15]), axis =0)
+        arr_input = np.concatenate((np.log(model_inputs[2][:10]), np.log(model_inputs[3][df.loc[t, 'arrival_code']][0][2] / np.array([arrival_rates[t]])), np.array([t]), initial[:30]), axis =0)
         arr_input = arr_input.reshape(1, arr_input.shape[0])
         probs = (time_dict[t]/time_dict[t].sum())
         fifty_or_more = probs[50:].sum()
@@ -1768,7 +1765,7 @@ def parse_arguments(argv):
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 1200)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 2)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
