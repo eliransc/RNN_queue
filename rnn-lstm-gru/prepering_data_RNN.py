@@ -35,10 +35,35 @@ def create_single_data_point(path, files_list, ind):
 
 def main(args):
 
-    path = r'C:\Users\user\workspace\data\mt_g_1'
+    curr_path = '/home/eliransc/projects/def-dkrass/eliransc/RNN_queue/rnn-lstm-gru'
+
+    files_in_path = os.listdir(curr_path)
+
+    server_file = [file for file in files_in_path if '_server' in file]
+
+    server_name = server_file.split('_')[0]
+
+
+    if 'C:' in os.getcwd().split('/')[0]:
+        path = r'C:\Users\user\workspace\data\mt_g_1'
+    else:
+        path = '/scratch/eliransc/single_rnn_gt_g_1_data'
+
     files = os.listdir(path)
 
-    df_files = pd.DataFrame([], columns=['file', 'batch'])
+    if 'C:' in os.getcwd().split('/')[0]:
+
+        if os.path.exists('./pkl/df_files.pkl'):
+            df_files = pkl.load(open('./pkl/df_files.pkl'))
+        else:
+            df_files = pd.DataFrame([], columns=['file', 'batch'])
+
+    else:
+
+        if os.path.exists('./pkl/df_files.pkl'):
+            df_files = pkl.load(open('./pkl/df_files.pkl'))
+        else:
+            df_files = pd.DataFrame([], columns=['file', 'batch'])
 
 
     batch_size = 16
@@ -54,7 +79,7 @@ def main(args):
             df_files.loc[curr_ind_df, 'file'] = curr_file
             df_files.loc[curr_ind_df, 'batch'] = curr_batch
 
-            pkl.dump(df_files, open('BELUGA_df_files.pkl', 'wb'))
+            pkl.dump(df_files, open('df_files.pkl', 'wb'))
             res_input, prob_queue_arr = pkl.load(open(os.path.join(path, files[ind]), 'rb'))
             # res_input, prob_queue_arr = create_single_data_point(path, files, ind)
             res_input = res_input.reshape(1, res_input.shape[0], res_input.shape[1])
@@ -67,7 +92,7 @@ def main(args):
                 batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
 
         pkl.dump((batch_input, batch_output), open(
-            '/scratch/eliransc/data_rnn_training/cyclic_poison/pkl_rnn/Beluga_batch_' + str(curr_batch) + '.pkl', 'wb'))
+            '/scratch/eliransc/data_rnn_training/pkl_rnn/'+server_name+'_ '+ str(curr_batch) + '.pkl', 'wb'))
 
 
 def parse_arguments(argv):

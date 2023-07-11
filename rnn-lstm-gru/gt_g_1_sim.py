@@ -1631,7 +1631,7 @@ def run_single_setting(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         services_path = r'C:\Users\user\workspace\data\ph_random\services'
     else:
-        services_path = '/scratch/eliransc/ph_random/medium_ph'   #
+        services_path = '/scratch/eliransc/ph_random/medium_ph_1'   #
 
     files = os.listdir(services_path)
     num_files = len(files)
@@ -1672,7 +1672,7 @@ def run_single_setting(args):
 
     list_of_lists1 = []
     for ind in tqdm(range(10)):
-        list_of_dicts = [single_sim(services, arrivals_dict, model_inputs, arrival_rates, initial,df,   args) for ind in
+        list_of_dicts = [single_sim(services, arrivals_dict, model_inputs, arrival_rates, initial,df,  args) for ind in
                           range(1, args.num_iter_same_params + 1)] #
         list_of_lists1.append(list_of_dicts)
 
@@ -1771,7 +1771,7 @@ def parse_arguments(argv):
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
     parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=100500)
     parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=10064)
-    parser.add_argument('--read_path', type=str, help='the path of the files to read from', default=  '/scratch/eliransc/time_dependant_cyclic' ) # r'C:\Users\user\workspace\data\time_dependant'
+    parser.add_argument('--read_path', type=str, help='the path of the files to read from', default=  '/scratch/eliransc/single_rnn_gt_g_1_data' ) # r'C:\Users\user\workspace\data\time_dependant'
     parser.add_argument('--dists_path', type=str, help='the path of the files to read from', default=  '' ) # r'C:\Users\user\workspace\data\time_dependant'
     parser.add_argument('--read_path_niagara', type=str, help='the path of the files to read from',
                         default='/scratch/d/dkrass/eliransc/time_dependant_cyclic')
