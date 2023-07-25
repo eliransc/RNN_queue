@@ -1319,11 +1319,14 @@ def find_num_cust_time_stamp(df, time):
         return df.loc[LB, 'num_cust']
 
 
-def log_normal_gener(mu, sig2, sample_size):
-    m = np.log((mu**2)/(sig2+mu**2)**0.5)
-    v = (np.log(sig2/mu**2+1))**0.5
-    s = np.random.lognormal(m, v, sample_size)
-    return s
+def log_normal_gener(m, s, sample_size):
+
+    mu = np.log(m)-np.log((m**2+s**2)/m**2)/2
+    sigma = (np.log((m**2+s**2)/m**2))**0.5
+    # m = np.log((mu**2)/(sig2+mu**2)**0.5)
+    # v = (np.log(sig2/mu**2+1))**0.5
+    samples = np.random.lognormal(mu, sigma, sample_size)
+    return samples
 
 def compute_first_ten_moms_log_N(s):
     moms = []
@@ -1694,27 +1697,27 @@ def get_inter_specical_dist(arrival_dist, arrival_rate ,sample_size):
     arrival_dics = {0: 'LN025', 1: 'LN4', 2: 'G4', 3: 'G025', 4: 'M'}
 
     if arrival_dics[arrival_dist] == 'LN025':
-        mu = 1 / arrival_rate
-        sig2 = 0.25 * mu**2
-        inter_arrival = log_normal_gener(mu, sig2, sample_size)
-        m = np.log((mu ** 2) / (sig2 + mu ** 2) ** 0.5)
-        v = (np.log(sig2 / mu ** 2 + 1)) ** 0.5
+        m = 1 / arrival_rate
+        s = (0.25 * m**2)**0.5
+        inter_arrival = log_normal_gener(m,s, sample_size)
+        # m = np.log((mu ** 2) / (sig2 + mu ** 2) ** 0.5)
+        # v = (np.log(sig2 / mu ** 2 + 1)) ** 0.5
         moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
         arrival_csv = 0.25
 
     elif arrival_dics[arrival_dist] == 'LN4':
 
-        mu = 1 / arrival_rate
-        sig2 = 4 * mu**2
-        inter_arrival = log_normal_gener(mu, sig2, sample_size)
-        m = np.log((mu ** 2) / (sig2 + mu ** 2) ** 0.5)
-        v = (np.log(sig2 / mu ** 2 + 1)) ** 0.5
+        m = 1 / arrival_rate
+        s = (4 * m**2)**0.5
+        inter_arrival = log_normal_gener(m,s, sample_size)
+        # m = np.log((mu ** 2) / (sig2 + mu ** 2) ** 0.5)
+        # v = (np.log(sig2 / mu ** 2 + 1)) ** 0.5
         moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
         arrival_csv = 4
 
     elif arrival_dics[arrival_dist] == 'G4':
 
-        shape, scale, moms_arrive = generate_gamma(True, 4,  arrival_rate)
+        shape, scale, moms_arrive1 = generate_gamma(True, 4,  arrival_rate)
         # moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
         inter_arrival = np.random.gamma(shape, scale, sample_size)
         moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
@@ -1722,7 +1725,7 @@ def get_inter_specical_dist(arrival_dist, arrival_rate ,sample_size):
 
     elif arrival_dics[arrival_dist] == 'G025':
 
-        shape, scale, moms_arrive = generate_gamma(True, 0.25, arrival_rate)
+        shape, scale, moms_arrive1 = generate_gamma(True, 0.25, arrival_rate)
         # moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
         inter_arrival = np.random.gamma(shape, scale, sample_size)
         moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
@@ -1764,34 +1767,35 @@ def get_ser_special_dist( service_dist, sample_size):
     ser_dics = {0: 'LN025', 1: 'LN4', 2: 'G4', 3: 'G025', 4: 'M'}
 
     if ser_dics[service_dist] == 'LN025':
-        mu = 1
-        sig2 = 0.25 * mu
-        services = log_normal_gener(mu, sig2, sample_size)
-        m = np.log((mu ** 2) / (sig2 + mu ** 2) ** 0.5)
-        v = (np.log(sig2 / mu ** 2 + 1)) ** 0.5
+
+        m = 1
+        s = (0.25 * m**2)**0.5
+        services = log_normal_gener(m,s, sample_size)
+        # m = np.log((mu ** 2) / (sig2 + mu ** 2) ** 0.5)
+        # v = (np.log(sig2 / mu ** 2 + 1)) ** 0.5
         moms_service = compute_first_ten_moms_log_N(services)
         service_csv = 0.25
 
     elif ser_dics[service_dist] == 'LN4':
 
-        mu = 1
-        sig2 = 4 * mu
-        services = log_normal_gener(mu, sig2, sample_size)
-        m = np.log((mu ** 2) / (sig2 + mu ** 2) ** 0.5)
-        v = (np.log(sig2 / mu ** 2 + 1)) ** 0.5
+        m = 1
+        s = (4 * m**2)**0.5
+        services = log_normal_gener(m,s, sample_size)
+        # m = np.log((mu ** 2) / (sig2 + mu ** 2) ** 0.5)
+        # v = (np.log(sig2 / mu ** 2 + 1)) ** 0.5
         moms_service = compute_first_ten_moms_log_N(services)
         service_csv = 4
 
     elif ser_dics[service_dist] == 'G4':
 
-        shape, scale, moms_service = generate_gamma(False, 4)
+        shape, scale, moms_service1 = generate_gamma(False, 4)
         services = np.random.gamma(shape, scale, sample_size)
         moms_service = compute_first_ten_moms_log_N(services)
         service_csv = 4
 
     elif ser_dics[service_dist] == 'G025':
 
-        shape, scale, moms_service = generate_gamma(False, 0.25)
+        shape, scale, moms_service1 = generate_gamma(False, 0.25)
         services = np.random.gamma(shape, scale, sample_size)
         moms_service = compute_first_ten_moms_log_N(services)
         service_csv = 0.25
@@ -1845,19 +1849,18 @@ def run_single_setting(args):
         df_counter['arrive_ind'] = df_counter['arrive_ind'].astype('int')
         df_counter['ser_ind'] = df_counter['ser_ind'].astype('int')
 
-        pkl.dump(df_counter, open('/scratch/eliransc/special_dists_counter/df_counter.pkl', 'wb'))
+        if 'dkrass' in os.getcwd().split('/'):
+            pass
+        elif 'C:' in os.getcwd().split('/')[0]:
+            pkl.dump(df_counter, open(r'C:\Users\user\workspace\data\test2_gtg1\df_counter.pkl', 'wb'))
+        else:
+            pkl.dump(df_counter, open('/scratch/eliransc/special_dists_counter/df_counter.pkl', 'wb'))
 
 
-    # if 'dkrass' in os.getcwd().split('/'):
-    #     ind_list_path = '/scratch/eliransc/inds_ind_dir/ind_list.pkl'
-    # elif 'C:' in os.getcwd().split('/')[0]:
-    #     ind_list_path = 'ind_list.pkl'
-    # else:
-    #     ind_list_path = '/scratch/eliransc/inds_ind_dir/ind_list.pkl'
 
     now = datetime.now()
 
-    sample_size = 500000
+    sample_size = 5000000
 
     # inds_list = pkl.load(open(ind_list_path, 'rb'))
 
@@ -1865,7 +1868,14 @@ def run_single_setting(args):
 
     for inddd in range(500):
 
-        df_counter = pkl.load(open('/scratch/eliransc/special_dists_counter/df_counter.pkl', 'rb'))
+        if 'dkrass' in os.getcwd().split('/'):
+            pass
+        elif 'C:' in os.getcwd().split('/')[0]:
+            df_counter = pkl.load(open(r'C:\Users\user\workspace\data\test2_gtg1\df_counter.pkl', 'rb'))
+        else:
+            df_counter = pkl.load(open('/scratch/eliransc/special_dists_counter/df_counter.pkl', 'rb'))
+
+
         inds = df_counter.loc[df_counter['counter'] < 1000, :].index.values
 
         ind_rand = np.random.randint(inds.shape[0])
@@ -1876,7 +1886,14 @@ def run_single_setting(args):
         avg_rho = df_counter.loc[ind, 'avg_rho']
         df_counter.loc[ind, 'counter'] += 1
 
-        pkl.dump(df_counter, open('/scratch/eliransc/special_dists_counter/df_counter.pkl', 'wb'))
+        if 'dkrass' in os.getcwd().split('/'):
+            pass
+        elif 'C:' in os.getcwd().split('/')[0]:
+            pkl.dump(df_counter, open(r'C:\Users\user\workspace\data\test2_gtg1\df_counter.pkl', 'wb'))
+        else:
+            pkl.dump(df_counter, open('/scratch/eliransc/special_dists_counter/df_counter.pkl', 'wb'))
+
+
 
         # inds_list.remove(inds_list[0])
         # pkl.dump(inds_list, open(ind_list_path, 'wb'))
@@ -1925,8 +1942,8 @@ def run_single_setting(args):
         model_inputs = (services, moms_service,  arrivals_dict)
 
         size_initial = 100
-        s = np.random.dirichlet(np.ones(15))
-        initial = np.concatenate((s, np.zeros(size_initial - 15)))
+        s = np.random.dirichlet(np.ones(30))
+        initial = np.concatenate((s, np.zeros(size_initial - 30)))
 
         time_dict = {}
         for time_ in range(g.end_time):
@@ -1961,7 +1978,7 @@ def create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df
     prob_queue_arr = np.array([])
     # time_dict, arrival_rates, model_inputs, initial = pkl.load(open(os.path.join(path, files_list[ind]), 'rb'))
     for t in range(len(time_dict)):
-        arr_input = np.concatenate((np.array([0]), np.log(model_inputs[1][1:10]), np.log(model_inputs[2][df.loc[t, 'arrival_code']][1]), np.array([t]), initial[:15]), axis =0)
+        arr_input = np.concatenate((np.array([0]), np.log(model_inputs[1][1:10]), np.log(model_inputs[2][df.loc[t, 'arrival_code']][1]), np.array([t]), initial[:30]), axis =0)
         arr_input = arr_input.reshape(1, arr_input.shape[0])
         probs = (time_dict[t]/time_dict[t].sum())
         fifty_or_more = probs[50:].sum()
@@ -1999,7 +2016,7 @@ def main(args):
     if 'dkrass' in os.getcwd().split('/'):
         args.read_path = '/scratch/d/dkrass/eliransc/time_dependant_cyclic'
     elif 'C:' in os.getcwd().split('/')[0]:
-        args.read_path = r'C:\Users\user\workspace\data\mt_g_1'
+        args.read_path = r'C:\Users\user\workspace\data\test2_gtg1'
     else:
         args.read_path = '/scratch/eliransc/new_gt_g_1_trans5' #
 
@@ -2030,7 +2047,7 @@ def parse_arguments(argv):
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default= 3000)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default= 30)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)

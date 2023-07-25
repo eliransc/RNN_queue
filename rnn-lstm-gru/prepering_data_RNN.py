@@ -35,19 +35,21 @@ def create_single_data_point(path, files_list, ind):
 
 def main(args):
 
-    curr_path = '/home/eliransc/projects/def-dkrass/eliransc/RNN_queue/rnn-lstm-gru'
+    if not  'C:' in os.getcwd().split('/')[0]:
 
-    files_in_path = os.listdir(curr_path)
+        curr_path = '/home/eliransc/projects/def-dkrass/eliransc/RNN_queue/rnn-lstm-gru'
 
-    server_file = [file for file in files_in_path if '_server' in file]
+        files_in_path = os.listdir(curr_path)
 
-    server_name = server_file.split('_')[0]
+        server_file = [file for file in files_in_path if '_server' in file]
+
+        server_name = server_file.split('_')[0]
 
 
     if 'C:' in os.getcwd().split('/')[0]:
         path = r'C:\Users\user\workspace\data\mt_g_1'
     else:
-        path = '/scratch/eliransc/single_rnn_gt_g_1_data'
+        path = '/scratch/eliransc/gt_g_1_data'
 
     files = os.listdir(path)
 
@@ -81,6 +83,7 @@ def main(args):
 
             pkl.dump(df_files, open('df_files.pkl', 'wb'))
             res_input, prob_queue_arr = pkl.load(open(os.path.join(path, files[ind]), 'rb'))
+            print(files[ind])
             # res_input, prob_queue_arr = create_single_data_point(path, files, ind)
             res_input = res_input.reshape(1, res_input.shape[0], res_input.shape[1])
             prob_queue_arr = prob_queue_arr.reshape(1, prob_queue_arr.shape[0], prob_queue_arr.shape[1])
@@ -91,8 +94,9 @@ def main(args):
                 batch_input = np.concatenate((batch_input, res_input), axis=0)
                 batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
 
+        path_dump = '/scratch/eliransc/rnn_data/gt_g_1/'
         pkl.dump((batch_input, batch_output), open(
-            '/scratch/eliransc/data_rnn_training/pkl_rnn/'+server_name+'_ '+ str(curr_batch) + '.pkl', 'wb'))
+            os.path.join(path_dump, server_name+'_ '+ str(curr_batch) + '.pkl'), 'wb'))
 
 
 def parse_arguments(argv):
