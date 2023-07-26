@@ -35,7 +35,7 @@ def create_single_data_point(path, files_list, ind):
 
 def main(args):
 
-    if not  'C:' in os.getcwd().split('/')[0]:
+    if not 'C:' in os.getcwd().split('/')[0]:
 
         curr_path = '/home/eliransc/projects/def-dkrass/eliransc/RNN_queue/rnn-lstm-gru'
 
@@ -43,7 +43,7 @@ def main(args):
 
         server_file = [file for file in files_in_path if '_server' in file]
 
-        server_name = server_file.split('_')[0]
+        server_name = server_file[0].split('_')[0]
 
 
     if 'C:' in os.getcwd().split('/')[0]:
