@@ -94,9 +94,9 @@ def main(args):
                 batch_input = np.concatenate((batch_input, res_input), axis=0)
                 batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
 
-        path_dump = '/scratch/eliransc/rnn_data/gt_g_1/'
+        path_dump = '/scratch/eliransc/rnn_data/gt_g_1_batches/'
         pkl.dump((batch_input, batch_output), open(
-            os.path.join(path_dump, server_name+'_ '+ str(curr_batch) + '.pkl'), 'wb'))
+            os.path.join(path_dump, server_name +'_'+ str(curr_batch) + '.pkl'), 'wb'))
 
 
 def parse_arguments(argv):
