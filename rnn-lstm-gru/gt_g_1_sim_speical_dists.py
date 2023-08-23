@@ -1857,14 +1857,11 @@ def run_single_setting(args):
             pkl.dump(df_counter, open('/scratch/eliransc/special_dists_counter/df_counter.pkl', 'wb'))
 
 
-
     now = datetime.now()
 
     sample_size = 5000000
 
-    # inds_list = pkl.load(open(ind_list_path, 'rb'))
 
-    # arrival_dist, service_dist = 5, 5  #inds_list[0][0], inds_list[0][1]
 
     for inddd in range(500):
 
@@ -1892,30 +1889,6 @@ def run_single_setting(args):
             pkl.dump(df_counter, open(r'C:\Users\user\workspace\data\test2_gtg1\df_counter.pkl', 'wb'))
         else:
             pkl.dump(df_counter, open('/scratch/eliransc/special_dists_counter/df_counter.pkl', 'wb'))
-
-
-
-        # inds_list.remove(inds_list[0])
-        # pkl.dump(inds_list, open(ind_list_path, 'wb'))
-
-        # avg_rho = 0.5
-
-        # path_df = '/home/eliransc/projects/def-dkrass/eliransc/RNN_queue/rnn-lstm-gru'
-        # df_counts1 = pkl.load(open(os.path.join(path_df, 'combs_df.pkl'), 'rb'))
-        #
-        # ind = df_counts1.loc[df_counts1['status'] == 'Pending', :].index.values.tolist()[0]
-        # df_counts1.loc[ind, 'status'] = 'Done'
-        #
-        # arrival_dist = df_counts1.loc[ind, 'arrive']
-        # service_dist = df_counts1.loc[ind, 'ser']
-        # avg_rho = df_counts1.loc[ind, 'rho']
-        #
-        # print(arrival_dist, service_dist, avg_rho)
-        # print(df_counts1.loc[df_counts1['status'] == 'Pending', :].shape)
-        # pkl.dump(df_counts1, open(os.path.join(path_df, 'combs_df.pkl'), 'wb'))
-        #
-        #
-
 
 
 
@@ -2047,7 +2020,7 @@ def parse_arguments(argv):
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default= 30)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 1700)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
