@@ -1991,7 +1991,7 @@ def main(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         args.read_path = r'C:\Users\user\workspace\data\test2_gtg1'
     else:
-        args.read_path = '/scratch/eliransc/new_gt_g_1_trans5' #
+        args.read_path = '/scratch/eliransc/gt_g_1_special' #
 
     for ind in tqdm(range(args.num_iterations)):
 
