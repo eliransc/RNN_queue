@@ -83,7 +83,7 @@ def main(args):
 
             pkl.dump(df_files, open('df_files.pkl', 'wb'))
             res_input, prob_queue_arr = pkl.load(open(os.path.join(path, files[ind]), 'rb'))
-            print(files[ind])
+
             # res_input, prob_queue_arr = create_single_data_point(path, files, ind)
             res_input = res_input.reshape(1, res_input.shape[0], res_input.shape[1])
             prob_queue_arr = prob_queue_arr.reshape(1, prob_queue_arr.shape[0], prob_queue_arr.shape[1])
