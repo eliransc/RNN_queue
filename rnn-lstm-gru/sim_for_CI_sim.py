@@ -1607,7 +1607,7 @@ def run_single_setting(args, model_num,  count):
         list_of_lists1 = []
         for ind in tqdm(range(10)):
             list_of_dicts = [single_sim(services, arrivals_dict, model_inputs, arrival_rates, initial, df, args) for ind in
-                             range(1, args.num_iter_same_params + 1)]  #
+                             range(1, 1700 + 1)]  #
             list_of_lists1.append(list_of_dicts)
 
         merged1 = list(itertools.chain(*list_of_lists1))
