@@ -1592,9 +1592,10 @@ def generate_cycle_arrivals(number_sequences):
 def run_single_setting(args, model_num,  count):
     # s_service, A_service, moms_service = model_inputs
 
-    dump_path =   r'C:\Users\user\workspace\data\CI_sim_gt_g_1_output'
-
-    path = r'C:\Users\user\workspace\data\CI_sim_gt_g_1'
+    # dump_path =   r'C:\Users\user\workspace\data\CI_sim_gt_g_1_output'
+    dump_path = '/scratch/eliransc/CI_check/CI_sim_gt_g_1_output'
+    # path = r'C:\Users\user\workspace\data\CI_sim_gt_g_1'
+    path = '/scratch/eliransc/CI_check/CI_sim_gt_g_1_input'
     file_name = str(model_num) + '_CI.pkl'
 
     full_path = os.path.join(path, file_name)
@@ -1604,7 +1605,7 @@ def run_single_setting(args, model_num,  count):
 
 
         list_of_lists1 = []
-        for ind in tqdm(range(2)):
+        for ind in tqdm(range(10)):
             list_of_dicts = [single_sim(services, arrivals_dict, model_inputs, arrival_rates, initial, df, args) for ind in
                              range(1, args.num_iter_same_params + 1)]  #
             list_of_lists1.append(list_of_dicts)
@@ -1661,7 +1662,7 @@ def create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df
 
 def main(args):
 
-    for ii in range(400):
+    for ii in range(2):
 
         now = datetime.now()
         current_time = now.strftime("%H_%M_%S")
@@ -1680,7 +1681,8 @@ def main(args):
 
         args.dists_path = dists_path
 
-        path = r'C:\Users\user\workspace\data\CI_sim_gt_g_1'
+        # path = r'C:\Users\user\workspace\data\CI_sim_gt_g_1'
+        path ='/scratch/eliransc/CI_check/CI_sim_gt_g_1_input'
 
         if 'dkrass' in os.getcwd().split('/'):
             args.read_path = '/scratch/d/dkrass/eliransc/time_dependant_cyclic'
@@ -1703,8 +1705,8 @@ def main(args):
             pkl.dump(df_CI_cover, open('df_CI_cover.pkl', 'wb'))
 
 
-        path = r'C:\Users\user\workspace\data\CI_sim_gt_g_1'
-
+        # path = r'C:\Users\user\workspace\data\CI_sim_gt_g_1'
+        path = '/scratch/eliransc/CI_check/CI_sim_gt_g_1_input'
         df_CI_cover = df_CI_cover.loc[df_CI_cover['count'] < 11, :]
         df_CI_cover = df_CI_cover.sort_values('count')
 
@@ -1726,7 +1728,7 @@ def parse_arguments(argv):
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default=4)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default=1700)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
