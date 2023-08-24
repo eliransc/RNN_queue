@@ -1670,25 +1670,36 @@ def run_single_setting(args):
     np.random.seed(now.microsecond)
     model_num = np.random.randint(1, 100000000)
 
-    list_of_lists1 = []
-    for ind in tqdm(range(10)):
-        list_of_dicts = [single_sim(services, arrivals_dict, model_inputs, arrival_rates, initial,df,  args) for ind in
-                          range(1, args.num_iter_same_params + 1)] #
-        list_of_lists1.append(list_of_dicts)
+    # path = r'C:\Users\user\workspace\data\CI_sim_gt_g_1'
+    path = '/scratch/eliransc/CI_check/CI_sim_gt_g_1_input'
+    file_name = str(model_num)+'_CI.pkl'
 
-    merged1 = list(itertools.chain(*list_of_lists1))
-
-    for resultDictionary in merged1:
-        for time1 in resultDictionary.keys():
-            time_dict[time1][resultDictionary[time1]] += 1
-
-    curr_path1 = str(model_num) + '_avg_rho_'+ str(avg_rho) + '.pkl'
-    full_path1 = os.path.join(args.read_path, curr_path1)
-
-    res_input, prob_queue_arr = create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df)
+    full_path = os.path.join(path, file_name)
 
 
-    pkl.dump((res_input, prob_queue_arr), open(full_path1, 'wb'))
+    pkl.dump((services, arrivals_dict, model_inputs, arrival_rates, initial,df, avg_rho,  args),open(full_path, 'wb'))
+
+
+
+    # list_of_lists1 = []
+    # for ind in tqdm(range(10)):
+    #     list_of_dicts = [single_sim(services, arrivals_dict, model_inputs, arrival_rates, initial,df,  args) for ind in
+    #                       range(1, args.num_iter_same_params + 1)] #
+    #     list_of_lists1.append(list_of_dicts)
+    #
+    # merged1 = list(itertools.chain(*list_of_lists1))
+    #
+    # for resultDictionary in merged1:
+    #     for time1 in resultDictionary.keys():
+    #         time_dict[time1][resultDictionary[time1]] += 1
+    #
+    # curr_path1 = str(model_num) + '_avg_rho_'+ str(avg_rho) + '.pkl'
+    # full_path1 = os.path.join(args.read_path, curr_path1)
+    #
+    # res_input, prob_queue_arr = create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df)
+    #
+    #
+    # pkl.dump((res_input, prob_queue_arr), open(full_path1, 'wb'))
 
 
 def create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df):

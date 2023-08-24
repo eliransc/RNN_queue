@@ -19,10 +19,10 @@ import random
 import time
 import itertools
 
-
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+
 sys.path.append(r'C:\Users\user\workspace\butools2\Python')
 sys.path.append('/home/d/dkrass/eliransc/Python')
 sys.path.append('/home/eliransc/projects/def-dkrass/eliransc/butools/Python')
@@ -52,9 +52,6 @@ import itertools
 from scipy.special import factorial
 
 import pickle as pkl
-
-
-
 
 
 def ser_mean(alph, T):
@@ -173,7 +170,6 @@ def give_s_A_given_size(ph_size):
     return (s, A)
 
 
-
 def create_erlang_row(rate, ind, size):
     'Compute a single Erlang row'
     aa = np.zeros(size)
@@ -182,19 +178,21 @@ def create_erlang_row(rate, ind, size):
         aa[ind + 1] = rate
     return aa
 
+
 def ser_moment_n(s, A, mom):
     '''
     Compute the  'mom' moment of PH
     '''
     e = np.ones((A.shape[0], 1))
     try:
-        mom_val = ((-1) ** mom) *factorial(mom)*np.dot(np.dot(s, matrix_power(A, -mom)), e)
+        mom_val = ((-1) ** mom) * factorial(mom) * np.dot(np.dot(s, matrix_power(A, -mom)), e)
         if mom_val > 0:
             return mom_val
         else:
             return False
     except:
         return False
+
 
 def compute_first_n_moments(s, A, n=3):
     moment_list = []
@@ -229,9 +227,6 @@ def recursion_group_size(group_left, curr_vector, phases_left):
         else:
             curr_size = np.random.randint(1, phases_left + 1 - group_left)
         return recursion_group_size(group_left - 1, np.append(curr_size, curr_vector), phases_left - curr_size)
-
-
-
 
 
 def generate_erlang_given_rates(rate, ph_size):
@@ -291,7 +286,6 @@ def ser_mean(alph, T):
 
 
 def create_final_x_data(s, A, lam):
-
     lam_arr = np.zeros((A.shape[0] + 1, 1))
 
     s1 = s.reshape((1, s.shape[0]))
@@ -303,9 +297,7 @@ def create_final_x_data(s, A, lam):
         # lam = lam * 0.95
         lam_arr[0, 0] = lam
 
-
         return np.append(np.append(A, s1, axis=0), lam_arr, axis=1).astype(np.float32)
-
 
 
 def compute_y_data_given_folder(x, ph_size_max, tot_prob=500, eps=0.00001):
@@ -320,10 +312,10 @@ def compute_y_data_given_folder(x, ph_size_max, tot_prob=500, eps=0.00001):
             R = compute_R(lam, s, A)
 
             steady_state = np.array([1 - rho])
-            for i in range(1, tot_prob-1):
+            for i in range(1, tot_prob - 1):
                 steady_state = np.append(steady_state, np.sum(steady_i(rho, s, R, i)))
 
-            steady_state = np.append(steady_state, 1-np.sum(steady_state))
+            steady_state = np.append(steady_state, 1 - np.sum(steady_state))
             return steady_state
 
 
@@ -363,7 +355,6 @@ def get_lower_upper_x(phsize, rate, prob_limit=0.999):
     return False
 
 
-
 def give_rates_given_Er_sizes(df_, sizes, ratio_size):
     rates = np.array([])
     ratio_list = list(np.arange(ratio_size))
@@ -385,8 +376,6 @@ def create_rate_phsize_combs(vals_bound):
     return all_combs_list
 
 
-
-
 def find_upper_bound_rate_given_n(n, upper_bound):
     if upper_bound == 0:
         return False
@@ -394,8 +383,6 @@ def find_upper_bound_rate_given_n(n, upper_bound):
         return find_upper_bound_rate_given_n(n, upper_bound - 1)
     else:
         return upper_bound + 1
-
-
 
 
 def find_when_cdf_cross_0_999(s, A, x, itera=0, thrsh=0.9995):
@@ -425,8 +412,7 @@ def normalize_ph_so_it_1_when_cdf_1(s, A, initial_val=0.5):
     return (s, A)
 
 
-
-def saving_batch(x_y_data, data_path, data_sample_name, num_moms, save_x = False):
+def saving_batch(x_y_data, data_path, data_sample_name, num_moms, save_x=False):
     '''
 
     :param x_y_data: the data is a batch of tuples: ph_input, first num_moms moments and steady-state probs
@@ -439,9 +425,8 @@ def saving_batch(x_y_data, data_path, data_sample_name, num_moms, save_x = False
 
     now = datetime.now()
 
-
     current_time = now.strftime("%H_%M_%S") + '_' + str(np.random.randint(1, 1000000, 1)[0])
-    x_list =  []
+    x_list = []
     mom_list = []
     y_list = []
 
@@ -452,26 +437,25 @@ def saving_batch(x_y_data, data_path, data_sample_name, num_moms, save_x = False
             mom_list.append(torch.from_numpy(x_y[0]))
             y_list.append(torch.from_numpy(x_y[1]))
 
-
-    if save_x: # should we want to save the x_data
+    if save_x:  # should we want to save the x_data
         # x_list = [torch.from_numpy(x_y[0]) for x_y in x_y_data if type(x_y) != bool]
         # torch_x = torch.stack(x_list).float()
-        pkl_name_xdat = 'xdat_' + data_sample_name + current_time +'size_' + '.pkl' #+ str(torch_x.shape[0]) +
+        pkl_name_xdat = 'xdat_' + data_sample_name + current_time + 'size_' + '.pkl'  # + str(torch_x.shape[0]) +
         full_path_xdat = os.path.join(data_path, pkl_name_xdat)
         pkl.dump(x_list, open(full_path_xdat, 'wb'))
 
     # dumping moments
     # mom_list = [torch.from_numpy(x_y[1]) for x_y in x_y_data if type(x_y) != bool]
     torch_moms = torch.stack(mom_list).float()
-    pkl_name_moms = 'moms_' + str(num_moms) + data_sample_name + current_time + 'size_'+ str(torch_moms.shape[0]) + '.pkl'
+    pkl_name_moms = 'moms_' + str(num_moms) + data_sample_name + current_time + 'size_' + str(
+        torch_moms.shape[0]) + '.pkl'
     full_path_moms = os.path.join(data_path, pkl_name_moms)
     pkl.dump(torch_moms, open(full_path_moms, 'wb'))
-
 
     # dumping steady_state
     # y_list = [torch.from_numpy(x_y[2]) for x_y in x_y_data if type(x_y) != bool]
     torch_y = torch.stack(y_list).float()
-    pkl_name_ydat = 'ydat_' + data_sample_name + current_time +'size_'+ str(torch_y.shape[0]) + '.pkl'
+    pkl_name_ydat = 'ydat_' + data_sample_name + current_time + 'size_' + str(torch_y.shape[0]) + '.pkl'
     full_path_ydat = os.path.join(data_path, pkl_name_ydat)
     pkl.dump(torch_y, open(full_path_ydat, 'wb'))
 
@@ -541,7 +525,6 @@ def give_s_A_given__fixed_size(ph_size, scale_low, scale_high):
 
 
 def create_mix_erlang_ph(scale_low=1, max_scale_high=15, max_ph=500):
-
     erlang_max_size = np.random.randint(int(0.25 * max_ph), int(0.75 * max_ph))
     scale_high = np.random.uniform(2, max_scale_high)
     ph_size_gen_ph = np.random.randint(5, max_ph - erlang_max_size)
@@ -592,16 +575,17 @@ def create_mix_erlang_ph(scale_low=1, max_scale_high=15, max_ph=500):
         return False
 
 
-def create_gen_erlang_many_ph(max_ph_size = 500):
+def create_gen_erlang_many_ph(max_ph_size=500):
     ph_size = np.random.randint(1, max_ph_size)
-    num_groups = np.random.randint(2,20)
-    group_sizes = np.random.randint(1,25,num_groups)
-    group_sizes_1 = (group_sizes*ph_size/np.sum(group_sizes)).astype(int)+1
-    rates = ((np.ones(num_groups)*np.random.uniform(1, 1.75))**np.arange(num_groups))
-    s,A = create_gen_erlang_given_sizes(group_sizes_1, rates)
+    num_groups = np.random.randint(2, 20)
+    group_sizes = np.random.randint(1, 25, num_groups)
+    group_sizes_1 = (group_sizes * ph_size / np.sum(group_sizes)).astype(int) + 1
+    rates = ((np.ones(num_groups) * np.random.uniform(1, 1.75)) ** np.arange(num_groups))
+    s, A = create_gen_erlang_given_sizes(group_sizes_1, rates)
 
-    A = A*compute_first_n_moments(s, A, 1)[0][0]
-    return (s,A)
+    A = A * compute_first_n_moments(s, A, 1)[0][0]
+    return (s, A)
+
 
 def create_gen_erlang_given_sizes(group_sizes, rates, probs=False):
     ph_size = np.sum(group_sizes)
@@ -622,27 +606,26 @@ def create_gen_erlang_given_sizes(group_sizes, rates, probs=False):
     return final_s, final_a
 
 
-def send_to_the_right_generator(num_ind, max_ph_size,  num_moms, data_path, data_sample_name):
-
+def send_to_the_right_generator(num_ind, max_ph_size, num_moms, data_path, data_sample_name):
     if num_ind == 1:
-        s_A = create_mix_erlang_ph() # Classes of erlangs and non-erlangs
+        s_A = create_mix_erlang_ph()  # Classes of erlangs and non-erlangs
     elif num_ind > 1:
-        s_A = create_gen_erlang_many_ph() # Classes of erlangs
+        s_A = create_gen_erlang_many_ph()  # Classes of erlangs
     else:
-        s_A = create_Erlang_given_ph_size(np.random.randint(1,max_ph_size))  # One large Erlang
+        s_A = create_Erlang_given_ph_size(np.random.randint(1, max_ph_size))  # One large Erlang
     if type(s_A) != bool:
         try:
             s = s_A[0]
             A = s_A[1]
 
-            return (s,A)
+            return (s, A)
 
 
         except:
             print('Not able to extract s and A')
 
-def compute_y_moms(s,A,num_moms,max_ph_size):
 
+def compute_y_moms(s, A, num_moms, max_ph_size):
     lam_vals = np.random.uniform(0.8, 0.99, 1)
 
     lam_y_list = []
@@ -662,23 +645,23 @@ def compute_y_moms(s,A,num_moms,max_ph_size):
             mom_arr = np.append(lam, mom_arr)
 
             if not np.any(np.isinf(mom_arr)):
-
                 lam_y_list.append((mom_arr, y))
 
     return lam_y_list
 
 
 def generate_one_ph(batch_size, max_ph_size, num_moms, data_path, data_sample_name):
-
     elements = [1, 2, 3]
     probabilities = [0.495, 0.495, 0.01]
     sample_type_arr = np.random.choice(elements, batch_size, p=probabilities)
-    x_y_moms_list = [send_to_the_right_generator(val, max_ph_size,  num_moms, data_path, data_sample_name) for val in sample_type_arr]
+    x_y_moms_list = [send_to_the_right_generator(val, max_ph_size, num_moms, data_path, data_sample_name) for val in
+                     sample_type_arr]
     x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
-    x_y_moms_lists = [compute_y_moms(x_y_moms[0], x_y_moms[1], num_moms, max_ph_size) for x_y_moms  in x_y_moms_list]
+    x_y_moms_lists = [compute_y_moms(x_y_moms[0], x_y_moms[1], num_moms, max_ph_size) for x_y_moms in x_y_moms_list]
     saving_batch(list(itertools.chain(*x_y_moms_lists)), data_path, data_sample_name, num_moms)
 
     return 1
+
 
 def create_Erlang_given_ph_size(ph_size):
     '''
@@ -688,8 +671,7 @@ def create_Erlang_given_ph_size(ph_size):
     s[0] = 1
     rate = ph_size
     A = generate_erlang_given_rates(rate, ph_size)
-    return (s,A)
-
+    return (s, A)
 
 
 def generate_erlangs(batch_size, max_ph_size, num_moms, data_path, data_sample_name):
@@ -697,13 +679,11 @@ def generate_erlangs(batch_size, max_ph_size, num_moms, data_path, data_sample_n
     Sample a batch of Erlangs
     '''
 
-    sizes = np.random.randint(500,max_ph_size,batch_size)
+    sizes = np.random.randint(500, max_ph_size, batch_size)
     x_y_moms_list = [create_Erlang_given_ph_size(ph_size) for ph_size in sizes]
     x_y_moms_list = [x_y_moms for x_y_moms in x_y_moms_list if x_y_moms]
-    x_y_moms_lists = [compute_y_moms(x_y_moms[0],x_y_moms[1], num_moms, max_ph_size) for x_y_moms  in x_y_moms_list]
+    x_y_moms_lists = [compute_y_moms(x_y_moms[0], x_y_moms[1], num_moms, max_ph_size) for x_y_moms in x_y_moms_list]
     saving_batch(list(itertools.chain(*x_y_moms_lists)), data_path, data_sample_name, num_moms)
-
-
 
     return 1
 
@@ -727,28 +707,29 @@ def create_gen_erlang_given_sizes(group_sizes, rates, probs=False):
     return final_s, final_a
 
 
-def create_gen_erlang_many_ph(max_ph_size = 500):
+def create_gen_erlang_many_ph(max_ph_size=500):
     ph_size = np.random.randint(1, max_ph_size)
-    num_groups = np.random.randint(2,20)
-    group_sizes = np.random.randint(1,25,num_groups)
-    group_sizes_1 = (group_sizes*ph_size/np.sum(group_sizes)).astype(int)+1
-    rates = ((np.ones(num_groups)*np.random.uniform(1, 1.75))**np.arange(num_groups))
-    s,A = create_gen_erlang_given_sizes(group_sizes_1, rates)
+    num_groups = np.random.randint(2, 20)
+    group_sizes = np.random.randint(1, 25, num_groups)
+    group_sizes_1 = (group_sizes * ph_size / np.sum(group_sizes)).astype(int) + 1
+    rates = ((np.ones(num_groups) * np.random.uniform(1, 1.75)) ** np.arange(num_groups))
+    s, A = create_gen_erlang_given_sizes(group_sizes_1, rates)
 
-    A = A*compute_first_n_moments(s, A, 1)[0][0]
-    return (s,A)
+    A = A * compute_first_n_moments(s, A, 1)[0][0]
+    return (s, A)
 
 
 def ser_moment_n(s, A, mom):
     e = np.ones((A.shape[0], 1))
     try:
-        mom_val = ((-1) ** mom) *factorial(mom)*np.dot(np.dot(s, matrix_power(A, -mom)), e)
+        mom_val = ((-1) ** mom) * factorial(mom) * np.dot(np.dot(s, matrix_power(A, -mom)), e)
         if mom_val > 0:
             return mom_val
         else:
             return False
     except:
         return False
+
 
 def compute_first_n_moments(s, A, n=3):
     moment_list = []
@@ -786,11 +767,13 @@ def create_row_rates(row_ind, is_absorbing, in_rate, non_abrosing_out_rates, ph_
         finarr[all_indices] = non_abrosing_out_rates[rate_ind[0][0]]
         return finarr
 
+
 def generate_erlang_given_rates(rate, ph_size):
     A = np.identity(ph_size)
     A_list = [create_erlang_row(rate, ind, ph_size) for ind in range(ph_size)]
     A = np.concatenate(A_list).reshape((ph_size, ph_size))
     return A
+
 
 def gives_rate(states_inds, rate, ph_size):
     '''
@@ -803,6 +786,7 @@ def gives_rate(states_inds, rate, ph_size):
     ## Computing the out rates
     final_rates[states_inds] = (rands_weights_out_rate / np.sum(rands_weights_out_rate)) * rate
     return final_rates
+
 
 def give_s_A_given__fixed_size(ph_size, scale_low, scale_high):
     if ph_size > 1:
@@ -867,14 +851,16 @@ def give_s_A_given__fixed_size(ph_size, scale_low, scale_high):
 
     return (s, A)
 
+
 def balance_sizes(sizes):
     for ind in range(sizes.shape[0]):
         if sizes[ind] < 3:
             ind_max = np.argmax(sizes)
-            if sizes[ind_max] >2 :
-                sizes[ind] +=1
-                sizes[ind_max] -=1
+            if sizes[ind_max] > 2:
+                sizes[ind] += 1
+                sizes[ind_max] -= 1
     return sizes
+
 
 def recursion_group_size(group_left, curr_vector, phases_left):
     if group_left == 1:
@@ -884,11 +870,11 @@ def recursion_group_size(group_left, curr_vector, phases_left):
         if phases_left + 1 - group_left == 1:
             curr_size = 1
         else:
-            curr_size =  1+ np.random.binomial(phases_left + 1 - group_left-1, np.random.uniform(0.1,0.5))
+            curr_size = 1 + np.random.binomial(phases_left + 1 - group_left - 1, np.random.uniform(0.1, 0.5))
         return recursion_group_size(group_left - 1, np.append(curr_size, curr_vector), phases_left - curr_size)
 
-def create_mix_erlang_ph(ph_size, scale_low=1, max_scale_high=15, max_ph=500):
 
+def create_mix_erlang_ph(ph_size, scale_low=1, max_scale_high=15, max_ph=500):
     if ph_size > 2:
         ph_size_gen_ph = np.random.randint(2, ph_size)
 
@@ -906,31 +892,33 @@ def create_mix_erlang_ph(ph_size, scale_low=1, max_scale_high=15, max_ph=500):
     #     num_groups = 1
     num_groups = sample_num_groups(ph_size_gen_ph)
 
-
     # group_sizes = np.random.randint(1, 25, num_groups)
 
-    group_sizes_gen_ph = recursion_group_size(num_groups, np.array([]), ph_size_gen_ph) #(group_sizes * ph_size_gen_ph / np.sum(group_sizes)).astype(int) + 1
-    if np.random.rand()>0.01:
+    group_sizes_gen_ph = recursion_group_size(num_groups, np.array([]),
+                                              ph_size_gen_ph)  # (group_sizes * ph_size_gen_ph / np.sum(group_sizes)).astype(int) + 1
+    if np.random.rand() > 0.01:
         group_sizes_gen_ph = balance_sizes(group_sizes_gen_ph)
-    erlang_list_gen_ph = [give_s_A_given__fixed_size(size, scale_low, scale_high) for size in group_sizes_gen_ph.astype(int)]
+    erlang_list_gen_ph = [give_s_A_given__fixed_size(size, scale_low, scale_high) for size in
+                          group_sizes_gen_ph.astype(int)]
     erlang_list_gen_ph_A = [lis[1] for lis in erlang_list_gen_ph]
     erlang_list_gen_ph_s = [lis[0] for lis in erlang_list_gen_ph]
 
-    ph_size_erl = ph_size - ph_size_gen_ph #np.random.randint(5, erlang_max_size)
+    ph_size_erl = ph_size - ph_size_gen_ph  # np.random.randint(5, erlang_max_size)
     # if ph_size_erl > 2:
     #     num_groups = np.random.randint(1, min(7, ph_size_erl - 1))
     # else:
     #     num_groups = 1
     num_groups = sample_num_groups(ph_size_erl)
 
-
     # group_sizes = recursion_group_size(num_groups, np.array([]), ph_size_erl).astype(int)  #np.random.randint(1, 25, num_groups)
     if np.random.rand() > 0.8:
-        rates = np.random.rand(num_groups)*200   #((np.ones(num_groups) * np.random.uniform(1, 1.75)) ** np.arange(num_groups))
+        rates = np.random.rand(
+            num_groups) * 200  # ((np.ones(num_groups) * np.random.uniform(1, 1.75)) ** np.arange(num_groups))
     else:
         rates = np.random.uniform(1, 1.75) ** (np.random.rand(num_groups) * 10)
-    group_sizes_erl = recursion_group_size(num_groups, np.array([]), ph_size_erl).astype(int) # (group_sizes * ph_size_erl / np.sum(group_sizes)).astype(int) + 1
-    if np.random.rand()>0.01:
+    group_sizes_erl = recursion_group_size(num_groups, np.array([]), ph_size_erl).astype(
+        int)  # (group_sizes * ph_size_erl / np.sum(group_sizes)).astype(int) + 1
+    if np.random.rand() > 0.01:
         group_sizes_erl = balance_sizes(group_sizes_erl)
     erlang_list_erl = [generate_erlang_given_rates(rates[ind], ph_size_erl) for ind, ph_size_erl in
                        enumerate(group_sizes_erl)]
@@ -946,7 +934,8 @@ def create_mix_erlang_ph(ph_size, scale_low=1, max_scale_high=15, max_ph=500):
     for ind in range(group_sizes.shape[0]):
         if ind < group_sizes_gen_ph.shape[0]:
             s[int(np.sum(group_sizes[:ind])):int(np.sum(group_sizes[:ind]) + group_sizes[ind])] = rand_probs[0][ind] * \
-                                                                                        erlang_list_gen_ph_s[ind]
+                                                                                                  erlang_list_gen_ph_s[
+                                                                                                      ind]
         else:
             s[np.sum(group_sizes[:ind])] = rand_probs[0][ind]  # 1/diff_list.shape[0]
         A[np.sum(group_sizes[:ind]):np.sum(group_sizes[:ind]) + group_sizes[ind],
@@ -962,40 +951,41 @@ def create_mix_erlang_ph(ph_size, scale_low=1, max_scale_high=15, max_ph=500):
         return False
 
 
-
 def create_gen_erlang_many_ph(ph_size):
     # ph_size = np.random.randint(1, max_ph_size)
 
     num_groups = sample_num_groups(ph_size)
-
 
     # if ph_size > 1:
     #     num_groups = np.random.randint(2,min(8,ph_size))
     # else:
     #     num_groups = 1
     group_sizes_1 = recursion_group_size(num_groups, np.array([]), ph_size).astype(int)
-    if np.random.rand()>0.01:
+    if np.random.rand() > 0.01:
         group_sizes_1 = balance_sizes(group_sizes_1)
-    rates = np.random.uniform(1, 1.75)**(np.random.rand(num_groups)*10) # ((np.ones(num_groups)*np.random.uniform(1, 1.85))**np.arange(num_groups))
-    s,A = create_gen_erlang_given_sizes(group_sizes_1, rates)
+    rates = np.random.uniform(1, 1.75) ** (np.random.rand(
+        num_groups) * 10)  # ((np.ones(num_groups)*np.random.uniform(1, 1.85))**np.arange(num_groups))
+    s, A = create_gen_erlang_given_sizes(group_sizes_1, rates)
 
-    A = A*compute_first_n_moments(s, A, 1)[0][0]
-    return (s,A)
+    A = A * compute_first_n_moments(s, A, 1)[0][0]
+    return (s, A)
 
-def sample_num_groups(n, thresh =0.98):
-    if np.random.rand()>thresh:
-        num = 1+np.random.binomial(n-1, np.random.uniform(0.2,0.99))
-    elif np.random.rand()>0.9:
-        num = 1+np.random.binomial(int(n*0.1), np.random.uniform(0.3,0.87))
+
+def sample_num_groups(n, thresh=0.98):
+    if np.random.rand() > thresh:
+        num = 1 + np.random.binomial(n - 1, np.random.uniform(0.2, 0.99))
+    elif np.random.rand() > 0.9:
+        num = 1 + np.random.binomial(int(n * 0.1), np.random.uniform(0.3, 0.87))
     else:
-        if n<10:
+        if n < 10:
             portion = 0.3
         else:
             portion = 0.8
-        num = 1+np.random.binomial(min(10,int(n-1)*portion), np.random.uniform(0.1,0.9))
-    if (num==1) & (n>1 ) &(np.random.rand()>0.4):
-        num +=1
+        num = 1 + np.random.binomial(min(10, int(n - 1) * portion), np.random.uniform(0.1, 0.9))
+    if (num == 1) & (n > 1) & (np.random.rand() > 0.4):
+        num += 1
     return num
+
 
 def create_Erlang_given_ph_size(ph_size):
     s = np.zeros(ph_size)
@@ -1003,12 +993,12 @@ def create_Erlang_given_ph_size(ph_size):
     rate = ph_size
     A = generate_erlang_given_rates(rate, ph_size)
     # A = A*compute_first_n_moments(s, A, 1)[0][0]
-    return (s,A)
+    return (s, A)
+
 
 def send_to_the_right_generator(num_ind, ph_size):
-
-    if num_ind == 1: ## Any arbitrary ph
-        s_A =  create_mix_erlang_ph(ph_size) # give_s_A_given_size(np.random.randint(60, max_ph_size))
+    if num_ind == 1:  ## Any arbitrary ph
+        s_A = create_mix_erlang_ph(ph_size)  # give_s_A_given_size(np.random.randint(60, max_ph_size))
     elif num_ind > 1:
         s_A = create_gen_erlang_many_ph(ph_size)
     else:
@@ -1019,7 +1009,7 @@ def send_to_the_right_generator(num_ind, ph_size):
             s = s_A[0]
             A = s_A[1]
 
-            return (s,A)
+            return (s, A)
 
         except:
             print('Not able to extract s and A')
@@ -1032,17 +1022,19 @@ def gamma_pdf(x, theta, k):
 def gamma_lst(s, theta, k):
     return (1 + theta * s) ** (-k)
 
+
 def gamma_mfg(shape, scale, s):
-    return (1-scale*s)**(-shape)
+    return (1 - scale * s) ** (-shape)
+
 
 def get_nth_moment(shape, scale, n):
     s = Symbol('s')
     y = gamma_mfg(shape, scale, s)
     for i in range(n):
         if i == 0:
-            dx = diff(y,s)
+            dx = diff(y, s)
         else:
-            dx = diff(dx,s)
+            dx = diff(dx, s)
     return dx.subs(s, 0)
 
 
@@ -1116,12 +1108,10 @@ def generate_unif(is_arrival):
         return (a_ser, b_ser, moms_ser)
 
 
-
-
 def generate_gamma(is_arrival):
     if is_arrival:
         rho = np.random.uniform(0.9, 0.99)
-        shape = 1 # np.random.uniform(0.1, 100)
+        shape = 1  # np.random.uniform(0.1, 100)
         scale = 1 / (rho * shape)
         moms_arr = np.array([])
         for mom in range(1, 11):
@@ -1156,7 +1146,7 @@ def generate_normal(is_arrival):
         return (mu, sig, moms_ser)
 
 
-def gg1_generator( util_lower = 0.5, util_upper = 0.99, arrival_dist =  4, ser_dist = 4):
+def gg1_generator(util_lower=0.5, util_upper=0.99, arrival_dist=4, ser_dist=4):
     '''
     Generate G/G/1 queue where is G is PH
     util_lower: lower bound of queue utilization
@@ -1171,8 +1161,6 @@ def gg1_generator( util_lower = 0.5, util_upper = 0.99, arrival_dist =  4, ser_d
     np.random.seed(now.microsecond)
     rho = np.random.uniform(util_lower, util_upper)
 
-
-
     if np.random.rand() < 0.8:
         s_arrival, A_arrival = create_gen_erlang_many_ph(np.random.randint(5, 50))
     else:
@@ -1183,7 +1171,7 @@ def gg1_generator( util_lower = 0.5, util_upper = 0.99, arrival_dist =  4, ser_d
 
     moms_arrive = np.array(compute_first_n_moments(s_arrival, A_arrival, 10)).flatten()
 
-    arrival_rate = 1/moms_arrive[0]
+    arrival_rate = 1 / moms_arrive[0]
 
     if np.random.rand() < 0.8:
         s_service, A_service = create_gen_erlang_many_ph(np.random.randint(35, 101))
@@ -1193,18 +1181,16 @@ def gg1_generator( util_lower = 0.5, util_upper = 0.99, arrival_dist =  4, ser_d
         except:
             s_service, A_service = create_gen_erlang_many_ph(np.random.randint(35, 101))
 
-
-    A_service = A_service/rho
+    A_service = A_service / rho
 
     moms_service = np.array(compute_first_n_moments(s_service, A_service, 10)).flatten()
 
-    rho = arrival_rate*moms_service[0]
-
-
+    rho = arrival_rate * moms_service[0]
 
     return (arrival_dist, ser_dist, (s_arrival, A_arrival, moms_arrive), (s_service, A_service, moms_service))
 
-def generate_mgc(capacity, util_lower = 0.7, util_upper = 1.1, arrival_dist =  4, ser_dist = 4):
+
+def generate_mgc(capacity, util_lower=0.7, util_upper=1.1, arrival_dist=4, ser_dist=4):
     '''
     Generate M/G/c queue where is G is PH
     util_lower: lower bound of queue utilization
@@ -1233,19 +1219,19 @@ def generate_mgc(capacity, util_lower = 0.7, util_upper = 1.1, arrival_dist =  4
         except:
             s_service, A_service = create_gen_erlang_many_ph(np.random.randint(35, 101))
 
-
-    ex_lower = util_lower*capacity/arrival_rate
-    ex_upper = util_upper*capacity/arrival_rate
+    ex_lower = util_lower * capacity / arrival_rate
+    ex_upper = util_upper * capacity / arrival_rate
 
     ex = np.random.uniform(ex_lower, ex_upper)
 
-    A_service = A_service/ex
+    A_service = A_service / ex
 
     moms_service = np.array(compute_first_n_moments(s_service, A_service, 10)).flatten()
 
-    rho = arrival_rate*moms_service[0]/capacity
+    rho = arrival_rate * moms_service[0] / capacity
 
     return (arrival_dist, ser_dist, (s_arrival, A_arrival, moms_arrive), (s_service, A_service, moms_service))
+
 
 def generate_mmc(capacity, util_lower=0.7, util_upper=1.1, arrival_dist=4, ser_dist=4):
     '''
@@ -1269,7 +1255,7 @@ def generate_mmc(capacity, util_lower=0.7, util_upper=1.1, arrival_dist=4, ser_d
 
     moms_arrive = np.array(compute_first_n_moments(s_arrival, A_arrival, 10)).flatten()
 
-    A_service = np.array([[-1.]])/rho
+    A_service = np.array([[-1.]]) / rho
     s_service = np.array([1.])
 
     moms_service = np.array(compute_first_n_moments(s_service, A_service, 10)).flatten()
@@ -1278,8 +1264,8 @@ def generate_mmc(capacity, util_lower=0.7, util_upper=1.1, arrival_dist=4, ser_d
 
     return (arrival_dist, ser_dist, (s_arrival, A_arrival, moms_arrive), (s_service, A_service, moms_service))
 
-def generate_ph(is_arrival, is_exponential):
 
+def generate_ph(is_arrival, is_exponential):
     if is_exponential:
         s1, A1 = create_gen_erlang_many_ph(1)
 
@@ -1292,8 +1278,8 @@ def generate_ph(is_arrival, is_exponential):
             s1, A1 = create_gen_erlang_many_ph(np.random.randint(35, 101))
 
     if is_arrival:
-        rho  = np.random.uniform(0.75, 1)
-        A1 = A1*rho
+        rho = np.random.uniform(0.75, 1)
+        A1 = A1 * rho
 
     moms_ser = np.array(compute_first_n_moments(s1, A1, 10)).flatten()
 
@@ -1301,7 +1287,6 @@ def generate_ph(is_arrival, is_exponential):
 
 
 def find_num_cust_time_stamp(df, time):
-
     if time == 0:
         return df.loc[df['Time_stamp'] == 0, :].shape[0]
 
@@ -1313,8 +1298,6 @@ def find_num_cust_time_stamp(df, time):
 
 
 class g:
-
-
     # capacity = 1
     inter_arrival = []
     service_times = []
@@ -1339,17 +1322,15 @@ class g:
     max_num_customers = 200
 
 
-
-
-
 class Customer:
-    def __init__(self, p_id,  arrival_time):
+    def __init__(self, p_id, arrival_time):
         self.id = p_id
         self.arrival_time = arrival_time
 
+
 class GG1:
 
-    def __init__(self,  model_input, services, arrivals, arrival_rates, initial, df):
+    def __init__(self, model_input, services, arrivals, arrival_rates, initial, df):
 
         self.df = df
         self.arrival_rates = arrival_rates
@@ -1383,8 +1364,7 @@ class GG1:
 
         self.initial_probs = initial
 
-
-        self.event_log = pd.DataFrame([], columns = ['Customer_id',  'time_stamp', 'num_cust', 'event_type'])
+        self.event_log = pd.DataFrame([], columns=['Customer_id', 'time_stamp', 'num_cust', 'event_type'])
         self.queueing_time = {}
         self.last1000 = time.time()
 
@@ -1399,34 +1379,29 @@ class GG1:
 
         # print(self.end_time)
 
-
-
     def run(self):
 
         self.env.process(self.customer_arrivals())
 
         self.env.run(until=g.end_time)
 
-
-
     def service(self, customer):
 
-       arrival_time = self.env.now
+        arrival_time = self.env.now
 
-
-       with self.server.request(priority=1) as req: #priority=priority
+        with self.server.request(priority=1) as req:  # priority=priority
             yield req
 
             q_time = self.env.now - arrival_time
 
             # service time
 
-            inter_ser = self.services[customer.id] #SamplesFromPH(ml.matrix(self.ser_dist_params[0]), self.ser_dist_params[1], 1)[0]
+            inter_ser = self.services[
+                customer.id]  # SamplesFromPH(ml.matrix(self.ser_dist_params[0]), self.ser_dist_params[1], 1)[0]
             yield self.env.timeout(inter_ser)
 
             self.prev_departure = self.last_departure
             self.last_departure = self.env.now
-
 
             tot_time = self.env.now - self.last_event_time
             self.num_cust_durations[self.num_cust_sys] += tot_time
@@ -1439,7 +1414,6 @@ class GG1:
             self.event_log_num_cust_list.append(self.num_cust_sys)
             self.event_log_type_list.append('Departure')
 
-
     def generate_arrival(self, curr_inter, envnow):
 
         time_period = int(envnow)
@@ -1448,16 +1422,16 @@ class GG1:
         else:
             inter_arrival_rate = self.arrival_rates[-1]
 
-        inter_arrival_time = np.random.exponential(1/inter_arrival_rate)
+        inter_arrival_time = np.random.exponential(1 / inter_arrival_rate)
         if curr_inter + inter_arrival_time + self.env.now < time_period + 1:
             return curr_inter + inter_arrival_time
         else:
             curr_inter_old = curr_inter
-            curr_inter += int(envnow)+1-envnow
-            envnow += int(envnow)+1-envnow
+            curr_inter += int(envnow) + 1 - envnow
+            envnow += int(envnow) + 1 - envnow
             return self.generate_arrival(curr_inter, envnow)
 
-    def generate_arrival_rate(self,  envnow):
+    def generate_arrival_rate(self, envnow):
 
         time_period = int(envnow)
         if time_period < self.arrival_rates.shape[0]:
@@ -1466,7 +1440,6 @@ class GG1:
             inter_arrival_rate = self.arrival_rates[-1]
 
         return inter_arrival_rate
-
 
     def customer_arrivals(self):
 
@@ -1493,10 +1466,7 @@ class GG1:
             self.last_time = self.env.now
             self.env.process(self.service(customer))
 
-
         while True:
-
-
             time_period = int(self.env.now)
             inter_arrival_rate = self.arrival_rates[time_period]
             arrival_code = self.df.loc[self.df['time'] == time_period, 'arrival_code']
@@ -1504,7 +1474,8 @@ class GG1:
             np.random.shuffle(arrivals)
             inter_arrival = arrivals[self.customer_counter]
             rate = self.generate_arrival_rate(self.env.now)
-            yield self.env.timeout(inter_arrival/rate) #self.env.timeout(np.random.exponential(1/inter_arrival_rate))
+            yield self.env.timeout(
+                inter_arrival / rate)  # self.env.timeout(np.random.exponential(1/inter_arrival_rate))
 
             arrival_time = self.env.now
             customer = Customer(self.customer_counter, arrival_time)
@@ -1517,7 +1488,6 @@ class GG1:
             self.event_log_num_cust_list.append(self.num_cust_sys)
             self.event_log_type_list.append('Arrival')
 
-
             tot_time = self.env.now - self.last_event_time
             self.num_cust_durations[self.num_cust_sys] += tot_time
             self.last_event_time = self.env.now
@@ -1525,8 +1495,8 @@ class GG1:
             self.last_time = self.env.now
             self.env.process(self.service(customer))
 
-def single_sim(services, arrivals, model_inputs, arrival_rates, initial, df,  args):
 
+def single_sim(services, arrivals, model_inputs, arrival_rates, initial, df, args):
     now = datetime.now()
     np.random.seed(now.microsecond)
     np.random.shuffle(services)
@@ -1552,13 +1522,13 @@ def single_sim(services, arrivals, model_inputs, arrival_rates, initial, df,  ar
 
 
 def give_group_size(phases):
-    num_groups = np.random.randint(min(3,int(phases/2)-1 ), int(phases/2))
+    num_groups = np.random.randint(min(3, int(phases / 2) - 1), int(phases / 2))
     group_size = np.ones(num_groups) + \
                  np.random.multinomial(phases - num_groups, [1 / num_groups] * num_groups, size=1)[0]
     return num_groups, group_size.astype(int)
 
-def generate_cycle_arrivals(number_sequences):
 
+def generate_cycle_arrivals(number_sequences):
     avg_rho = np.random.uniform(0.5, 1)
 
     vector_lenght = number_sequences
@@ -1618,77 +1588,53 @@ def generate_cycle_arrivals(number_sequences):
 
     return (all_arrivals, num_groups, df, rates_dict_rate_code, rate_dict_code_rate, avg_rho)
 
-def run_single_setting(args):
 
+def run_single_setting(args, model_num,  count):
     # s_service, A_service, moms_service = model_inputs
 
-    now = datetime.now()
+    dump_path =   r'C:\Users\user\workspace\data\CI_sim_gt_g_1_output'
 
-    arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate, avg_rho = generate_cycle_arrivals(args.number_sequences)
+    path = r'C:\Users\user\workspace\data\CI_sim_gt_g_1'
+    file_name = str(model_num) + '_CI.pkl'
 
-    if 'dkrass' in os.getcwd().split('/'):
-        services_path = '/scratch/d/dkrass/eliransc/services'
-    elif 'C:' in os.getcwd().split('/')[0]:
-        services_path = r'C:\Users\user\workspace\data\ph_random\services'
-    else:
-        services_path = '/scratch/eliransc/ph_random/medium_ph_1'   #
+    full_path = os.path.join(path, file_name)
 
-    files = os.listdir(services_path)
-    num_files = len(files)
-    file_num = np.random.randint(0, num_files)
-    services_ = pkl.load(open(os.path.join(services_path, files[file_num]), 'rb'))
-    list_size = len(services_)
-    sample_num = np.random.randint(0, list_size)
-    s_service, A_service, moms_service, services = services_[sample_num]
-    np.random.seed(now.microsecond)
-
-    file_nums = np.random.choice(num_files,num_groups)
-
-    arrivals_dict = {}
-
-    for ind, file_num in enumerate(file_nums):
-
-        arrivals_ = pkl.load(open(os.path.join(services_path, files[file_num]), 'rb'))
-        list_size = len(arrivals_)
-        sample_num = np.random.randint(0, list_size)
-        arrivals_dict[ind] = (arrivals_[sample_num], rate_dict_code_rate[ind])
-
-    np.random.seed(now.microsecond)
-
-    model_inputs = (s_service, A_service, moms_service,  arrivals_dict)
-
-    size_initial = 100
-    s = np.random.dirichlet(np.ones(30))
-    initial = np.concatenate((s, np.zeros(size_initial - 30)))
-
-    time_dict = {}
-    for time_ in range(g.end_time):
-        time_dict[time_] = np.zeros(g.max_num_customers)
-
-    now = datetime.now()
-    current_time = now.strftime("%H_%M_%S")
-    np.random.seed(now.microsecond)
-    model_num = np.random.randint(1, 100000000)
-
-    list_of_lists1 = []
-    for ind in tqdm(range(10)):
-        list_of_dicts = [single_sim(services, arrivals_dict, model_inputs, arrival_rates, initial,df,  args) for ind in
-                          range(1, args.num_iter_same_params + 1)] #
-        list_of_lists1.append(list_of_dicts)
-
-    merged1 = list(itertools.chain(*list_of_lists1))
-
-    for resultDictionary in merged1:
-        for time1 in resultDictionary.keys():
-            time_dict[time1][resultDictionary[time1]] += 1
-
-    curr_path1 = str(model_num) + '_avg_rho_'+ str(avg_rho) + '.pkl'
-    full_path1 = os.path.join(args.read_path, curr_path1)
-
-    res_input, prob_queue_arr = create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df)
+    try:
+        services, arrivals_dict, model_inputs, arrival_rates, initial, df, avg_rho, args = pkl.load(open(full_path, 'rb'))
 
 
-    pkl.dump((res_input, prob_queue_arr), open(full_path1, 'wb'))
+        list_of_lists1 = []
+        for ind in tqdm(range(2)):
+            list_of_dicts = [single_sim(services, arrivals_dict, model_inputs, arrival_rates, initial, df, args) for ind in
+                             range(1, args.num_iter_same_params + 1)]  #
+            list_of_lists1.append(list_of_dicts)
+
+        merged1 = list(itertools.chain(*list_of_lists1))
+
+        time_dict = {}
+        for time_ in range(g.end_time):
+            time_dict[time_] = np.zeros(g.max_num_customers)
+
+        for resultDictionary in merged1:
+            for time1 in resultDictionary.keys():
+                time_dict[time1][resultDictionary[time1]] += 1
+
+
+        model_path = os.path.join(dump_path, model_num)
+        if not os.path.exists(model_path):
+            os.mkdir(model_path)
+
+
+
+        curr_path1 = str(model_num) + '_' + str(count) + '.pkl'
+        full_path1 = os.path.join(model_path, curr_path1)
+
+        res_input, prob_queue_arr = create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df)
+
+        pkl.dump((res_input, prob_queue_arr), open(full_path1, 'wb'))
+
+    except:
+        print('bad input', model_num)
 
 
 def create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df):
@@ -1696,88 +1642,108 @@ def create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df
     prob_queue_arr = np.array([])
 
     for t in range(len(time_dict)):
-        arr_input = np.concatenate((np.log(model_inputs[2][:10]), np.log(model_inputs[3][df.loc[t, 'arrival_code']][0][2] / np.array([arrival_rates[t]])), np.array([t]), initial[:30]), axis =0)
+        arr_input = np.concatenate((np.log(model_inputs[2][:10]), np.log(
+            model_inputs[3][df.loc[t, 'arrival_code']][0][2] / np.array([arrival_rates[t]])), np.array([t]),
+                                    initial[:30]), axis=0)
         arr_input = arr_input.reshape(1, arr_input.shape[0])
-        probs = (time_dict[t]/time_dict[t].sum())
+        probs = (time_dict[t] / time_dict[t].sum())
         fifty_or_more = probs[50:].sum()
-        probs_output = np.concatenate((probs[:50], np.array([fifty_or_more]) ), axis = 0)
+        probs_output = np.concatenate((probs[:50], np.array([fifty_or_more])), axis=0)
         if res_input.shape[0] == 0:
             res_input = arr_input
             prob_queue_arr = np.array(probs_output).reshape(1, probs_output.shape[0])
         else:
-            res_input = np.concatenate((res_input, arr_input), axis = 0)
-            prob_queue_arr = np.concatenate((prob_queue_arr, np.array(probs_output).reshape(1,probs_output.shape[0])), axis = 0)
+            res_input = np.concatenate((res_input, arr_input), axis=0)
+            prob_queue_arr = np.concatenate((prob_queue_arr, np.array(probs_output).reshape(1, probs_output.shape[0])),
+                                            axis=0)
     return (res_input, prob_queue_arr)
+
 
 def main(args):
 
-    now = datetime.now()
-    current_time = now.strftime("%H_%M_%S")
-    np.random.seed(now.microsecond)
+    for ii in range(400):
 
+        now = datetime.now()
+        current_time = now.strftime("%H_%M_%S")
+        np.random.seed(now.microsecond)
 
-    # s_service, A_service, moms_service = model_inputs
+        # s_service, A_service, moms_service = model_inputs
 
-    now = datetime.now()
+        now = datetime.now()
 
-    if 'dkrass' in os.getcwd().split('/'):
-        dists_path = '/scratch/d/dkrass/eliransc/services'
-    elif 'C:' in os.getcwd().split('/')[0]:
-        dists_path = r'C:\Users\user\workspace\data\ph_random\ph_mean_1_one_per_pkl'
-    else:
-        dists_path = '/scratch/eliransc/ph_random/large_ph_one_in_pkl_mdium/'
-
-    args.dists_path = dists_path
-
-
-
-    if 'dkrass' in os.getcwd().split('/'):
-        args.read_path = '/scratch/d/dkrass/eliransc/time_dependant_cyclic'
-    elif 'C:' in os.getcwd().split('/')[0]:
-        args.read_path = r'C:\Users\user\workspace\data\mt_g_1'
-    else:
-        args.read_path = '/scratch/eliransc/gt_g_1_data' #
-
-    for ind in tqdm(range(args.num_iterations)):
-
-        if os.path.exists('df_runtimes.pkl'):
-            df_runtimes = pkl.load(open('df_runtimes.pkl', 'rb'))
+        if 'dkrass' in os.getcwd().split('/'):
+            dists_path = '/scratch/d/dkrass/eliransc/services'
+        elif 'C:' in os.getcwd().split('/')[0]:
+            dists_path = r'C:\Users\user\workspace\data\ph_random\ph_mean_1_one_per_pkl'
         else:
-            df_runtimes = pd.DataFrame([])
+            dists_path = '/scratch/eliransc/ph_random/large_ph_one_in_pkl_mdium/'
 
-        start = time.time()
-        ####################
-        run_single_setting(args)
-        ####################
-        runtime = time.time() - start
+        args.dists_path = dists_path
 
-        curr_ind = df_runtimes.shape[0]
-        df_runtimes.loc[curr_ind, 'run_time'] = runtime
-        pkl.dump(df_runtimes, open('df_runtimes.pkl', 'wb'))
+        path = r'C:\Users\user\workspace\data\CI_sim_gt_g_1'
+
+        if 'dkrass' in os.getcwd().split('/'):
+            args.read_path = '/scratch/d/dkrass/eliransc/time_dependant_cyclic'
+        elif 'C:' in os.getcwd().split('/')[0]:
+            args.read_path = r'C:\Users\user\workspace\data\mt_g_1'
+        else:
+            args.read_path = '/scratch/eliransc/gt_g_1_data'  #
+
+
+
+        if os.path.exists('df_CI_cover.pkl'):
+            df_CI_cover = pkl.load(open('df_CI_cover.pkl', 'rb'))
+        else:
+            df_CI_cover = pd.DataFrame([])
+            files_CI = os.listdir(path)
+            for ind_file, file in enumerate(files_CI):
+                df_CI_cover.loc[ind_file, 'file'] = file
+                df_CI_cover.loc[ind_file, 'count'] = 0
+
+            pkl.dump(df_CI_cover, open('df_CI_cover.pkl', 'wb'))
+
+
+        path = r'C:\Users\user\workspace\data\CI_sim_gt_g_1'
+
+        df_CI_cover = df_CI_cover.loc[df_CI_cover['count'] < 11, :]
+        df_CI_cover = df_CI_cover.sort_values('count')
+
+        model_num = df_CI_cover.loc[df_CI_cover.index[0], 'file'].split('_')[0]
+
+        df_CI_cover.loc[df_CI_cover.index[0], 'count'] += 1
+        count = df_CI_cover.loc[df_CI_cover.index[0], 'count']
+        pkl.dump(df_CI_cover, open('df_CI_cover.pkl', 'wb'))
+
+
+        ####################
+        run_single_setting(args, model_num, count)
+        ####################
 
 
 
 def parse_arguments(argv):
-
-
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 4)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default=4)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
     parser.add_argument('--num_arrival', type=float, help='The number of total arrivals', default=100500)
     parser.add_argument('--num_iterations', type=float, help='service rate of mismatched customers', default=10064)
-    parser.add_argument('--read_path', type=str, help='the path of the files to read from', default=  '/scratch/eliransc/single_rnn_gt_g_1_data' ) # r'C:\Users\user\workspace\data\time_dependant'
-    parser.add_argument('--dists_path', type=str, help='the path of the files to read from', default=  '' ) # r'C:\Users\user\workspace\data\time_dependant'
+    parser.add_argument('--read_path', type=str, help='the path of the files to read from',
+                        default='/scratch/eliransc/single_rnn_gt_g_1_data')  # r'C:\Users\user\workspace\data\time_dependant'
+    parser.add_argument('--dists_path', type=str, help='the path of the files to read from',
+                        default='')  # r'C:\Users\user\workspace\data\time_dependant'
     parser.add_argument('--read_path_niagara', type=str, help='the path of the files to read from',
                         default='/scratch/d/dkrass/eliransc/time_dependant_cyclic')
-    parser.add_argument('--dump_path', type=str, help='path to pkl folder', default= r'C:\Users\user\workspace\data\gg1_inverse_pkls' ) # '/scratch/eliransc/gg1_inverse_pkls'
+    parser.add_argument('--dump_path', type=str, help='path to pkl folder',
+                        default=r'C:\Users\user\workspace\data\gg1_inverse_pkls')  # '/scratch/eliransc/gg1_inverse_pkls'
     args = parser.parse_args(argv)
 
     return args
+
 
 if __name__ == '__main__':
     args = parse_arguments(sys.argv[1:])
