@@ -51,6 +51,17 @@ def main(args):
     else:
         path = '/scratch/eliransc/gt_g_1_data'
 
+
+
+    path = '/scratch/eliransc/gt_g_1_data'
+    files = os.listdir(path)
+    for file in tqdm(files):
+        try:
+            res_input, prob_queue_arr = pkl.load(open(os.path.join(path, file), 'rb'))
+        except:
+            print(file)
+            os.remove(os.path.join(path, file))
+
     files = os.listdir(path)
 
     if 'C:' in os.getcwd().split('/')[0]:
