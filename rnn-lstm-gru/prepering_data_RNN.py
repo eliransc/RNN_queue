@@ -49,7 +49,7 @@ def main(args):
     if 'C:' in os.getcwd().split('/')[0]:
         path = r'C:\Users\user\workspace\data\mt_g_1'
     else:
-        path = '/scratch/eliransc/gt_g_1_special'
+        path = '/scratch/eliransc/gt_g_1_data'
 
     files = os.listdir(path)
 
@@ -94,7 +94,7 @@ def main(args):
                 batch_input = np.concatenate((batch_input, res_input), axis=0)
                 batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
 
-        path_dump = '/scratch/eliransc/rnn_data/gt_g_batches_special_1/'
+        path_dump = '/scratch/eliransc/rnn_data/gt_g_1_batches_2/'
         pkl.dump((batch_input, batch_output), open(
             os.path.join(path_dump, server_name +'_'+ str(curr_batch) + '.pkl'), 'wb'))
 
