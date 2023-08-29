@@ -64,50 +64,50 @@ def main(args):
 
     files = os.listdir(path)
 
-    if 'C:' in os.getcwd().split('/')[0]:
-
-        if os.path.exists('./pkl/df_files.pkl'):
-            df_files = pkl.load(open('./pkl/df_files.pkl'))
-        else:
-            df_files = pd.DataFrame([], columns=['file', 'batch'])
-
-    else:
-
-        if os.path.exists('./pkl/df_files.pkl'):
-            df_files = pkl.load(open('./pkl/df_files.pkl'))
-        else:
-            df_files = pd.DataFrame([], columns=['file', 'batch'])
-
-
-    batch_size = 16
-    num_batches = int(len(files) / batch_size)
-
-    for curr_batch in tqdm(range(num_batches)):
-        batch_input = np.array([])
-        batch_output = np.array([])
-
-        for ind in range(curr_batch * batch_size, (curr_batch + 1) * batch_size):
-            curr_file = files[ind]
-            curr_ind_df = df_files.shape[0]
-            df_files.loc[curr_ind_df, 'file'] = curr_file
-            df_files.loc[curr_ind_df, 'batch'] = curr_batch
-
-            pkl.dump(df_files, open('df_files.pkl', 'wb'))
-            res_input, prob_queue_arr = pkl.load(open(os.path.join(path, files[ind]), 'rb'))
-
-            # res_input, prob_queue_arr = create_single_data_point(path, files, ind)
-            res_input = res_input.reshape(1, res_input.shape[0], res_input.shape[1])
-            prob_queue_arr = prob_queue_arr.reshape(1, prob_queue_arr.shape[0], prob_queue_arr.shape[1])
-            if ind == curr_batch * batch_size:
-                batch_input = res_input
-                batch_output = prob_queue_arr
-            else:
-                batch_input = np.concatenate((batch_input, res_input), axis=0)
-                batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
-
-        path_dump = '/scratch/eliransc/rnn_data/gt_g_1_batches_2/'
-        pkl.dump((batch_input, batch_output), open(
-            os.path.join(path_dump, server_name +'_'+ str(curr_batch) + '.pkl'), 'wb'))
+    # if 'C:' in os.getcwd().split('/')[0]:
+    #
+    #     if os.path.exists('./pkl/df_files.pkl'):
+    #         df_files = pkl.load(open('./pkl/df_files.pkl'))
+    #     else:
+    #         df_files = pd.DataFrame([], columns=['file', 'batch'])
+    #
+    # else:
+    #
+    #     if os.path.exists('./pkl/df_files.pkl'):
+    #         df_files = pkl.load(open('./pkl/df_files.pkl'))
+    #     else:
+    #         df_files = pd.DataFrame([], columns=['file', 'batch'])
+    #
+    #
+    # batch_size = 16
+    # num_batches = int(len(files) / batch_size)
+    #
+    # for curr_batch in tqdm(range(num_batches)):
+    #     batch_input = np.array([])
+    #     batch_output = np.array([])
+    #
+    #     for ind in range(curr_batch * batch_size, (curr_batch + 1) * batch_size):
+    #         curr_file = files[ind]
+    #         curr_ind_df = df_files.shape[0]
+    #         df_files.loc[curr_ind_df, 'file'] = curr_file
+    #         df_files.loc[curr_ind_df, 'batch'] = curr_batch
+    #
+    #         pkl.dump(df_files, open('df_files.pkl', 'wb'))
+    #         res_input, prob_queue_arr = pkl.load(open(os.path.join(path, files[ind]), 'rb'))
+    #
+    #         # res_input, prob_queue_arr = create_single_data_point(path, files, ind)
+    #         res_input = res_input.reshape(1, res_input.shape[0], res_input.shape[1])
+    #         prob_queue_arr = prob_queue_arr.reshape(1, prob_queue_arr.shape[0], prob_queue_arr.shape[1])
+    #         if ind == curr_batch * batch_size:
+    #             batch_input = res_input
+    #             batch_output = prob_queue_arr
+    #         else:
+    #             batch_input = np.concatenate((batch_input, res_input), axis=0)
+    #             batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
+    #
+    #     path_dump = '/scratch/eliransc/rnn_data/gt_g_1_batches_2/'
+    #     pkl.dump((batch_input, batch_output), open(
+    #         os.path.join(path_dump, server_name +'_'+ str(curr_batch) + '.pkl'), 'wb'))
 
 
 def parse_arguments(argv):
