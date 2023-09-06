@@ -1618,6 +1618,68 @@ def generate_cycle_arrivals(number_sequences):
 
     return (all_arrivals, num_groups, df, rates_dict_rate_code, rate_dict_code_rate, avg_rho)
 
+
+def generate_cycle_arrivals_constant(number_sequences):
+
+    avg_rho = np.random.uniform(0.5, 1)
+
+    vector_lenght = number_sequences
+    cycle_size = np.random.randint(4, int(vector_lenght / 2))
+    num_cycles = int(vector_lenght / cycle_size)
+
+    num_groups, group_size = give_group_size(cycle_size)
+
+    if num_groups > 8:
+        num_picks = np.random.choice(2, 1, p=[0.5, 0.5])[0] + 1
+    else:
+        num_picks = 1
+
+    if num_picks == 1:
+        if num_groups - 1 == 2:
+            first_pick = 2
+        else:
+            first_pick = np.random.randint(min(2, num_groups - 2), num_groups - 1)
+    else:
+        first_pick = np.random.randint(1, int(num_groups / 2))
+        second_pick = np.random.randint(first_pick + 1, int(num_groups - 1))
+
+    arrival_rates = np.random.uniform(0.5, 10, num_groups)
+
+    arrival_rates.sort()
+
+    if num_picks == 1:
+        arrival_rates[first_pick], arrival_rates[-1] = arrival_rates[-1], arrival_rates[first_pick]
+    else:
+        arrival_rates[second_pick], arrival_rates[-2] = arrival_rates[-2], arrival_rates[second_pick]
+
+    if np.random.rand() < 0.2:
+        arrival_rates = arrival_rates[::-1]
+
+    rates_tot = np.array([])
+    for ind, size in enumerate(group_size):
+        rates_tot = np.concatenate((rates_tot, np.ones(size) * arrival_rates[ind]))
+
+    arrivals = (rates_tot / rates_tot.mean()) * avg_rho
+
+    all_arrivals = np.tile(arrivals, num_cycles + 1)[:vector_lenght]
+
+    df = pd.DataFrame([])
+    df['arrival_rate'] = all_arrivals
+    df['time'] = np.arange(vector_lenght)
+    unqiue_arrival_rate = df['arrival_rate'].unique()
+
+    rates_dict_rate_code = {}
+    rate_dict_code_rate = {}
+
+    for ind, rate in enumerate(unqiue_arrival_rate):
+        rates_dict_rate_code[rate] = ind
+        rate_dict_code_rate[ind] = rate
+
+    for ind in range(df.shape[0]):
+        df.loc[ind, 'arrival_code'] = rates_dict_rate_code[df.loc[ind, 'arrival_rate']]
+
+    return (all_arrivals, num_groups, df, rates_dict_rate_code, rate_dict_code_rate, avg_rho)
+
 def run_single_setting(args):
 
     # s_service, A_service, moms_service = model_inputs
@@ -1631,7 +1693,7 @@ def run_single_setting(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         services_path = r'C:\Users\user\workspace\data\ph_random\services'
     else:
-        services_path = '/scratch/eliransc/ph_random/medium_ph_1'   #
+        services_path = '/scratch/eliransc/ph_random/medium_ph_1_special'   #
 
     files = os.listdir(services_path)
     num_files = len(files)
@@ -1642,7 +1704,7 @@ def run_single_setting(args):
     s_service, A_service, moms_service, services = services_[sample_num]
     np.random.seed(now.microsecond)
 
-    file_nums = np.random.choice(num_files,num_groups)
+    file_nums = np.random.choice(num_files, 1)  #np.random.choice(num_files, num_groups)
 
     arrivals_dict = {}
 
@@ -1715,7 +1777,6 @@ def main(args):
     current_time = now.strftime("%H_%M_%S")
     np.random.seed(now.microsecond)
 
-
     # s_service, A_service, moms_service = model_inputs
 
     now = datetime.now()
@@ -1728,8 +1789,6 @@ def main(args):
         dists_path = '/scratch/eliransc/ph_random/large_ph_one_in_pkl_mdium/'
 
     args.dists_path = dists_path
-
-
 
     if 'dkrass' in os.getcwd().split('/'):
         args.read_path = '/scratch/d/dkrass/eliransc/time_dependant_cyclic'
