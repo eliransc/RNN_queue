@@ -1500,7 +1500,7 @@ class GG1:
             time_period = int(self.env.now)
             inter_arrival_rate = self.arrival_rates[time_period]
             arrival_code = self.df.loc[self.df['time'] == time_period, 'arrival_code']
-            arrivals = self.arrival_dist_params[arrival_code.item()][0][3]
+            arrivals = self.arrival_dist_params[0][0][3] #self.arrival_dist_params[arrival_code.item()][0][3]
             np.random.shuffle(arrivals)
             inter_arrival = arrivals[self.customer_counter]
             rate = self.generate_arrival_rate(self.env.now)
@@ -1708,11 +1708,15 @@ def run_single_setting(args):
 
     arrivals_dict = {}
 
+    arrivals_ = pkl.load(open(os.path.join(services_path, files[file_num]), 'rb'))
+    list_size = len(arrivals_)
+    sample_num = np.random.randint(0, list_size)
+
     for ind, file_num in enumerate(file_nums):
 
-        arrivals_ = pkl.load(open(os.path.join(services_path, files[file_num]), 'rb'))
-        list_size = len(arrivals_)
-        sample_num = np.random.randint(0, list_size)
+        # arrivals_ = pkl.load(open(os.path.join(services_path, files[file_num]), 'rb'))
+        # list_size = len(arrivals_)
+        # sample_num = np.random.randint(0, list_size)
         arrivals_dict[ind] = (arrivals_[sample_num], rate_dict_code_rate[ind])
 
     np.random.seed(now.microsecond)
