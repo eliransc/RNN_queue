@@ -1693,7 +1693,7 @@ def run_single_setting(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         services_path = r'C:\Users\user\workspace\data\ph_random\services'
     else:
-        services_path = '/scratch/eliransc/ph_random/medium_ph_1_special'   #
+        services_path = '/scratch/eliransc/ph_random/medium_ph_1'   #
 
     files = os.listdir(services_path)
     num_files = len(files)
