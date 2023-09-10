@@ -1682,8 +1682,6 @@ def generate_cycle_arrivals_constant(number_sequences):
 
 def run_single_setting(args):
 
-    # s_service, A_service, moms_service = model_inputs
-
     now = datetime.now()
 
     arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate, avg_rho = generate_cycle_arrivals(args.number_sequences)
@@ -1691,7 +1689,7 @@ def run_single_setting(args):
     if 'dkrass' in os.getcwd().split('/'):
         services_path = '/scratch/d/dkrass/eliransc/services'
     elif 'C:' in os.getcwd().split('/')[0]:
-        services_path = r'C:\Users\user\workspace\data\ph_random\services'
+        services_path = r'C:\Users\user\workspace\data\medium_ph_1_special' #r'C:\Users\user\workspace\data\ph_random\services'
     else:
         services_path = '/scratch/eliransc/ph_random/medium_ph_1'   #
 
@@ -1712,7 +1710,8 @@ def run_single_setting(args):
     list_size = len(arrivals_)
     sample_num = np.random.randint(0, list_size)
 
-    for ind, file_num in enumerate(file_nums):
+    # for ind, file_num in enumerate(file_nums):
+    for ind in range(num_groups):
 
         # arrivals_ = pkl.load(open(os.path.join(services_path, files[file_num]), 'rb'))
         # list_size = len(arrivals_)
@@ -1762,7 +1761,10 @@ def create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df
     prob_queue_arr = np.array([])
 
     for t in range(len(time_dict)):
-        arr_input = np.concatenate((np.log(model_inputs[2][:10]), np.log(model_inputs[3][df.loc[t, 'arrival_code']][0][2] / np.array([arrival_rates[t]])), np.array([t]), initial[:30]), axis =0)
+        try:
+            arr_input = np.concatenate((np.log(model_inputs[2][:10]), np.log(model_inputs[3][df.loc[t, 'arrival_code']][0][2] / np.array([arrival_rates[t]])), np.array([t]), initial[:30]), axis =0)
+        except:
+            print('stop')
         arr_input = arr_input.reshape(1, arr_input.shape[0])
         probs = (time_dict[t]/time_dict[t].sum())
         fifty_or_more = probs[50:].sum()
@@ -1788,9 +1790,9 @@ def main(args):
     if 'dkrass' in os.getcwd().split('/'):
         dists_path = '/scratch/d/dkrass/eliransc/services'
     elif 'C:' in os.getcwd().split('/')[0]:
-        dists_path = r'C:\Users\user\workspace\data\ph_random\ph_mean_1_one_per_pkl'
+        dists_path = r'C:\Users\user\workspace\data\special_ph'
     else:
-        dists_path = '/scratch/eliransc/ph_random/large_ph_one_in_pkl_mdium/'
+        dists_path = '/scratch/eliransc/ph_random/medium_ph_1_special/'
 
     args.dists_path = dists_path
 
