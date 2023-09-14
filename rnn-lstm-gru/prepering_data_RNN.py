@@ -60,63 +60,64 @@ def main(args):
     #         print(file)
     #         os.remove(os.path.join(path, file))
 
-    path = '/scratch/eliransc/testset1'
-    files_rho_groups = os.listdir(path)
+    path = '/scratch/eliransc/gt_g_1_data2'
+    files = os.listdir(path)
+    # files_rho_groups = os.listdir()
 
-    for rho in files_rho_groups:
-        curr_path = os.path.join(path, rho)
-        files = os.listdir(curr_path)
+    # for rho in files_rho_groups:
+    #     curr_path = os.path.join(path, rho)
+    #     files = os.listdir(curr_path)
 
-        if 'C:' in os.getcwd().split('/')[0]:
+    if 'C:' in os.getcwd().split('/')[0]:
 
-            if os.path.exists('./pkl/df_files.pkl'):
-                df_files = pkl.load(open('./pkl/df_files.pkl'))
-            else:
-                df_files = pd.DataFrame([], columns=['file', 'batch'])
-
+        if os.path.exists('./pkl/df_files.pkl'):
+            df_files = pkl.load(open('./pkl/df_files.pkl'))
         else:
+            df_files = pd.DataFrame([], columns=['file', 'batch'])
 
-            if os.path.exists('./pkl/df_files.pkl'):
-                df_files = pkl.load(open('./pkl/df_files.pkl'))
+    else:
+
+        if os.path.exists('./pkl/df_files.pkl'):
+            df_files = pkl.load(open('./pkl/df_files.pkl'))
+        else:
+            df_files = pd.DataFrame([], columns=['file', 'batch'])
+
+
+    batch_size = 16
+    num_batches = int(len(files) / batch_size)
+
+    for curr_batch in tqdm(range(num_batches)):
+        batch_input = np.array([])
+        batch_output = np.array([])
+
+        for ind in range(curr_batch * batch_size, (curr_batch + 1) * batch_size):
+            curr_file = files[ind]
+            curr_ind_df = df_files.shape[0]
+            df_files.loc[curr_ind_df, 'file'] = curr_file
+            df_files.loc[curr_ind_df, 'batch'] = curr_batch
+
+            pkl.dump(df_files, open('df_files.pkl', 'wb'))
+            res_input, prob_queue_arr = pkl.load(open(os.path.join(curr_path, files[ind]), 'rb'))
+
+            # res_input, prob_queue_arr = create_single_data_point(path, files, ind)
+            res_input = res_input.reshape(1, res_input.shape[0], res_input.shape[1])
+            prob_queue_arr = prob_queue_arr.reshape(1, prob_queue_arr.shape[0], prob_queue_arr.shape[1])
+            if ind == curr_batch * batch_size:
+                batch_input = res_input
+                batch_output = prob_queue_arr
             else:
-                df_files = pd.DataFrame([], columns=['file', 'batch'])
+                batch_input = np.concatenate((batch_input, res_input), axis=0)
+                batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
 
+        path_dump = '/scratch/eliransc/rnn_data/gt_gt_1_batches_2/'
 
-        batch_size = 16
-        num_batches = int(len(files) / batch_size)
+        curr_dump_path = os.path.join(path_dump, rho)
 
-        for curr_batch in tqdm(range(num_batches)):
-            batch_input = np.array([])
-            batch_output = np.array([])
+        if not curr_dump_path:
+            os.mkdir(curr_dump_path)
 
-            for ind in range(curr_batch * batch_size, (curr_batch + 1) * batch_size):
-                curr_file = files[ind]
-                curr_ind_df = df_files.shape[0]
-                df_files.loc[curr_ind_df, 'file'] = curr_file
-                df_files.loc[curr_ind_df, 'batch'] = curr_batch
-
-                pkl.dump(df_files, open('df_files.pkl', 'wb'))
-                res_input, prob_queue_arr = pkl.load(open(os.path.join(curr_path, files[ind]), 'rb'))
-
-                # res_input, prob_queue_arr = create_single_data_point(path, files, ind)
-                res_input = res_input.reshape(1, res_input.shape[0], res_input.shape[1])
-                prob_queue_arr = prob_queue_arr.reshape(1, prob_queue_arr.shape[0], prob_queue_arr.shape[1])
-                if ind == curr_batch * batch_size:
-                    batch_input = res_input
-                    batch_output = prob_queue_arr
-                else:
-                    batch_input = np.concatenate((batch_input, res_input), axis=0)
-                    batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
-
-            path_dump = '/scratch/eliransc/rnn_data/testset1_batches/'
-
-            curr_dump_path = os.path.join(path_dump, rho)
-
-            if not curr_dump_path:
-                os.mkdir(curr_dump_path)
-
-            pkl.dump((batch_input, batch_output), open(
-                 os.path.join(curr_dump_path, server_name +'_'+ str(curr_batch) + '.pkl'), 'wb'))
+        pkl.dump((batch_input, batch_output), open(
+             os.path.join(curr_dump_path, server_name +'_'+ str(curr_batch) + '.pkl'), 'wb'))
 
 
 def parse_arguments(argv):
