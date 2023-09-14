@@ -111,13 +111,13 @@ def main(args):
 
         path_dump = '/scratch/eliransc/rnn_data/gt_gt_1_batches_2/'
 
-        curr_dump_path = os.path.join(path_dump, rho)
+        # curr_dump_path = os.path.join(path_dump, rho)
 
-        if not curr_dump_path:
-            os.mkdir(curr_dump_path)
+        # if not curr_dump_path:
+        #     os.mkdir(curr_dump_path)
 
         pkl.dump((batch_input, batch_output), open(
-             os.path.join(curr_dump_path, server_name +'_'+ str(curr_batch) + '.pkl'), 'wb'))
+             os.path.join(path_dump, server_name +'_'+ str(curr_batch) + '.pkl'), 'wb'))
 
 
 def parse_arguments(argv):
