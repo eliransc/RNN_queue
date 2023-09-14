@@ -87,7 +87,7 @@ def main(args):
             res_input, prob_queue_arr = pkl.load(open(os.path.join(path, file), 'rb'))
         except:
             os.remove(os.path.join(path, file))
-
+    files = os.listdir(path)
     batch_size = 16
     num_batches = int(len(files) / batch_size)
 
