@@ -97,7 +97,7 @@ def main(args):
             df_files.loc[curr_ind_df, 'batch'] = curr_batch
 
             pkl.dump(df_files, open('df_files.pkl', 'wb'))
-            res_input, prob_queue_arr = pkl.load(open(os.path.join(curr_path, files[ind]), 'rb'))
+            res_input, prob_queue_arr = pkl.load(open(os.path.join(path, files[ind]), 'rb'))
 
             # res_input, prob_queue_arr = create_single_data_point(path, files, ind)
             res_input = res_input.reshape(1, res_input.shape[0], res_input.shape[1])
@@ -117,7 +117,7 @@ def main(args):
         #     os.mkdir(curr_dump_path)
 
         pkl.dump((batch_input, batch_output), open(
-             os.path.join(path_dump, server_name +'_'+ str(curr_batch) + '.pkl'), 'wb'))
+             os.path.join(path_dump, server_name +'_'+ str(curr_batch) + 'const_arrival_dist.pkl'), 'wb'))
 
 
 def parse_arguments(argv):
