@@ -82,6 +82,11 @@ def main(args):
         else:
             df_files = pd.DataFrame([], columns=['file', 'batch'])
 
+    for file in files:
+        try:
+            res_input, prob_queue_arr = pkl.load(open(os.path.join(path, file), 'rb'))
+        except:
+            os.remove(os.path.join(path, file))
 
     batch_size = 16
     num_batches = int(len(files) / batch_size)

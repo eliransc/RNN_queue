@@ -1552,7 +1552,7 @@ def single_sim(services, arrivals, model_inputs, arrival_rates, initial, df,  ar
 
 
 def give_group_size(phases):
-    num_groups = np.random.randint(min(3,int(phases/2)-1 ), int(phases/2))
+    num_groups = np.random.randint(min(3,int(phases/2)-1), int(phases/2))
     group_size = np.ones(num_groups) + \
                  np.random.multinomial(phases - num_groups, [1 / num_groups] * num_groups, size=1)[0]
     return num_groups, group_size.astype(int)
