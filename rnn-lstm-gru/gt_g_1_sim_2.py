@@ -1716,15 +1716,15 @@ def run_single_setting(args):
 
     arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate, avg_rho = generate_cycle_arrivals(args.number_sequences)
 
-    if 'dkrass' in os.getcwd().split('/'):
-        services_path = '/scratch/d/dkrass/eliransc/services'
-    elif 'C:' in os.getcwd().split('/')[0]:
-        services_path = r'C:\Users\user\workspace\data\medium_ph_1_special'
-    else:
-        services_path = '/scratch/eliransc/ph_random/medium_ph_1_special'
+    # if 'dkrass' in os.getcwd().split('/'):
+    #     services_path = '/scratch/d/dkrass/eliransc/services'
+    # elif 'C:' in os.getcwd().split('/')[0]:
+    #     services_path = r'C:\Users\user\workspace\data\medium_ph_1_special'
+    # else:
+    #     services_path = '/scratch/eliransc/ph_random/medium_ph_1_special'
 
-    files = os.listdir(services_path)
-    num_files = len(files)
+    # files = os.listdir(services_path)
+    # num_files = len(files)
     np.random.seed(now.microsecond)
 
     shape, scale, moms_arrive1 = generate_gamma(True, 4, 1)
@@ -1811,14 +1811,14 @@ def main(args):
 
     now = datetime.now()
 
-    if 'dkrass' in os.getcwd().split('/'):
-        dists_path = '/scratch/d/dkrass/eliransc/services'
-    elif 'C:' in os.getcwd().split('/')[0]:
-        dists_path = r'C:\Users\user\workspace\data\special_ph'
-    else:
-        dists_path = '/scratch/eliransc/ph_random/medium_ph_1_special/'
-
-    args.dists_path = dists_path
+    # if 'dkrass' in os.getcwd().split('/'):
+    #     dists_path = '/scratch/d/dkrass/eliransc/services'
+    # elif 'C:' in os.getcwd().split('/')[0]:
+    #     dists_path = r'C:\Users\user\workspace\data\special_ph'
+    # else:
+    #     dists_path = '/scratch/eliransc/ph_random/medium_ph_1_special/'
+    #
+    # args.dists_path = dists_path
 
     if 'dkrass' in os.getcwd().split('/'):
         args.read_path = '/scratch/d/dkrass/eliransc/time_dependant_cyclic'
