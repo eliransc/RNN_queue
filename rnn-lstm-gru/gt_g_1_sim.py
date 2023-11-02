@@ -1552,7 +1552,7 @@ def single_sim(services, arrivals, model_inputs, arrival_rates, initial, df,  ar
 
 
 def give_group_size(phases):
-    num_groups = np.random.randint(min(3,int(phases/2)-1), int(phases/2))
+    num_groups = np.random.randint(min(3, int(phases/2)-1), int(phases/2))
     group_size = np.ones(num_groups) + \
                  np.random.multinomial(phases - num_groups, [1 / num_groups] * num_groups, size=1)[0]
     return num_groups, group_size.astype(int)
@@ -1689,7 +1689,7 @@ def run_single_setting(args):
     if 'dkrass' in os.getcwd().split('/'):
         services_path = '/scratch/d/dkrass/eliransc/services'
     elif 'C:' in os.getcwd().split('/')[0]:
-        services_path = r'C:\Users\user\workspace\data\medium_ph_1_special' #r'C:\Users\user\workspace\data\ph_random\services'
+        services_path = r'C:\Users\user\workspace\data\ph_random\services' #r'C:\Users\user\workspace\data\ph_random\medium_ph_1_special'
     else:
         services_path = '/scratch/eliransc/ph_random/medium_ph_1_special'   #
 
@@ -1725,6 +1725,13 @@ def run_single_setting(args):
     size_initial = 100
     s = np.random.dirichlet(np.ones(30))
     initial = np.concatenate((s, np.zeros(size_initial - 30)))
+
+
+    np.random.seed(now.microsecond)
+
+    # services, moms_service = get_ser_special_dist(service_dist, sample_size)
+
+    sample_size = 700000
 
     time_dict = {}
     for time_ in range(g.end_time):

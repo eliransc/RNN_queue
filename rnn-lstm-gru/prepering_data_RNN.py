@@ -60,7 +60,7 @@ def main(args):
     #         print(file)
     #         os.remove(os.path.join(path, file))
 
-    path = '/scratch/eliransc/gt_g_1_special'
+    path = '/scratch/eliransc/gt_g_1_data2'
     files = os.listdir(path)
     # files_rho_groups = os.listdir()
 
@@ -114,7 +114,7 @@ def main(args):
                 batch_input = np.concatenate((batch_input, res_input), axis=0)
                 batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
 
-        path_dump = '/scratch/eliransc/rnn_data/special_dists/'
+        path_dump = '/scratch/eliransc/rnn_data/gt_gt_1_batches_2/'
 
         # curr_dump_path = os.path.join(path_dump, rho)
 
