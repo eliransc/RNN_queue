@@ -1157,6 +1157,21 @@ def generate_gamma(is_arrival, scv,rho = 0.01):
         return (shape, scale, moms_ser)
 
 
+def log_normal_gener(m, s, sample_size):
+
+    mu = np.log(m)-np.log((m**2+s**2)/m**2)/2
+    sigma = (np.log((m**2+s**2)/m**2))**0.5
+    samples = np.random.lognormal(mu, sigma, sample_size)
+    moms = []
+
+    for ind in range(1,11):
+        moms.append((samples**ind).mean())
+
+    return (samples, moms)
+
+
+
+
 def generate_normal(is_arrival):
     if is_arrival:
         mu = np.random.uniform(1.1, 1.2)
@@ -1710,7 +1725,7 @@ def compute_first_ten_moms_log_N(s):
 
 def run_single_setting(args):
 
-    sample_size = 5000000
+    sample_size = 500000
 
     now = datetime.now()
 
@@ -1725,27 +1740,51 @@ def run_single_setting(args):
 
     # files = os.listdir(services_path)
     # num_files = len(files)
+
+    special = 'G4'
+    if special == 'LN4':
+        m = 1
+        s = (4 * m ** 2) ** 0.5
+        services, moms_service = log_normal_gener(m, s, sample_size)
+        a_service, A_service = PH3From5Moments(moms_service[:5])
+
+    elif special == 'G4':
+
+        shape, scale, moms_arrive1 = generate_gamma(True, 4, 1)
+        services = np.random.gamma(shape, scale, sample_size)
+        moms_service = compute_first_ten_moms_log_N(services)
+
+        a_service, A_service = PH3From5Moments(moms_service[:5])
+
     np.random.seed(now.microsecond)
 
-    shape, scale, moms_arrive1 = generate_gamma(True, 4, 1)
-    services = np.random.gamma(shape, scale, sample_size)
-    moms_service = compute_first_ten_moms_log_N(services)
-    
-    a_service, A_service = PH3From5Moments(moms_service[:5])
 
     arrivals_dict = {}
 
     for ind in range(num_groups):
 
-        shape, scale, moms_arrive1 = generate_gamma(True, 4, 1)
-        inter_arrival = np.random.gamma(shape, scale, sample_size)
-        moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
-        a_arrivals, A_arrivals = PH3From5Moments(moms_arrive[:5])
+        if special == 'LN4':
 
-        arrivals = SamplesFromPH(a_arrivals, A_arrivals, sample_size)
-        arrivals_ = (a_arrivals, A_arrivals, moms_arrive, arrivals)
+            inter_arrival, moms_arrive = log_normal_gener(m, s, sample_size)
 
-        arrivals_dict[ind] = (arrivals_, rate_dict_code_rate[ind])
+            a_arrivals, A_arrivals = PH3From5Moments(moms_arrive[:5])
+
+            arrivals = SamplesFromPH(a_arrivals, A_arrivals, sample_size)
+            arrivals_ = (a_arrivals, A_arrivals, moms_arrive, arrivals)
+
+            arrivals_dict[ind] = (arrivals_, rate_dict_code_rate[ind])
+
+        elif special == 'G4':
+
+            shape, scale, moms_arrive1 = generate_gamma(True, 4, 1)
+            inter_arrival = np.random.gamma(shape, scale, sample_size)
+            moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
+            a_arrivals, A_arrivals = PH3From5Moments(moms_arrive[:5])
+
+            arrivals = SamplesFromPH(a_arrivals, A_arrivals, sample_size)
+            arrivals_ = (a_arrivals, A_arrivals, moms_arrive, arrivals)
+
+            arrivals_dict[ind] = (arrivals_, rate_dict_code_rate[ind])
 
     np.random.seed(now.microsecond)
 

@@ -114,7 +114,7 @@ def main(args):
                 batch_input = np.concatenate((batch_input, res_input), axis=0)
                 batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
 
-        path_dump = '/scratch/eliransc/rnn_data/gt_gt_1_batches_2/'
+        path_dump = '/scratch/eliransc/rnn_data/gt_gt_1_batches_G4_experiment/'
 
         # curr_dump_path = os.path.join(path_dump, rho)
 
