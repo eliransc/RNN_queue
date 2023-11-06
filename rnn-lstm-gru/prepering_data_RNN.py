@@ -60,7 +60,7 @@ def main(args):
     #         print(file)
     #         os.remove(os.path.join(path, file))
 
-    path = '/scratch/eliransc/gt_g_1_data2'
+    path = '/scratch/eliransc/G4_experiment'
     files = os.listdir(path)
     # files_rho_groups = os.listdir()
 
@@ -122,7 +122,7 @@ def main(args):
         #     os.mkdir(curr_dump_path)
 
         pkl.dump((batch_input, batch_output), open(
-             os.path.join(path_dump, server_name +'_'+ str(curr_batch) + 'const_arrival_dist.pkl'), 'wb'))
+             os.path.join(path_dump, server_name +'_'+ str(curr_batch) + 'G4_dist.pkl'), 'wb'))
 
 
 def parse_arguments(argv):
