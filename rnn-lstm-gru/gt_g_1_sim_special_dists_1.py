@@ -1878,7 +1878,7 @@ def run_single_setting(args):
         ind_rand = np.random.randint(inds.shape[0])
         ind = inds[ind_rand]
 
-        arrival_dist = 1 # df_counter.loc[ind, 'arrive_ind']
+        arrival_dist = 2 # df_counter.loc[ind, 'arrive_ind']
         service_dist = df_counter.loc[ind, 'ser_ind']
         service_dist = 2
         avg_rho = df_counter.loc[ind, 'avg_rho']
@@ -1935,7 +1935,7 @@ def run_single_setting(args):
         list_of_lists1 = []
         for ind in tqdm(range(10)):
             list_of_dicts = [single_sim(services, arrivals_dict, model_inputs, arrival_rates, initial,df,   args) for ind in
-                              range(1, args.num_iter_same_params + 1)] #
+                              range(1, args.num_iter_same_params + 1)]  #
             list_of_lists1.append(list_of_dicts)
 
         merged1 = list(itertools.chain(*list_of_lists1))
@@ -1996,7 +1996,7 @@ def main(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         args.read_path = r'C:\Users\user\workspace\data\test2_gtg1'
     else:
-        args.read_path = '/scratch/eliransc/gt_g_1_special' #
+        args.read_path = '/scratch/eliransc/G4_special'  # vgt_g_1_special' #
 
     for ind in tqdm(range(args.num_iterations)):
 
