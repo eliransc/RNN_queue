@@ -1741,7 +1741,7 @@ def run_single_setting(args):
     # files = os.listdir(services_path)
     # num_files = len(files)
     rand_val = np.random.randint(1, 4)
-
+    rand_val = 1
     if rand_val == 1:
         special_arr, special_ser = 'LN4', 'LN4'
     elif rand_val == 2:
@@ -1771,9 +1771,11 @@ def run_single_setting(args):
     arrivals_dict = {}
 
     for ind in range(num_groups):
-
+        special_arr = 'LN4'
         if special_arr == 'LN4':
 
+            m = 1
+            s = (4 * m ** 2) ** 0.5
             inter_arrival, moms_arrive = log_normal_gener(m, s, sample_size)
 
             a_arrivals, A_arrivals = PH3From5Moments(moms_arrive[:5])
@@ -1822,7 +1824,7 @@ def run_single_setting(args):
         for time1 in resultDictionary.keys():
             time_dict[time1][resultDictionary[time1]] += 1
 
-    curr_path1 = str(model_num) + '_avg_rho_'+ str(avg_rho) + '_gt_g_1_sim_CSV_4.pkl'
+    curr_path1 = str(model_num) + '_avg_rho_'+ str(avg_rho) + '_gt_g_1_sim_LN_4.pkl'
     full_path1 = os.path.join(args.read_path, curr_path1)
     res_input, prob_queue_arr = create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df)
     pkl.dump((res_input, prob_queue_arr), open(full_path1, 'wb'))
@@ -1873,7 +1875,7 @@ def main(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         args.read_path = r'C:\Users\user\workspace\data\mt_g_1'
     else:
-        args.read_path = '/scratch/eliransc/training_CSV_4' #
+        args.read_path = '/scratch/eliransc/LN_experiment' #
 
     for ind in tqdm(range(args.num_iterations)):
 
