@@ -1876,9 +1876,9 @@ def run_single_setting(args):
         ind_rand = np.random.randint(inds.shape[0])
         ind = inds[ind_rand]
 
-        arrival_dist = 2  # df_counter.loc[ind, 'arrive_ind']
+        arrival_dist = df_counter.loc[ind, 'arrive_ind']
         service_dist = df_counter.loc[ind, 'ser_ind']
-        service_dist = 2
+        # service_dist = 2
         avg_rho = df_counter.loc[ind, 'avg_rho']
         df_counter.loc[ind, 'counter'] += 1
 
@@ -1994,7 +1994,7 @@ def main(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         args.read_path = r'C:\Users\user\workspace\data\test2_gtg1'
     else:
-        args.read_path = '/scratch/eliransc/G4_special' #
+        args.read_path = '/scratch/eliransc/new_test2_gtg1' #
 
     for ind in tqdm(range(args.num_iterations)):
 
