@@ -1740,15 +1740,24 @@ def run_single_setting(args):
 
     # files = os.listdir(services_path)
     # num_files = len(files)
+    rand_val = np.random.randint(1, 4)
 
-    special = 'G4'
-    if special == 'LN4':
+    if rand_val == 1:
+        special_arr, special_ser = 'LN4', 'LN4'
+    elif rand_val == 2:
+        special_arr, special_ser = 'G4', 'LN4'
+    elif rand_val == 3:
+        special_arr, special_ser = 'LN4', 'G4'
+
+
+    special_ser = 'G4'
+    if special_ser == 'LN4':
         m = 1
         s = (4 * m ** 2) ** 0.5
         services, moms_service = log_normal_gener(m, s, sample_size)
         a_service, A_service = PH3From5Moments(moms_service[:5])
 
-    elif special == 'G4':
+    elif special_ser == 'G4':
 
         shape, scale, moms_arrive1 = generate_gamma(True, 4, 1)
         services = np.random.gamma(shape, scale, sample_size)
@@ -1763,7 +1772,7 @@ def run_single_setting(args):
 
     for ind in range(num_groups):
 
-        if special == 'LN4':
+        if special_arr == 'LN4':
 
             inter_arrival, moms_arrive = log_normal_gener(m, s, sample_size)
 
@@ -1774,7 +1783,7 @@ def run_single_setting(args):
 
             arrivals_dict[ind] = (arrivals_, rate_dict_code_rate[ind])
 
-        elif special == 'G4':
+        elif special_arr == 'G4':
 
             shape, scale, moms_arrive1 = generate_gamma(True, 4, 1)
             inter_arrival = np.random.gamma(shape, scale, sample_size)
@@ -1813,7 +1822,7 @@ def run_single_setting(args):
         for time1 in resultDictionary.keys():
             time_dict[time1][resultDictionary[time1]] += 1
 
-    curr_path1 = str(model_num) + '_avg_rho_'+ str(avg_rho) + '_gt_g_1_sim_G4_experiment.pkl'
+    curr_path1 = str(model_num) + '_avg_rho_'+ str(avg_rho) + '_gt_g_1_sim_CSV_4.pkl'
     full_path1 = os.path.join(args.read_path, curr_path1)
     res_input, prob_queue_arr = create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df)
     pkl.dump((res_input, prob_queue_arr), open(full_path1, 'wb'))
@@ -1864,7 +1873,7 @@ def main(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         args.read_path = r'C:\Users\user\workspace\data\mt_g_1'
     else:
-        args.read_path = '/scratch/eliransc/G4_experiment' #
+        args.read_path = '/scratch/eliransc/training_CSV_4' #
 
     for ind in tqdm(range(args.num_iterations)):
 
