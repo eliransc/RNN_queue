@@ -1911,7 +1911,7 @@ def run_single_setting(args):
 
             arrivals_dict[ind_rate] = get_inter_specical_dist(arrival_dist, arrival_rate, sample_size)
 
-        arrivals_dict = pkl.load( open('arrivals_dict.pkl', 'rb'))
+        # arrivals_dict = pkl.load( open('arrivals_dict.pkl', 'rb'))
 
         np.random.seed(now.microsecond)
 
