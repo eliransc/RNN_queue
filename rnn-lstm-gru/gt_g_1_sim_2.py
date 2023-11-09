@@ -1740,8 +1740,8 @@ def run_single_setting(args):
 
     # files = os.listdir(services_path)
     # num_files = len(files)
-    rand_val = np.random.randint(1, 4)
-    rand_val = 1
+    rand_val = np.random.randint(1, 3)
+
     if rand_val == 1:
         special_arr, special_ser = 'LN4', 'LN4'
     elif rand_val == 2:
@@ -1750,7 +1750,7 @@ def run_single_setting(args):
         special_arr, special_ser = 'LN4', 'G4'
 
 
-    special_ser = 'G4'
+
     if special_ser == 'LN4':
         m = 1
         s = (4 * m ** 2) ** 0.5
@@ -1771,7 +1771,7 @@ def run_single_setting(args):
     arrivals_dict = {}
 
     for ind in range(num_groups):
-        special_arr = 'LN4'
+
         if special_arr == 'LN4':
 
             m = 1
@@ -1824,7 +1824,7 @@ def run_single_setting(args):
         for time1 in resultDictionary.keys():
             time_dict[time1][resultDictionary[time1]] += 1
 
-    curr_path1 = str(model_num) + '_avg_rho_'+ str(avg_rho) + '_gt_g_1_sim_LN_4.pkl'
+    curr_path1 = str(model_num) + '_avg_rho_'+ str(avg_rho) + '_gt_g_1_sim_CSV_4'+str(rand_val) + '.pkl'
     full_path1 = os.path.join(args.read_path, curr_path1)
     res_input, prob_queue_arr = create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df)
     pkl.dump((res_input, prob_queue_arr), open(full_path1, 'wb'))
