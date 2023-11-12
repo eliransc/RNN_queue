@@ -60,7 +60,7 @@ def main(args):
     #         print(file)
     #         os.remove(os.path.join(path, file))
 
-    path = '/scratch/eliransc/new_test2_gtg1'
+    path = '/scratch/eliransc/CSV4_experiment'
     files = os.listdir(path)
     # files_rho_groups = os.listdir()
 
@@ -114,7 +114,7 @@ def main(args):
                 batch_input = np.concatenate((batch_input, res_input), axis=0)
                 batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
 
-        path_dump = '/scratch/eliransc/rnn_data/new_test2_batches/'
+        path_dump = '/scratch/eliransc/rnn_data/CSV4_batches/'
 
 
         pkl.dump((batch_input, batch_output), open(
