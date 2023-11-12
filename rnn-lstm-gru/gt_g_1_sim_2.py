@@ -1536,7 +1536,7 @@ class GG1:
             time_period = int(self.env.now)
             inter_arrival_rate = self.arrival_rates[time_period]
             arrival_code = self.df.loc[self.df['time'] == time_period, 'arrival_code']
-            arrivals = self.arrival_dist_params[0][0][3] #self.arrival_dist_params[arrival_code.item()][0][3]
+            arrivals = self.arrival_dist_params[arrival_code.item()][0][3]
             np.random.shuffle(arrivals)
             inter_arrival = arrivals[self.customer_counter]
             rate = self.generate_arrival_rate(self.env.now)
@@ -1793,6 +1793,7 @@ def run_single_setting(args):
             a_arrivals, A_arrivals = PH3From5Moments(moms_arrive[:5])
 
             arrivals = SamplesFromPH(a_arrivals, A_arrivals, sample_size)
+            moms_arrive = compute_first_ten_moms_log_N(arrivals)
             arrivals_ = (a_arrivals, A_arrivals, moms_arrive, arrivals)
 
             arrivals_dict[ind] = (arrivals_, rate_dict_code_rate[ind])
@@ -1903,7 +1904,7 @@ def parse_arguments(argv):
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 1700)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 3)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)

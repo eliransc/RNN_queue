@@ -1590,7 +1590,6 @@ class GG1:
             self.event_log_num_cust_list.append(self.num_cust_sys)
             self.event_log_type_list.append('Arrival')
 
-
             tot_time = self.env.now - self.last_event_time
             self.num_cust_durations[self.num_cust_sys] += tot_time
             self.last_event_time = self.env.now
@@ -1625,6 +1624,7 @@ def single_sim(services, arrivals, model_inputs, arrival_rates, initial, df,  ar
 
 
 def give_group_size(phases):
+
     num_groups = np.random.randint(min(3, int(phases/2)-1 ), int(phases/2))
     group_size = np.ones(num_groups) + \
                  np.random.multinomial(phases - num_groups, [1 / num_groups] * num_groups, size=1)[0]
