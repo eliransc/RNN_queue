@@ -60,7 +60,7 @@ def main(args):
     #         print(file)
     #         os.remove(os.path.join(path, file))
 
-    path = '/scratch/eliransc/CSV4_experiment'
+    path = '/scratch/eliransc/new_test2_gtg1'
     files = os.listdir(path)
     # files_rho_groups = os.listdir()
 
@@ -114,12 +114,8 @@ def main(args):
                 batch_input = np.concatenate((batch_input, res_input), axis=0)
                 batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
 
-        path_dump = '/scratch/eliransc/rnn_data/CSV4_batches/'
+        path_dump = '/scratch/eliransc/rnn_data/new_test2_batches/'
 
-        # curr_dump_path = os.path.join(path_dump, rho)
-
-        # if not curr_dump_path:
-        #     os.mkdir(curr_dump_path)
 
         pkl.dump((batch_input, batch_output), open(
              os.path.join(path_dump, server_name +'_'+ str(curr_batch) + 'CSV4_dist_special.pkl'), 'wb'))
