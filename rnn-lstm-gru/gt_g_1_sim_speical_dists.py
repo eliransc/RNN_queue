@@ -1973,7 +1973,6 @@ def main(args):
     current_time = now.strftime("%H_%M_%S")
     np.random.seed(now.microsecond)
 
-
     # s_service, A_service, moms_service = model_inputs
 
     now = datetime.now()
@@ -2012,8 +2011,6 @@ def main(args):
         curr_ind = df_runtimes.shape[0]
         df_runtimes.loc[curr_ind, 'run_time'] = runtime
         pkl.dump(df_runtimes, open('df_runtimes.pkl', 'wb'))
-
-
 
 
 def parse_arguments(argv):
