@@ -1577,7 +1577,7 @@ class GG1:
 
             inter_arrival = arrivals[self.customer_counter]
             rate = self.generate_arrival_rate(self.env.now)
-            yield self.env.timeout(inter_arrival) #self.env.timeout(np.random.exponential(1/inter_arrival_rate))
+            yield self.env.timeout(inter_arrival)   #self.env.timeout(np.random.exponential(1/inter_arrival_rate))
 
             arrival_time = self.env.now
             customer = Customer(self.customer_counter, arrival_time)
@@ -1700,8 +1700,6 @@ def get_inter_specical_dist(arrival_dist, arrival_rate ,sample_size):
         m = 1 / arrival_rate
         s = (0.25 * m**2)**0.5
         inter_arrival = log_normal_gener(m,s, sample_size)
-        # m = np.log((mu ** 2) / (sig2 + mu ** 2) ** 0.5)
-        # v = (np.log(sig2 / mu ** 2 + 1)) ** 0.5
         moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
         arrival_csv = 0.25
 
@@ -1780,7 +1778,7 @@ def get_ser_special_dist( service_dist, sample_size):
 
         m = 1
         s = (4 * m**2)**0.5
-        services = log_normal_gener(m,s, sample_size)
+        services = log_normal_gener(m, s, sample_size)
         # m = np.log((mu ** 2) / (sig2 + mu ** 2) ** 0.5)
         # v = (np.log(sig2 / mu ** 2 + 1)) ** 0.5
         moms_service = compute_first_ten_moms_log_N(services)
@@ -1878,7 +1876,7 @@ def run_single_setting(args):
 
         arrival_dist = df_counter.loc[ind, 'arrive_ind']
         service_dist = df_counter.loc[ind, 'ser_ind']
-        # service_dist = 2
+
         avg_rho = df_counter.loc[ind, 'avg_rho']
         df_counter.loc[ind, 'counter'] += 1
 
@@ -1892,10 +1890,7 @@ def run_single_setting(args):
         print(avg_rho, arrival_dist, service_dist)
 
         arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate = generate_cycle_arrivals(args.number_sequences, avg_rho)
-        #
-        # pkl.dump((arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate), open('generate_cycle_arrivals.pkl', 'wb'))
 
-        # arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate = pkl.load(open('generate_cycle_arrivals.pkl', 'rb'))
 
         np.random.seed(now.microsecond)
 
@@ -1993,7 +1988,7 @@ def main(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         args.read_path = r'C:\Users\user\workspace\data\test2_gtg1'
     else:
-        args.read_path = '/scratch/eliransc/new_test2_gtg1' #
+        args.read_path = '/scratch/eliransc/new_special_test'
 
     for ind in tqdm(range(args.num_iterations)):
 
@@ -2020,7 +2015,7 @@ def parse_arguments(argv):
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 400)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 1700)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
