@@ -1157,14 +1157,14 @@ def generate_gamma(is_arrival, scv,rho = 0.01):
         return (shape, scale, moms_ser)
 
 
-def log_normal_gener(m, s, sample_size):
+def log_normal_gener(m, s , sample_size):
 
     mu = np.log(m)-np.log((m**2+s**2)/m**2)/2
     sigma = (np.log((m**2+s**2)/m**2))**0.5
-    samples = np.random.lognormal(mu, sigma, sample_size)
-    moms = []
 
-    for ind in range(1,11):
+    moms = []
+    samples = np.random.lognormal(mu, sigma, sample_size)
+    for ind in range(1, 11):
         moms.append((samples**ind).mean())
 
     return (samples, moms)
@@ -1740,7 +1740,7 @@ def run_single_setting(args):
 
     # files = os.listdir(services_path)
     # num_files = len(files)
-    rand_val = np.random.randint(1, 3)
+    rand_val = np.random.randint(1, 4)
 
     if rand_val == 1:
         special_arr, special_ser = 'LN4', 'LN4'
