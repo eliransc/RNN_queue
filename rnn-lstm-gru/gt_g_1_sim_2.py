@@ -1740,7 +1740,7 @@ def run_single_setting(args):
 
     # files = os.listdir(services_path)
     # num_files = len(files)
-    rand_val = np.random.randint(1, 4)
+    rand_val = np.random.randint(1, 5)
 
     if rand_val == 1:
         special_arr, special_ser = 'LN4', 'LN4'
@@ -1748,6 +1748,8 @@ def run_single_setting(args):
         special_arr, special_ser = 'G4', 'LN4'
     elif rand_val == 3:
         special_arr, special_ser = 'LN4', 'G4'
+    elif rand_val == 4:
+        special_arr, special_ser = 'G4', 'G4'
 
 
 
@@ -1904,7 +1906,7 @@ def parse_arguments(argv):
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 3)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 1700)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
