@@ -34,39 +34,16 @@ def create_single_data_point(path, files_list, ind):
 
 
 def main(args):
+    curr_path = '/home/eliransc/projects/def-dkrass/eliransc/RNN_queue/rnn-lstm-gru'
 
-    if not 'C:' in os.getcwd().split('/')[0]:
+    files_in_path = os.listdir(curr_path)
 
-        curr_path = '/home/eliransc/projects/def-dkrass/eliransc/RNN_queue/rnn-lstm-gru'
+    server_file = [file for file in files_in_path if '_server' in file]
 
-        files_in_path = os.listdir(curr_path)
+    server_name = server_file[0].split('_')[0]
 
-        server_file = [file for file in files_in_path if '_server' in file]
-
-        server_name = server_file[0].split('_')[0]
-
-
-    if 'C:' in os.getcwd().split('/')[0]:
-        path = r'C:\Users\user\workspace\data\mt_g_1'
-    else:
-        path = '/scratch/eliransc/gt_g_1_data'
-
-    # path = '/scratch/eliransc/gt_g_1_data'
-    # files = os.listdir(path)
-    # for file in tqdm(files):
-    #     try:
-    #         res_input, prob_queue_arr = pkl.load(open(os.path.join(path, file), 'rb'))
-    #     except:
-    #         print(file)
-    #         os.remove(os.path.join(path, file))
-
-    path = '/scratch/eliransc/gt_g_1_data3'
+    path = '/scratch/eliransc/CSV4_experiment'
     files = os.listdir(path)
-    # files_rho_groups = os.listdir()
-
-    # for rho in files_rho_groups:
-    #     curr_path = os.path.join(path, rho)
-    #     files = os.listdir(curr_path)
 
     if 'C:' in os.getcwd().split('/')[0]:
 
@@ -114,7 +91,7 @@ def main(args):
                 batch_input = np.concatenate((batch_input, res_input), axis=0)
                 batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
 
-        path_dump = '/scratch/eliransc/rnn_data/new_gt_g_1_data_batches/'
+        path_dump = '/scratch/eliransc/rnn_data/CSV4_batches/'
 
 
         pkl.dump((batch_input, batch_output), open(
