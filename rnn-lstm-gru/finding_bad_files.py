@@ -18,4 +18,4 @@ for file in tqdm(files):
 
     except:
         print('bad')
-        #os.remove(os.path.join(path, file))
+        os.remove(os.path.join(path, file))
