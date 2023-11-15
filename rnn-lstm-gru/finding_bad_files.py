@@ -11,11 +11,12 @@ files = os.listdir(path)
 
 
 for file in tqdm(files):
-    a, b = pkl.load(open(os.path.join(path, file)))
 
 
-    # try:
-    #     a, b = pkl.load(open(os.path.join(path, file)))
-    # except:
-    #     print(file)
-    #     os.remove(os.path.join(path, file))
+
+    try:
+        a, b = pkl.load(open(os.path.join(path, file)))
+        print(os.path.join(path, file))
+    except:
+        pass
+        #os.remove(os.path.join(path, file))
