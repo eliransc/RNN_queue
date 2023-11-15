@@ -13,8 +13,8 @@ files = os.listdir(path)
 for file in tqdm(files):
 
     try:
-        a, b = pkl.load(open(os.path.join(path, file)))
-        print(os.path.join(path, file))
+        a, b = pkl.load(open(os.path.join(path, file),'rb'))
+        # print(os.path.join(path, file))
 
     except:
         print('bad')
