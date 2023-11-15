@@ -4,7 +4,7 @@ import os
 from tqdm import tqdm
 
 
-path = '/scratch/eliransc/gt_g_1_data3'
+path = '/scratch/eliransc/CSV4_experiment'
 
 
 files = os.listdir(path)
