@@ -51,16 +51,9 @@ def main(args):
     else:
         path = '/scratch/eliransc/gt_g_1_data'
 
-    # path = '/scratch/eliransc/gt_g_1_data'
-    # files = os.listdir(path)
-    # for file in tqdm(files):
-    #     try:
-    #         res_input, prob_queue_arr = pkl.load(open(os.path.join(path, file), 'rb'))
-    #     except:
-    #         print(file)
-    #         os.remove(os.path.join(path, file))
 
-    path = '/scratch/eliransc/gt_g_1_data3'
+
+    path = '/scratch/eliransc/CSV4_experiment'
     files = os.listdir(path)
     # files_rho_groups = os.listdir()
 
@@ -114,7 +107,7 @@ def main(args):
                 batch_input = np.concatenate((batch_input, res_input), axis=0)
                 batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
 
-        path_dump = '/scratch/eliransc/rnn_data/batch_data3_training/'
+        path_dump = '/scratch/eliransc/rnn_data/batch_CSV4_training/'
 
 
         pkl.dump((batch_input, batch_output), open(
