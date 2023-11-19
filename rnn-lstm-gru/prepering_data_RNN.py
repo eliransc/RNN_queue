@@ -53,7 +53,7 @@ def main(args):
 
 
 
-    path = '/scratch/eliransc/from_narval/CSV4_experiment'
+    path = '/scratch/eliransc/from_narval/gt_g_1_data3'
     files = os.listdir(path)
     # files_rho_groups = os.listdir()
 
