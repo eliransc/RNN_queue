@@ -49,7 +49,7 @@ def main(args):
     if 'C:' in os.getcwd().split('/')[0]:
         path = r'C:\Users\user\workspace\data\mt_g_1'
     else:
-        path = '/scratch/eliransc/gt_g_1_data'
+        path = '/scratch/eliransc/from_narval/CSV4_experiment'
 
 
 
