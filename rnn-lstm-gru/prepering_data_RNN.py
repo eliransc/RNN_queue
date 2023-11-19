@@ -110,8 +110,10 @@ def main(args):
         path_dump = '/scratch/eliransc/rnn_data/batch_CSV4_training/'
 
 
+        # pkl.dump((batch_input, batch_output), open(
+        #      os.path.join(path_dump, server_name +'_'+ str(curr_batch) + 'new_training.pkl'), 'wb'))
         pkl.dump((batch_input, batch_output), open(
-             os.path.join(path_dump, server_name +'_'+ str(curr_batch) + 'new_training.pkl'), 'wb'))
+            os.path.join(path_dump, 'Narval_' + str(curr_batch) + 'new_training.pkl'), 'wb'))
 
 
 def parse_arguments(argv):
