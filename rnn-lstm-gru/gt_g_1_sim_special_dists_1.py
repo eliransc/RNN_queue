@@ -1878,9 +1878,9 @@ def run_single_setting(args):
         ind_rand = np.random.randint(inds.shape[0])
         ind = inds[ind_rand]
 
-        arrival_dist = 3 # df_counter.loc[ind, 'arrive_ind']
+        arrival_dist = 0   # df_counter.loc[ind, 'arrive_ind']
         service_dist = df_counter.loc[ind, 'ser_ind']
-        service_dist = 3
+        service_dist = 0
         avg_rho = df_counter.loc[ind, 'avg_rho']
         df_counter.loc[ind, 'counter'] += 1
 

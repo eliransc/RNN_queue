@@ -1744,7 +1744,16 @@ def run_single_setting(args):
 
 
     path_ph =  '/scratch/eliransc/ph_random/medium_ph_1_025'
-    file_ph = '15_7246635_num_samples_750000.pkl'
+    path_ph = '/scratch/eliransc/ph_random/ph_025_training'
+
+    files = os.listdir(path_ph)
+
+    rand_val = np.random.randint(0, len(files))
+
+    file_ph = files[rand_val]
+
+
+    # file_ph = '15_7246635_num_samples_750000.pkl'
 
     ph_file = pkl.load(open(os.path.join(path_ph, file_ph), 'rb'))
 
