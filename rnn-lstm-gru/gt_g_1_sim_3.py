@@ -1744,7 +1744,7 @@ def run_single_setting(args):
 
 
     path_ph =  '/scratch/eliransc/ph_random/medium_ph_1_025'
-    file_ph = '1680623_num_samples_750000.pkl0.86'
+    file_ph = '15_7246635_num_samples_750000.pkl'
 
     ph_file = pkl.load(open(os.path.join(path_ph, file_ph), 'rb'))
 
