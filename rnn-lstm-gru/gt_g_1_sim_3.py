@@ -1802,7 +1802,7 @@ def run_single_setting(args):
         for time1 in resultDictionary.keys():
             time_dict[time1][resultDictionary[time1]] += 1
 
-    curr_path1 = str(model_num) + '_avg_rho_'+ str(avg_rho) + '_gt_g_1_sim_G_025_'+str(rand_val) + '.pkl'
+    curr_path1 = str(model_num) + '_avg_rho_'+ str(avg_rho) + '_gt_g_1_sim_LN_025_'+str(rand_val) + '.pkl'
     full_path1 = os.path.join(args.read_path, curr_path1)
     res_input, prob_queue_arr = create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df)
     pkl.dump((res_input, prob_queue_arr), open(full_path1, 'wb'))
