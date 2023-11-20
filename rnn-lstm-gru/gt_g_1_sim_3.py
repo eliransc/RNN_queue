@@ -1765,9 +1765,15 @@ def run_single_setting(args):
 
     arrivals_dict = {}
 
+    rand_val = np.random.randint(0, len(files))
+
+    file_ph = files[rand_val]
+
+    ph_file_arrival = pkl.load(open(os.path.join(path_ph, file_ph), 'rb'))
+
     for ind in range(num_groups):
 
-        a_arrivals, A_arrivals , moms_arrive, arrivals = ph_file
+        a_arrivals, A_arrivals , moms_arrive, arrivals = ph_file_arrival
 
         arrivals_ = (a_arrivals, A_arrivals, moms_arrive, arrivals)
 
