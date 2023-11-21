@@ -53,7 +53,7 @@ def main(args):
 
 
 
-    path = '/scratch/eliransc/from_narval/gt_g_1_data3'
+    path = '/scratch/eliransc/from_narval/G025_experiment'
     files = os.listdir(path)
     # files_rho_groups = os.listdir()
 
@@ -107,13 +107,13 @@ def main(args):
                 batch_input = np.concatenate((batch_input, res_input), axis=0)
                 batch_output = np.concatenate((batch_output, prob_queue_arr), axis=0)
 
-        path_dump = '/scratch/eliransc/rnn_data/batch_data3_training/'
+        path_dump = '/scratch/eliransc/rnn_data/SCV025_batch/'
 
 
         # pkl.dump((batch_input, batch_output), open(
         #      os.path.join(path_dump, server_name +'_'+ str(curr_batch) + 'new_training.pkl'), 'wb'))
         pkl.dump((batch_input, batch_output), open(
-            os.path.join(path_dump, 'Narval_' + str(curr_batch) + 'new_training.pkl'), 'wb'))
+            os.path.join(path_dump, 'Narval_' + str(curr_batch) + 'SCV_025_new_training.pkl'), 'wb'))
 
 
 def parse_arguments(argv):
