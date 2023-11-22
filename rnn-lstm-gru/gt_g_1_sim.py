@@ -1723,8 +1723,14 @@ def run_single_setting(args):
     model_inputs = (s_service, A_service, moms_service,  arrivals_dict)
 
     size_initial = 100
-    s = np.random.dirichlet(np.ones(30))
-    initial = np.concatenate((s, np.zeros(size_initial - 30)))
+
+    if True:
+        initial = np.zeros(size_initial)
+        start_initial = np.random.randint(5)
+        initial[start_initial] = 1
+    else:
+        s = np.random.dirichlet(np.ones(30))
+        initial = np.concatenate((s, np.zeros(size_initial - 30)))
 
 
     np.random.seed(now.microsecond)
@@ -1808,7 +1814,7 @@ def main(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         args.read_path = r'C:\Users\user\workspace\data\mt_g_1'
     else:
-        args.read_path = '/scratch/eliransc/gt_g_1_data3' #
+        args.read_path = '/scratch/eliransc/const_initial' #
 
     for ind in tqdm(range(args.num_iterations)):
 

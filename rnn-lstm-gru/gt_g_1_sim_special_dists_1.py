@@ -1878,9 +1878,9 @@ def run_single_setting(args):
         ind_rand = np.random.randint(inds.shape[0])
         ind = inds[ind_rand]
 
-        arrival_dist = 0   # df_counter.loc[ind, 'arrive_ind']
+        arrival_dist = 3   # df_counter.loc[ind, 'arrive_ind']
         service_dist = df_counter.loc[ind, 'ser_ind']
-        service_dist = 0
+        service_dist = 3
         avg_rho = df_counter.loc[ind, 'avg_rho']
         df_counter.loc[ind, 'counter'] += 1
 
@@ -1891,37 +1891,40 @@ def run_single_setting(args):
         else:
             pkl.dump(df_counter, open('/scratch/eliransc/special_dists_counter/df_counter.pkl', 'wb'))
 
-
-
+        avg_rho = 0.7
         print(avg_rho, arrival_dist, service_dist)
 
-        arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate = generate_cycle_arrivals(args.number_sequences, avg_rho)
+
+        # arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate = generate_cycle_arrivals(args.number_sequences, avg_rho)
+
+        arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate = pkl.load(open('arrival_rate_inp.pkl', 'rb'))
 
         np.random.seed(now.microsecond)
 
-
-
-        services, moms_service = get_ser_special_dist(service_dist, sample_size)
-
-
+        # services, moms_service = get_ser_special_dist(service_dist, sample_size)
+        services, moms_service = pkl.load( open('services_data.pkl', 'rb'))
 
         arrivals_dict = {}
 
         sample_size = 500000
 
-        for ind_rate in range(num_groups):
+        # for ind_rate in range(num_groups):
+        #
+        #     arrival_rate = rate_dict_code_rate[ind_rate]
+        #
+        #     arrivals_dict[ind_rate] = get_inter_specical_dist(arrival_dist, arrival_rate, sample_size)
 
-            arrival_rate = rate_dict_code_rate[ind_rate]
-
-            arrivals_dict[ind_rate] = get_inter_specical_dist(arrival_dist, arrival_rate, sample_size)
+        arrivals_dict = pkl.load( open('arrivals_dict.pkl', 'rb'))
 
         np.random.seed(now.microsecond)
 
         model_inputs = (services, moms_service, arrivals_dict)
 
-        size_initial = 100
-        s = np.random.dirichlet(np.ones(30))
-        initial = np.concatenate((s, np.zeros(size_initial - 30)))
+        # size_initial = 100
+        # s = np.random.dirichlet(np.ones(30))
+        # initial = np.concatenate((s, np.zeros(size_initial - 30)))
+
+        initial = pkl.load( open('initial.pkl', 'rb'))
 
         time_dict = {}
         for time_ in range(g.end_time):
@@ -2025,7 +2028,7 @@ def parse_arguments(argv):
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 1700)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 500)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)

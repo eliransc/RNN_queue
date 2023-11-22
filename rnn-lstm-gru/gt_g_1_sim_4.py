@@ -1729,8 +1729,9 @@ def run_single_setting(args):
 
     now = datetime.now()
 
-    arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate, avg_rho = generate_cycle_arrivals(args.number_sequences)
-
+    # arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate, avg_rho = generate_cycle_arrivals(args.number_sequences)
+    arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate = pkl.load(
+        open('arrival_rate_inp.pkl', 'rb'))
     # if 'dkrass' in os.getcwd().split('/'):
     #     services_path = '/scratch/d/dkrass/eliransc/services'
     # elif 'C:' in os.getcwd().split('/')[0]:
@@ -1742,44 +1743,19 @@ def run_single_setting(args):
     # num_files = len(files)
     rand_val = np.random.randint(1, 5)
 
-
-    path_ph =  '/scratch/eliransc/ph_random/medium_ph_1_025'
-    path_ph = '/scratch/eliransc/ph_random/ph_025_training'
-
-    # files = os.listdir(path_ph)
-    #
-    # rand_val = np.random.randint(0, len(files))
-    #
-    # file_ph = files[rand_val]
-
-
-    ###############
     path_ph = r'C:\Users\user\workspace\data'
     file_ph = '15_7246635_num_samples_750000.pkl'
-    # ph_file = pkl.load(open(os.path.join(path_ph, file_ph), 'rb'))
-    ###############
-    # file_ph = '15_7246635_num_samples_750000.pkl'
 
     ph_file = pkl.load(open(os.path.join(path_ph, file_ph), 'rb'))
 
     a_service, A_service, moms_service, services = ph_file
 
+    avg_rho = 0.7
 
     np.random.seed(now.microsecond)
 
 
     arrivals_dict = {}
-
-    # rand_val = np.random.randint(0, len(files))
-
-    # file_ph = files[rand_val]
-
-
-    ###############
-    path_ph = r'C:\Users\user\workspace\data'
-    file_ph = '15_7246635_num_samples_750000.pkl'
-    # ph_file = pkl.load(open(os.path.join(path_ph, file_ph), 'rb'))
-    ###############
 
     ph_file_arrival = pkl.load(open(os.path.join(path_ph, file_ph), 'rb'))
 
@@ -1795,9 +1771,11 @@ def run_single_setting(args):
 
     np.random.seed(now.microsecond)
 
-    size_initial = 100
-    s = np.random.dirichlet(np.ones(30))
-    initial = np.concatenate((s, np.zeros(size_initial - 30)))
+    # size_initial = 100
+    # s = np.random.dirichlet(np.ones(30))
+    # initial = np.concatenate((s, np.zeros(size_initial - 30)))
+    initial = pkl.load(open('initial.pkl', 'rb'))
+
     model_inputs = (a_service, A_service, moms_service, arrivals_dict)
 
     time_dict = {}
@@ -1899,7 +1877,7 @@ def parse_arguments(argv):
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 2)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 100)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
