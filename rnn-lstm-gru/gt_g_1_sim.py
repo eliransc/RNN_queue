@@ -1326,7 +1326,7 @@ class g:
     counter_for_moms_arrivals = 0
     counter_for_moms_depart_sojourn = 0
 
-    end_time = 60
+    end_time = 120
 
     # lenght1 = np.random.randint(5, 30)
     # lenght2 = end_time - lenght1
@@ -1395,7 +1395,7 @@ class GG1:
         elif self.sim_lenght_indicator == 1:
             self.end_time = 30
         else:
-            self.end_time = 60
+            self.end_time = 120
 
         # print(self.end_time)
 
@@ -1724,7 +1724,7 @@ def run_single_setting(args):
 
     size_initial = 100
 
-    if True:
+    if False:
         initial = np.zeros(size_initial)
         start_initial = np.random.randint(5)
         initial[start_initial] = 1
@@ -1814,7 +1814,7 @@ def main(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         args.read_path = r'C:\Users\user\workspace\data\mt_g_1'
     else:
-        args.read_path = '/scratch/eliransc/const_initial' #
+        args.read_path = '/scratch/eliransc/long_sim' #
 
     for ind in tqdm(range(args.num_iterations)):
 
@@ -1840,7 +1840,7 @@ def parse_arguments(argv):
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
+    parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=120)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
     parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 1700)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
