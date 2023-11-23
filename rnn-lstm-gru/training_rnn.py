@@ -76,7 +76,7 @@ def SAE_batch(soft, labels):
 
 
 def loss_queue1(soft, labels):
-    return (3 * (torch.abs(soft[:, :3, :] - labels[:, :3, :])).sum(axis=[2])).mean() + (
+    return ( (torch.abs(soft[:, :3, :] - labels[:, :3, :])).sum(axis=[2])).mean() + (
                 (torch.abs(soft[:, :, :] - labels[:, :, :])).sum(axis=[2]) +
                 torch.max(torch.abs(soft[:, :, :] - labels[:, :, :]), axis=2)[0]).mean()
 
