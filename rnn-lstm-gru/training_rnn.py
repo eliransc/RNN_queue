@@ -262,7 +262,7 @@ def main(args):
     hidden_size = 128  # int(np.random.choice([32,64,128],  p=[0.3, 0.4, 0.3]))
     num_layers = np.random.randint(2, 6)
 
-    loss_option = np.random.randint(1 , 3) # if 1 loss_queue if 2 loss_queue1
+    loss_option = np.random.randint(1 ,3) # if 1 loss_queue if 2 loss_queue1
 
     sequence_length = args.time_ub
 
@@ -316,7 +316,7 @@ def main(args):
     loss_list = []
     setting_string = 'batch_size_' + str(batch_size * 16) + '_num_layers_' + str(num_layers) + '_num_epochs_' + str(
         num_epochs) + '_learning_rate_' + str(learning_rate) + '_hidden_size_' + str(hidden_size) + '_lr_change_' + str(
-        lr_change+ '_loss_option_'+ str(loss_option))
+        lr_change)+ '_loss_option_'+ str(loss_option)
     print(setting_string)
 
     valid_loss_list = []
