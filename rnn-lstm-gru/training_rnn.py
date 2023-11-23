@@ -211,7 +211,7 @@ def main(args):
     file_list = os.listdir(path)
     data_paths = [os.path.join(path, name) for name in file_list]
 
-    valid_path_ = '/scratch/eliransc/rnn_data/test_set_1_a'  # '/scratch/eliransc/rnn_data/gt_gt_1_batches_G4_experiment'
+    valid_path_ = '/scratch/eliransc/rnn_data/moment_fix_test_set_1_a'  # '/scratch/eliransc/rnn_data/gt_gt_1_batches_G4_experiment'
     valid_path = os.listdir(valid_path_)
 
     valid_path = [os.path.join(valid_path_, name) for name in valid_path]
