@@ -1814,7 +1814,7 @@ def main(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         args.read_path = r'C:\Users\user\workspace\data\mt_g_1'
     else:
-        args.read_path = '/scratch/eliransc/long_sim' #
+        args.read_path = '/scratch/eliransc/const_initial' #
 
     for ind in tqdm(range(args.num_iterations)):
 
