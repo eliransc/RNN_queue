@@ -372,7 +372,7 @@ def main(args):
 
 
         valids = []
-        for loader in [valid_loader, valid_loader1, valid_loader2, valid_loader3, valid_loader4, valid_loader5]:
+        for loader in [valid_loader,  valid_loader2, valid_loader3, valid_loader4, valid_loader5]:
 
             totloss = []
 
