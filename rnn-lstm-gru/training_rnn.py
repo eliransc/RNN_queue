@@ -255,14 +255,14 @@ def main(args):
 
     num_epochs = 40
     lr_change = 1.025  # np.random.choice([1.025, 1.05, 1.1, 1.25, 1.3],  p=[0.2, 0.2, 0.2, 0.2, 0.2])
-    batch_size = int(np.random.choice([1, 2, 4, 8], p=[0.25, 0.35, 0.25, 0.15]))
-    learning_rate = np.random.choice([0.001, 0.005, 0.0005, 0.0002, 0.0001], p=[0.2, 0.2, 0.2, 0.2, 0.2])
+    batch_size = int(np.random.choice([1, 2, 4, 8], p=[0.01, 0.01, 0.97, 0.01]))
+    learning_rate = np.random.choice([0.001, 0.005, 0.0005, 0.0002, 0.0001], p=[0.98, 0.01, 0.01, 0.0, 0.0])
 
     input_size = 30 + 2 * num_moments
     hidden_size = 128  # int(np.random.choice([32,64,128],  p=[0.3, 0.4, 0.3]))
-    num_layers = np.random.randint(2, 6)
+    num_layers = np.random.randint(4, 5)
 
-    loss_option = np.random.randint(1 ,3) # if 1 loss_queue if 2 loss_queue1
+    loss_option = np.random.randint(2, 3)  # if 1 loss_queue if 2 loss_queue1
 
     sequence_length = args.time_ub
 
