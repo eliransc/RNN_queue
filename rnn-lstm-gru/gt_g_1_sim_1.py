@@ -1301,6 +1301,7 @@ def generate_ph(is_arrival, is_exponential):
 
 
 def find_num_cust_time_stamp(df, time):
+    time = time + 1
 
     if time == 0:
         return df.loc[df['Time_stamp'] == 0, :].shape[0]

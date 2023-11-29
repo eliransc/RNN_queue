@@ -1301,7 +1301,7 @@ def generate_ph(is_arrival, is_exponential):
 
 
 def find_num_cust_time_stamp(df, time):
-
+    time = time + 1
     if time == 0:
         return df.loc[df['Time_stamp'] == 0, :].shape[0]
 
@@ -1546,7 +1546,7 @@ def single_sim(services, arrivals, model_inputs, arrival_rates, initial, df,  ar
                                   'Type': gg1.event_log_type_list,
                                   'num_cust': gg1.event_log_num_cust_list})
 
-    result = [(time_epoch, find_num_cust_time_stamp(gg1.event_log, time_epoch)) for time_epoch in range(1,1+gg1.end_time)]
+    result = [(time_epoch, find_num_cust_time_stamp(gg1.event_log, time_epoch)) for time_epoch in range(gg1.end_time)]
     resultDictionary = dict((x, y) for x, y in result)
     return resultDictionary
 
