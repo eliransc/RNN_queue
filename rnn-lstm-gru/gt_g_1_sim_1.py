@@ -1413,7 +1413,6 @@ class GG1:
 
        arrival_time = self.env.now
 
-
        with self.server.request(priority=1) as req: #priority=priority
             yield req
 
@@ -1546,7 +1545,7 @@ def single_sim(services, arrivals, model_inputs, arrival_rates, initial, df,  ar
                                   'Type': gg1.event_log_type_list,
                                   'num_cust': gg1.event_log_num_cust_list})
 
-    result = [(time_epoch, find_num_cust_time_stamp(gg1.event_log, time_epoch)) for time_epoch in range(gg1.end_time)]
+    result = [(time_epoch, find_num_cust_time_stamp(gg1.event_log, time_epoch)) for time_epoch in range(1, gg1.end_time+1)]
     resultDictionary = dict((x, y) for x, y in result)
     return resultDictionary
 
@@ -1621,13 +1620,15 @@ def generate_cycle_arrivals(number_sequences):
 
 def generate_cycle_arrivals_constant(number_sequences):
 
-    avg_rho = np.random.uniform(0.5, 1)
+    avg_rho = 0.5
 
     vector_lenght = number_sequences
-    cycle_size = np.random.randint(4, int(vector_lenght / 2))
+    cycle_size = number_sequences
     num_cycles = int(vector_lenght / cycle_size)
 
     num_groups, group_size = give_group_size(cycle_size)
+    num_groups = 1
+    group_size = np.array([60])
 
     if num_groups > 8:
         num_picks = np.random.choice(2, 1, p=[0.5, 0.5])[0] + 1
@@ -1684,7 +1685,7 @@ def run_single_setting(args):
 
     now = datetime.now()
 
-    arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate, avg_rho = generate_cycle_arrivals(args.number_sequences)
+    arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate, avg_rho = generate_cycle_arrivals_constant(args.number_sequences)
 
     if 'dkrass' in os.getcwd().split('/'):
         services_path = '/scratch/d/dkrass/eliransc/services'
@@ -1706,52 +1707,32 @@ def run_single_setting(args):
 
     arrivals_dict = {}
 
-    # arrivals_ = pkl.load(open(os.path.join(services_path, files[file_num]), 'rb'))
-    # list_size = len(arrivals_)
-    # sample_num = np.random.randint(0, list_size)
-    #
-    # # for ind, file_num in enumerate(file_nums):
-    # for ind in range(num_groups):
-    #
-    #     # arrivals_ = pkl.load(open(os.path.join(services_path, files[file_num]), 'rb'))
-    #     # list_size = len(arrivals_)
-    #     # sample_num = np.random.randint(0, list_size)
-    #     arrivals_dict[ind] = (arrivals_[sample_num], rate_dict_code_rate[ind])
-
     np.random.seed(now.microsecond)
 
     # model_inputs = (s_service, A_service, moms_service,  arrivals_dict)
 
     size_initial = 100
-    s = np.random.dirichlet(np.ones(30))
-    initial = np.concatenate((s, np.zeros(size_initial - 30)))
+    initial = np.zeros(size_initial)
+    initial[5] = 1
 
-    arrival_rates, num_groups, df, rates_dict_rate_code, rate_dict_code_rate = pkl.load(
-        open('generate_cycle_arrivals.pkl', 'rb'))
 
-    moms_service = pkl.load(open('moms_service_G4.pkl', 'rb'))
-    services = pkl.load(open(r'C:\Users\user\workspace\RNN_queue\RNN_queue\rnn-lstm-gru\samples_services.pkl', 'rb'))
-    arrivals = pkl.load(open(r'C:\Users\user\workspace\RNN_queue\RNN_queue\rnn-lstm-gru\samples_arrivals.pkl', 'rb'))
+    a_arrivals = ml.matrix(np.array([1, 0]))
+    A_arrivals = ml.matrix(np.array([[-1, 1], [0, -1]]))
 
-    a_arrivals = ml.matrix([[0.59359927, 0.31656522, 0.08983551]])
-    A_arrivals = ml.matrix([[-7.49616688,  0.        ,  0.        ],
-         [ 0.47906101, -0.47906101,  0.        ],
-         [ 0.        ,  0.20312811, -0.20312811]])
+    a_service = ml.matrix(np.array([1, 0]))
+    A_service = ml.matrix(np.array([[-2, 2], [0, -2]]))
 
-    a_service = ml.matrix([[0.61174205, 0.30573033, 0.08252761]])
-    A_service = ml.matrix([[-9.28315677,  0.,  0.],
-         [ 0.643187  , -0.643187  ,  0.        ],
-         [ 0.,  0.28699479, -0.28699479]])
+    services = SamplesFromPH(a_service, A_service, 1000000)
+    arrivals = SamplesFromPH(a_arrivals, A_arrivals, 1000000)
 
-    arrivals_dict = pkl.load(open('arrivals_dict.pkl', 'rb'))
-    arrivals_ = (a_arrivals, A_arrivals, arrivals_dict[0][1], arrivals)
+    moms_service = np.array(compute_first_n_moments(a_service, A_service, n=10)).flatten()
+    moms_arrival = np.array(compute_first_n_moments(a_arrivals, A_arrivals, n=10)).flatten()
+
+    arrivals_ = (a_arrivals, A_arrivals, moms_arrival, arrivals)
 
     arrivals_dict[0] = (arrivals_, rate_dict_code_rate[0])
 
-    initial = pkl.load(open('initial_G4.pkl', 'rb'))
-
-
-    model_inputs = (a_service, A_service, moms_service[1], arrivals_dict)
+    model_inputs = (a_service, A_service, moms_service, arrivals_dict)
 
     time_dict = {}
     for time_ in range(g.end_time):
@@ -1765,7 +1746,7 @@ def run_single_setting(args):
     list_of_lists1 = []
     for ind in tqdm(range(10)):
         list_of_dicts = [single_sim(services, arrivals_dict, model_inputs, arrival_rates, initial,df,  args) for ind in
-                          range(1, args.num_iter_same_params + 1)] #
+                          range(1, args.num_iter_same_params + 1)]
         list_of_lists1.append(list_of_dicts)
 
     merged1 = list(itertools.chain(*list_of_lists1))
@@ -1789,7 +1770,7 @@ def create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df
 
     for t in range(len(time_dict)):
         try:
-            arr_input = np.concatenate((np.log(model_inputs[2][:10]), np.log(model_inputs[3][df.loc[t, 'arrival_code']][0][2] / np.array([arrival_rates[t]])), np.array([t]), initial[:30]), axis =0)
+            arr_input = np.concatenate((np.log(model_inputs[2][:10]), np.log(model_inputs[3][df.loc[t, 'arrival_code']][0][2] ), np.array([t]), initial[:30]), axis =0)
         except:
             print('stop')
         arr_input = arr_input.reshape(1, arr_input.shape[0])
@@ -1856,7 +1837,7 @@ def parse_arguments(argv):
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 400)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 40)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
