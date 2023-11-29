@@ -1326,7 +1326,7 @@ class g:
     counter_for_moms_arrivals = 0
     counter_for_moms_depart_sojourn = 0
 
-    end_time = 180
+    end_time = 60
 
     # lenght1 = np.random.randint(5, 30)
     # lenght2 = end_time - lenght1
@@ -1367,7 +1367,7 @@ class GG1:
         self.ser_dist_params = ser_dist_params
         self.arrival_dist_params = arrival_dist_params
         self.num_cust_sys = 0
-        self.num_cust_durations = np.zeros(180)
+        self.num_cust_durations = np.zeros(60)
         self.last_event_time = 0
         self.last_time = 0
         self.last_departure = 0
@@ -1395,7 +1395,7 @@ class GG1:
         elif self.sim_lenght_indicator == 1:
             self.end_time = 30
         else:
-            self.end_time = 180
+            self.end_time = 60
 
         # print(self.end_time)
 
@@ -1559,7 +1559,7 @@ def give_group_size(phases):
 
 def generate_cycle_arrivals(number_sequences):
 
-    avg_rho = np.random.uniform(0.5, 1)
+    avg_rho = np.random.uniform(0.5, 0.65)
 
     vector_lenght = number_sequences
     cycle_size = np.random.randint(4, int(vector_lenght / 2))
@@ -1729,7 +1729,9 @@ def run_single_setting(args):
         start_initial = np.random.randint(5)
         initial[start_initial] = 1
     else:
-        s = np.random.dirichlet(np.ones(30))
+        smooth_initial_list = pkl.load( open('/scratch/eliransc/smooth_initial_list.pkl', 'rb'))
+
+        s = smooth_initial_list[np.random.randint(0,len(smooth_initial_list))].numpy() #np.random.dirichlet(np.ones(30))
         initial = np.concatenate((s, np.zeros(size_initial - 30)))
 
 
@@ -1814,7 +1816,7 @@ def main(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         args.read_path = r'C:\Users\user\workspace\data\mt_g_1'
     else:
-        args.read_path = '/scratch/eliransc/long_sim_180'
+        args.read_path = '/scratch/eliransc/smooth_starts'
 
     for ind in tqdm(range(args.num_iterations)):
 
@@ -1840,9 +1842,9 @@ def parse_arguments(argv):
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=180)
+    parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 1700)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 1600)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
