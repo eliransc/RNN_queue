@@ -1546,7 +1546,7 @@ def single_sim(services, arrivals, model_inputs, arrival_rates, initial, df,  ar
                                   'Type': gg1.event_log_type_list,
                                   'num_cust': gg1.event_log_num_cust_list})
 
-    result = [(time_epoch, find_num_cust_time_stamp(gg1.event_log, time_epoch)) for time_epoch in range(1, gg1.end_time+1)]
+    result = [(time_epoch, find_num_cust_time_stamp(gg1.event_log, time_epoch)) for time_epoch in range( gg1.end_time)]
     resultDictionary = dict((x, y) for x, y in result)
     return resultDictionary
 
@@ -1756,7 +1756,7 @@ def run_single_setting(args):
         for time1 in resultDictionary.keys():
             time_dict[time1][resultDictionary[time1]] += 1
 
-    curr_path1 = str(model_num) + '_avg_rho_'+ str(avg_rho) + '_gt_g_1_sim.pkl'
+    curr_path1 = str(model_num) + '_avg_rho_'+ str(avg_rho) + '_Erlang_sim.pkl'
     full_path1 = os.path.join(args.read_path, curr_path1)
 
     res_input, prob_queue_arr = create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df)
@@ -1838,7 +1838,7 @@ def parse_arguments(argv):
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 40)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 3)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)

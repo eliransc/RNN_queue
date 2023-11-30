@@ -1302,6 +1302,8 @@ def generate_ph(is_arrival, is_exponential):
 
 def find_num_cust_time_stamp(df, time):
 
+    time = time + 1
+
     if time == 0:
         return df.loc[df['Time_stamp'] == 0, :].shape[0]
 
@@ -1773,7 +1775,7 @@ def run_single_setting(args):
         for time1 in resultDictionary.keys():
             time_dict[time1][resultDictionary[time1]] += 1
 
-    curr_path1 = str(model_num) + '_avg_rho_'+ str(avg_rho) + '_gt_g_1_sim.pkl'
+    curr_path1 = str(model_num) + '_avg_rho_'+ str(avg_rho) + '_hyper_sim.pkl'
     full_path1 = os.path.join(args.read_path, curr_path1)
 
     res_input, prob_queue_arr = create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df)
@@ -1855,7 +1857,7 @@ def parse_arguments(argv):
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 40)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 1700)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)

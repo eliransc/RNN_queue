@@ -12,9 +12,10 @@ from datetime import datetime
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 m = nn.Softmax(dim=2)
 num_moments = np.random.randint(1,11)
-time_ub = 60
-
-
+time_ub = 59
+######################
+num_moments = 4
+######################
 def valid_loss(model, valid_loader,sequence_length, input_size):
 
     torch.cuda.empty_cache()
@@ -76,7 +77,7 @@ def SAE_batch(soft, labels):
 
 
 def loss_queue1(soft, labels):
-    return ( (torch.abs(soft[:, :6, :] - labels[:, :6, :])).sum(axis=[2])).mean() + (
+    return ( (torch.abs(soft[:, :4, :] - labels[:, :6, :])).sum(axis=[2])).mean() + (
                 (torch.abs(soft[:, :, :] - labels[:, :, :])).sum(axis=[2]) +
                 torch.max(torch.abs(soft[:, :, :] - labels[:, :, :]), axis=2)[0]).mean()
 
@@ -119,7 +120,7 @@ class my_Dataset(Dataset):
 
         inputs = torch.from_numpy(x[:, :time_ub, :21 + 30])
         x = torch.cat((inputs[:, :, :num_moments], inputs[:, :, 10:10 + num_moments], inputs[:, :, 21:]), 2)
-        y = torch.from_numpy(y[:, :, :])
+        y = torch.from_numpy(y[:, 1:, :])
 
         return (x, y)
 
@@ -261,6 +262,11 @@ def main(args):
     input_size = 30 + 2 * num_moments
     hidden_size = 128  # int(np.random.choice([32,64,128],  p=[0.3, 0.4, 0.3]))
     num_layers = np.random.randint(4, 5)
+
+    ###################
+    batch_size = 1
+    learning_rate = 0.001
+    #####################
 
     loss_option = np.random.randint(2, 3)  # if 1 loss_queue if 2 loss_queue1
 
@@ -410,7 +416,7 @@ def parse_arguments(argv):
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--time_ub', type=int, help='num sequences in a single sim', default=60)
+    parser.add_argument('--time_ub', type=int, help='num sequences in a single sim', default=59)
     args = parser.parse_args(argv)
 
     return args
