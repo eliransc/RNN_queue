@@ -1730,17 +1730,17 @@ def run_single_setting(args):
     initial = np.zeros(size_initial)
     initial[5] = 1
 
-    a3 = ml.matrix(np.array([0.111111, 0.888889]))
-    A3 = ml.matrix(np.array([[-0.2, 0], [0, -2]]))
+    # a3 = ml.matrix(np.array([0.111111, 0.888889]))
+    # A3 = ml.matrix(np.array([[-0.2, 0], [0, -2]]))
+    #
+    # a4 = ml.matrix(np.array([0.888889, 0.111111]))
+    # A4 = ml.matrix(np.array([[-1, 0], [0, -0.1]]))
 
-    a4 = ml.matrix(np.array([0.888889, 0.111111]))
-    A4 = ml.matrix(np.array([[-1, 0], [0, -0.1]]))
+    a_arrivals = ml.matrix(np.array([0.888889, 0.111111]))
+    A_arrivals = ml.matrix(np.array([[-1, 0], [0, -0.1]]))
 
-    a_arrivals = ml.matrix(np.array([1, 0]))
-    A_arrivals = ml.matrix(np.array([[-1, 1], [0, -1]]))
-
-    a_service = ml.matrix(np.array([1, 0]))
-    A_service = ml.matrix(np.array([[-2, 2], [0, -2]]))
+    a_service = ml.matrix(np.array([0.111111, 0.888889]))
+    A_service = ml.matrix(np.array([[-0.2, 0], [0, -2]]))
 
     services = SamplesFromPH(a_service, A_service, 1000000)
     arrivals = SamplesFromPH(a_arrivals, A_arrivals, 1000000)

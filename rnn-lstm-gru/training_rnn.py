@@ -11,11 +11,9 @@ from datetime import datetime
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 m = nn.Softmax(dim=2)
-num_moments = np.random.randint(1,11)
+num_moments = np.random.randint(4,6)
 time_ub = 59
-######################
-num_moments = 4
-######################
+
 def valid_loss(model, valid_loader,sequence_length, input_size):
 
     torch.cuda.empty_cache()
@@ -68,7 +66,7 @@ def check_loss_increasing(loss_list, n_last_steps=10, failure_rate=0.45):
 
 
 def loss_queue(soft, labels):
-    return ((torch.abs(soft[:, :, :] - labels[:, :, :])).sum(axis=[2]) +
+    return ((torch.abs(soft[:, :6, :] - labels[:, :, :])).sum(axis=[2]) +
             torch.max(torch.abs(soft[:, :, :] - labels[:, :, :]), axis=2)[0]).mean()
 
 
@@ -263,12 +261,9 @@ def main(args):
     hidden_size = 128  # int(np.random.choice([32,64,128],  p=[0.3, 0.4, 0.3]))
     num_layers = np.random.randint(4, 5)
 
-    ###################
-    batch_size = 1
-    learning_rate = 0.001
-    #####################
 
-    loss_option = np.random.randint(2, 3)  # if 1 loss_queue if 2 loss_queue1
+
+    loss_option = np.random.randint(1, 3)  # if 1 loss_queue if 2 loss_queue1
 
     sequence_length = args.time_ub
 
