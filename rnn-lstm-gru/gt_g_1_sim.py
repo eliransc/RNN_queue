@@ -1301,7 +1301,7 @@ def generate_ph(is_arrival, is_exponential):
 
 
 def find_num_cust_time_stamp(df, time):
-    time = time + 1
+    # time = time + 1
     if time == 0:
         return df.loc[df['Time_stamp'] == 0, :].shape[0]
 
@@ -1724,9 +1724,9 @@ def run_single_setting(args):
 
     size_initial = 100
 
-    if False:
+    if True:
         initial = np.zeros(size_initial)
-        start_initial = np.random.randint(5)
+        start_initial = 5
         initial[start_initial] = 1
     else:
         smooth_initial_list = pkl.load( open('/scratch/eliransc/smooth_initial_list.pkl', 'rb'))
@@ -1816,7 +1816,7 @@ def main(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         args.read_path = r'C:\Users\user\workspace\data\mt_g_1'
     else:
-        args.read_path = '/scratch/eliransc/smooth_starts'
+        args.read_path = '/scratch/eliransc/const_start_5'
 
     for ind in tqdm(range(args.num_iterations)):
 
