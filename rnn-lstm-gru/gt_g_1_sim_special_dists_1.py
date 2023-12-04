@@ -1717,7 +1717,7 @@ def get_inter_specical_dist(arrival_dist, arrival_rate ,sample_size):
 
     elif arrival_dics[arrival_dist] == 'G4':
 
-        shape, scale, moms_arrive1 = generate_gamma(True, 4,  arrival_rate)
+        shape, scale, moms_arrive1 = generate_gamma(True, 5,  arrival_rate)
         # moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
         inter_arrival = np.random.gamma(shape, scale, sample_size)
         moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
@@ -1878,9 +1878,9 @@ def run_single_setting(args):
         ind_rand = np.random.randint(inds.shape[0])
         ind = inds[ind_rand]
 
-        arrival_dist = 3   # df_counter.loc[ind, 'arrive_ind']
+        arrival_dist = 2   # df_counter.loc[ind, 'arrive_ind']
         service_dist = df_counter.loc[ind, 'ser_ind']
-        service_dist = 3
+        service_dist = 2
         avg_rho = df_counter.loc[ind, 'avg_rho']
         df_counter.loc[ind, 'counter'] += 1
 
@@ -1891,7 +1891,7 @@ def run_single_setting(args):
         else:
             pkl.dump(df_counter, open('/scratch/eliransc/special_dists_counter/df_counter.pkl', 'wb'))
 
-        avg_rho = 0.7
+        avg_rho = 0.5
         print(avg_rho, arrival_dist, service_dist)
 
 

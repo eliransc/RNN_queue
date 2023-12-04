@@ -1344,8 +1344,8 @@ def generate_gamma(is_arrival, scv,rho = 0.01):
             moms_arr = np.append(moms_arr, np.array(N(get_nth_moment(shape, scale, mom))).astype(np.float64))
         return (shape, scale, moms_arr)
     else:
-        if scv == 4:
-            shape = 0.25 # np.random.uniform(1, 100)
+        if scv == 5:
+            shape = 0.2 # np.random.uniform(1, 100)
         else:
             shape = 4
 
@@ -1640,6 +1640,12 @@ def generate_cycle_arrivals(number_sequences, avg_rho):
 
     num_groups, group_size = give_group_size(cycle_size)
 
+    ###################
+    num_cycles = 1
+    num_groups = 1
+    group_size = np.array([60])
+    ###############
+
     if num_groups > 8:
         num_picks = np.random.choice(2, 1, p=[0.5, 0.5])[0] + 1
     else:
@@ -1715,7 +1721,7 @@ def get_inter_specical_dist(arrival_dist, arrival_rate ,sample_size):
 
     elif arrival_dics[arrival_dist] == 'G4':
 
-        shape, scale, moms_arrive1 = generate_gamma(True, 4,  arrival_rate)
+        shape, scale, moms_arrive1 = generate_gamma(True, 5,  arrival_rate)
         # moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
         inter_arrival = np.random.gamma(shape, scale, sample_size)
         moms_arrive = compute_first_ten_moms_log_N(inter_arrival)
@@ -1786,7 +1792,7 @@ def get_ser_special_dist( service_dist, sample_size):
 
     elif ser_dics[service_dist] == 'G4':
 
-        shape, scale, moms_service1 = generate_gamma(False, 4)
+        shape, scale, moms_service1 = generate_gamma(False, 5)
         services = np.random.gamma(shape, scale, sample_size)
         moms_service = compute_first_ten_moms_log_N(services)
         service_csv = 4
@@ -1874,10 +1880,10 @@ def run_single_setting(args):
         ind_rand = np.random.randint(inds.shape[0])
         ind = inds[ind_rand]
 
-        arrival_dist = df_counter.loc[ind, 'arrive_ind']
-        service_dist = df_counter.loc[ind, 'ser_ind']
+        arrival_dist = 2 #df_counter.loc[ind, 'arrive_ind']
+        service_dist = 2 #df_counter.loc[ind, 'ser_ind']
 
-        avg_rho = df_counter.loc[ind, 'avg_rho']
+        avg_rho = 0.5 # df_counter.loc[ind, 'avg_rho']
         df_counter.loc[ind, 'counter'] += 1
 
         if 'dkrass' in os.getcwd().split('/'):
@@ -1912,9 +1918,19 @@ def run_single_setting(args):
 
         model_inputs = (services, moms_service,  arrivals_dict)
 
-        size_initial = 100
-        s = np.random.dirichlet(np.ones(30))
-        initial = np.concatenate((s, np.zeros(size_initial - 30)))
+
+        ########################
+
+        if True:
+            size_initial = 100
+            initial = np.zeros(size_initial)
+            start_initial = 5
+            initial[start_initial] = 1
+        else:
+            size_initial = 100
+            s = np.random.dirichlet(np.ones(30))
+            initial = np.concatenate((s, np.zeros(size_initial - 30)))
+        #######################
         # initial = pkl.load(open('initial_G4.pkl', 'rb'))
         time_dict = {}
         for time_ in range(g.end_time):
@@ -1988,8 +2004,10 @@ def main(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         args.read_path = r'C:\Users\user\workspace\data\test2_gtg1'
     else:
-        args.read_path = '/scratch/eliransc/new_special_test'
-
+        #args.read_path = '/scratch/eliransc/new_special_test'
+        #################################
+        args.read_path = '/scratch/eliransc/const_5_CSV_5'
+        ########################################
     for ind in tqdm(range(args.num_iterations)):
 
         if os.path.exists('df_runtimes.pkl'):
