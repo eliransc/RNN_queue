@@ -1736,11 +1736,25 @@ def run_single_setting(args):
     # a4 = ml.matrix(np.array([0.888889, 0.111111]))
     # A4 = ml.matrix(np.array([[-1, 0], [0, -0.1]]))
 
+    p_arrival = np.random.rand()
+
     a_arrivals = ml.matrix(np.array([0.888889, 0.111111]))
+    # a_arrivals = ml.matrix(np.array([p_arrival, 1-p_arrival]))
+
     A_arrivals = ml.matrix(np.array([[-1, 0], [0, -0.1]]))
 
     a_service = ml.matrix(np.array([0.111111, 0.888889]))
+
+
+    a = np.random.uniform(4,7)
+    p_service = (a-1)/(31+a)
+    l2 = -8/(a-9)
+    l1 = 0.2
+
+    a_service = ml.matrix(np.array([p_service, 1-p_service]))
+
     A_service = ml.matrix(np.array([[-0.2, 0], [0, -2]]))
+    A_service = ml.matrix(np.array([[-l1, 0], [0, -l2]]))
 
     services = SamplesFromPH(a_service, A_service, 1000000)
     arrivals = SamplesFromPH(a_arrivals, A_arrivals, 1000000)
@@ -1829,7 +1843,7 @@ def main(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         args.read_path = r'C:\Users\user\workspace\data\mt_g_1'
     else:
-        args.read_path = '/scratch/eliransc/gt_g_1_data2' #
+        args.read_path = '/scratch/eliransc/hyper_exmaples' #
 
     for ind in tqdm(range(args.num_iterations)):
 
@@ -1857,7 +1871,7 @@ def parse_arguments(argv):
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 2100)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 1600)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
