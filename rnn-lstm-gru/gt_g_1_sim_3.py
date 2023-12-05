@@ -1834,7 +1834,7 @@ def main(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         dists_path = r'C:\Users\user\workspace\data\special_ph'
     else:
-        dists_path = '/scratch/eliransc/ph_random/medium_ph_1_special/'
+        dists_path = '/scratch/eliransc/ph_random/medium_ph_1/'
 
     args.dists_path = dists_path
 
