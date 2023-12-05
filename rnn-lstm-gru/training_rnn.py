@@ -11,7 +11,7 @@ from datetime import datetime
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 m = nn.Softmax(dim=2)
-num_moments = np.random.randint(4,6)
+num_moments = np.random.randint(4, 6)
 time_ub = 59
 
 def valid_loss(model, valid_loader,sequence_length, input_size):
@@ -116,7 +116,7 @@ class my_Dataset(Dataset):
 
         x, y = pkl.load(open(self.data_paths[index], 'rb'))
 
-        inputs = torch.from_numpy(x[:, :time_ub, :21 + 30])
+        inputs = torch.from_numpy(x[:, 1:1+time_ub, :21 + 30])
         x = torch.cat((inputs[:, :, :num_moments], inputs[:, :, 10:10 + num_moments], inputs[:, :, 21:]), 2)
         y = torch.from_numpy(y[:, 1:, :])
 
@@ -317,7 +317,7 @@ def main(args):
     loss_list = []
     setting_string = 'batch_size_' + str(batch_size * 16) + '_num_layers_' + str(num_layers) + '_num_epochs_' + str(
         num_epochs) + '_learning_rate_' + str(learning_rate) + '_hidden_size_' + str(hidden_size) + '_lr_change_' + str(
-        lr_change)+ '_loss_option_' +  str(loss_option) + '_num_moms_' + str(num_moments)
+        lr_change)+ '_loss_option_' +  str(loss_option) + '_num_moms_' + str(num_moments) + '_start_from_1'
     print(setting_string)
 
     valid_loss_list = []
@@ -364,11 +364,11 @@ def main(args):
         learning_rate = learning_rate ** lr_change
 
         torch.save(model.state_dict(),
-                   '/scratch/eliransc/RNN_models_new1/pytorch_gt_gt_1_true_moms_new_data_' + setting_string + '_' + str(
+                   '/scratch/eliransc/RNN_models_new2/pytorch_gt_gt_1_true_moms_new_data_' + setting_string + '_' + str(
                        current_time) + '.pkl')
 
         model1.load_state_dict(
-            torch.load('/scratch/eliransc/RNN_models_new1/pytorch_gt_gt_1_true_moms_new_data_' + setting_string + '_' + str(
+            torch.load('/scratch/eliransc/RNN_models_new2/pytorch_gt_gt_1_true_moms_new_data_' + setting_string + '_' + str(
                 current_time) + '.pkl'))  # ,map_location=torch.device('cude')
 
 
@@ -402,7 +402,7 @@ def main(args):
         valid_loss_list.append(valids)
 
         pkl.dump((loss_list, valid_loss_list),
-                 open('/scratch/eliransc/RNN_loss_vals_new1/' + 'loss_' + setting_string + '_' + str(current_time) + '.pkl',
+                 open('/scratch/eliransc/RNN_loss_vals_new2/' + 'loss_' + setting_string + '_' + str(current_time) + '.pkl',
                       'wb'))
 
 
