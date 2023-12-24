@@ -1775,7 +1775,20 @@ def run_single_setting(args):
     res_input, prob_queue_arr = create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df)
 
 
-    pkl.dump((res_input, prob_queue_arr), open(full_path1, 'wb'))
+    if True:
+        sample_initial = np.random.choice(size_initial, 50000, p=initial)
+        frec = [np.sum(sample_initial == ind) for ind in range(30)]
+        est_probs = np.array(frec) / 50000
+
+        arrivals = arrivals_dict[0][0][3] / arrival_rates[0]
+        est_arrival_moms = [(arrivals[:50000]**ind).mean() for ind in range(1, 11)]
+        est_ser_moms = [(services[:50000]**ind).mean() for ind in range(1, 11)]
+
+        pkl.dump(((res_input, prob_queue_arr),(est_probs, est_arrival_moms, est_ser_moms)), open(full_path1, 'wb'))
+
+    else:
+
+        pkl.dump((res_input, prob_queue_arr), open(full_path1, 'wb'))
 
 
 def create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df):
@@ -1784,7 +1797,7 @@ def create_single_data_point(time_dict, arrival_rates, model_inputs, initial, df
 
     for t in range(len(time_dict)):
         try:
-            arr_input = np.concatenate((np.log(model_inputs[2][:10]), np.log(model_inputs[3][df.loc[t, 'arrival_code']][0][2] / np.array([arrival_rates[t]])), np.array([t]), initial[:30]), axis =0)
+            arr_input = np.concatenate((np.log(model_inputs[2][:10]), np.log(model_inputs[3][df.loc[t, 'arrival_code']][0][2] / np.array([arrival_rates[t]])**np.linspace(1,10,10)), np.array([t]), initial[:30]), axis =0)
         except:
             print('stop')
         arr_input = arr_input.reshape(1, arr_input.shape[0])
@@ -1823,7 +1836,7 @@ def main(args):
     elif 'C:' in os.getcwd().split('/')[0]:
         args.read_path = r'C:\Users\user\workspace\data\mt_g_1'
     else:
-        args.read_path = '/scratch/eliransc/const_start_5'
+        args.read_path = '/scratch/eliransc/estimate_trial'
 
     for ind in tqdm(range(args.num_iterations)):
 
@@ -1851,7 +1864,7 @@ def parse_arguments(argv):
 
     parser.add_argument('--number_sequences', type=int, help='num sequences in a single sim', default=60)
     parser.add_argument('--max_capacity', type=int, help='maximum server capacity', default=1)
-    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 2)
+    parser.add_argument('--num_iter_same_params', type=int, help='nu, replications within same input', default = 1700)
     parser.add_argument('--max_num_classes', type=int, help='max num priority classes', default=1)
     parser.add_argument('--number_of_classes', type=int, help='number of classes', default=1)
     parser.add_argument('--end_time', type=float, help='The end of the simulation', default=1000)
